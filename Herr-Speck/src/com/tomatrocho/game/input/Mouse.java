@@ -3,17 +3,22 @@ package com.tomatrocho.game.input;
 public class Mouse {
 	
 	/**
-	 * 
+	 * Delay before hiding the mouse cursor
 	 */
-	public static final int MAX_HIDE_TIME = 60;
+	public static final int HIDE_DELAY = 60;
 	
 	/**
-	 * 
+	 * Indicates whether the mouse cursor moved at the last tick.
 	 */
 	private boolean moved = false;
+	
+	/**
+	 * Indicates whether the mouse was pressed at the last tick.
+	 */
+	private boolean pressed = false;
 
 	/**
-	 * 
+	 * Indicates whether the mouse cursor is hidden.
 	 */
 	private boolean hidden = false;
 	
@@ -98,10 +103,26 @@ public class Mouse {
     
     /**
      * 
+     * @param pressed
+     */
+    public void setPressed(boolean pressed) {
+    	this.pressed = pressed;
+    }
+    
+    /**
+     * 
      * @return
      */
     public boolean moved() {
     	return moved;
+    }
+    
+    /**
+     * 
+     * @return
+     */
+    public boolean pressed() {
+    	return pressed;
     }
     
     /**

@@ -130,7 +130,7 @@ public class Player extends Mob {
         }
         // update orientation for rendering
         if (!mouseAiming && fireKeyDown() && xaShot * xaShot + yaShot * yaShot != 0) {
-        	aimVector.set(xaShot,  yaShot);
+        	aimVector.set(xaShot, yaShot);
         	aimVector.normalize();
         	updateFacing();
         }

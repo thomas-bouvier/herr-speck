@@ -159,7 +159,7 @@ public class HerrSpeck extends Canvas implements Runnable, MouseListener, MouseM
 
     /**
      * Constructor for the {@link HerrSpeck} class.
-     * Sets up the {@link JFrame} containing the game.
+     * Set up the {@link JFrame} containing the game.
      *
      * @param frame
      *      {@link JFrame} object representing the game window
@@ -240,7 +240,7 @@ public class HerrSpeck extends Canvas implements Runnable, MouseListener, MouseM
 
     /**
      * Main loop of the game.
-     * Limits the update method to 60 launches per second.
+     * Limit the update method to 60 launches per second.
      */
     public void run() {
         long old = System.nanoTime();
@@ -320,14 +320,13 @@ public class HerrSpeck extends Canvas implements Runnable, MouseListener, MouseM
     	if (mousePosition != null) {
     		mouse.setPosition(mousePosition.x / SCALE, mousePosition.y / SCALE);
     	}
-    	if (mouse.moved()) {
-    		mouse.setMoved(false);
+    	if (mouse.pressed()) {
     		mouse.setHidden(false);
     		mouse.setHideTime(0);
     	} else {
     		mouse.incrementHideTime();
     	}
-    	if (mouse.getHideTime() > Mouse.MAX_HIDE_TIME) {
+    	if (mouse.getHideTime() > Mouse.HIDE_DELAY) {
     		mouse.setHidden(true);
     	}
     	mouse.tick();
@@ -402,11 +401,13 @@ public class HerrSpeck extends Canvas implements Runnable, MouseListener, MouseM
     @Override
     public void mousePressed(MouseEvent e) {
     	mouse.setNextState(e.getButton(), true);
+    	mouse.setPressed(true);
     }
 
     @Override
     public void mouseReleased(MouseEvent e) {
     	mouse.setNextState(e.getButton(), false);
+    	mouse.setPressed(false);
     }
 
     @Override
