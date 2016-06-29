@@ -3,6 +3,7 @@ package com.tomatrocho.game.entity;
 import com.tomatrocho.game.entity.mob.Player;
 import com.tomatrocho.game.entity.mob.Team;
 import com.tomatrocho.game.entity.weapon.Weapon;
+import com.tomatrocho.game.gfx.Art;
 import com.tomatrocho.game.gfx.IAbstractBitmap;
 import com.tomatrocho.game.gfx.IAbstractScreen;
 import com.tomatrocho.game.math.Vec2;
@@ -22,14 +23,24 @@ public abstract class Mob extends Entity {
 	public static final int W = 32;
 	
 	/**
-	 * 
+	 * Max amount of health a {@link Mob} can have.
 	 */
 	protected static final float MAX_HEALTH = 100;
 	
 	/**
-	 * 
+	 * Amount of health the {@link Mob} currently has.
 	 */
 	protected float health = MAX_HEALTH;
+	
+	/**
+	 * 
+	 */
+	protected int yShadowOffset = 13;
+	
+	/**
+	 * 
+	 */
+	protected int alphaShadow = 128;
 	
 	/**
 	 * 
@@ -132,6 +143,7 @@ public abstract class Mob extends Entity {
 
 	@Override
 	public void render(IAbstractScreen screen) {
+		screen.alphaBlit(Art.bigShadow, (int) (x - Art.bigShadow.getW() / 2), (int) (y - Art.bigShadow.getH() / 2 + yShadowOffset), alphaShadow);
 		final IAbstractBitmap sprite = getSprite();
 		if (hurtTime > 0) {
 			int col = (int) (180 - health * 180 / MAX_HEALTH);

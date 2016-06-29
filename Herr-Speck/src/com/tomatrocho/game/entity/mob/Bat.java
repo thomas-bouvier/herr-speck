@@ -18,6 +18,8 @@ public class Bat extends Mob {
 	 */
 	public Bat(World level, int x, int y) {
 		super(level, x, y, Team.TEAM_2);
+		yShadowOffset = 28;
+		alphaShadow = 60;
 		health = 50f;
 		speed = 1.5;
 	}
@@ -32,6 +34,7 @@ public class Bat extends Mob {
 
 	@Override
 	public void render(IAbstractScreen screen) {
+		super.render(screen);
 		final IAbstractBitmap sprite = getSprite();
 		screen.blit(sprite, x - sprite.getW() / 2, y - sprite.getH() / 2);
 	}

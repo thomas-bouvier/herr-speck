@@ -333,13 +333,13 @@ public class HerrSpeck extends Canvas implements Runnable, MouseListener, MouseM
     }
 
     /**
-     * Renders all the graphics on the {@link Screen}.
+     * Render all the graphics using the given {@link Graphics} object.
      */
     private synchronized void render(Graphics g) {
     	// world
-        renderWorld();
+        renderWorld(screen);
         // gui
-        renderGui();
+        renderGui(screen);
         // rendering
         g.fillRect(0, 0, getWidth(), getHeight());
         g.translate((getWidth() - W * SCALE) / 2, (getHeight() - H * SCALE) / 2);
@@ -350,9 +350,9 @@ public class HerrSpeck extends Canvas implements Runnable, MouseListener, MouseM
     }
     
     /**
-     * 
+     * Render the world on the {@link Screen}.
      */
-    private synchronized void renderWorld() {
+    private synchronized void renderWorld(IAbstractScreen screen) {
     	if (world != null) {
             int xScroll = (int) (player.getX() - screen.getW() / 2);
             int yScroll = (int) (player.getY() - screen.getH() / 2);
@@ -361,9 +361,9 @@ public class HerrSpeck extends Canvas implements Runnable, MouseListener, MouseM
     }
     
     /**
-     * 
+     * Render the GUI elements on the {@link Screen}.
      */
-    private synchronized void renderGui() {
+    private synchronized void renderGui(IAbstractScreen screen) {
     	// fonts
     	if (debug) {    		
     		final Font font = Font.getDefaultFont();

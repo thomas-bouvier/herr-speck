@@ -31,6 +31,8 @@ public class Art {
 	public static IAbstractBitmap[][] darkness;
 	public static IAbstractBitmap[][] muzzle;
 	
+	// shadows
+	public static IAbstractBitmap bigShadow;
 	
 	/**
 	*
@@ -51,5 +53,6 @@ public class Art {
 	    bullets = screen.cut("/art/projectiles/bullet.png", 16, 16);
 	    darkness = screen.cut("/art/effects/darkness.png", 16, 16);
 	    muzzle = screen.cut("/art/effects/muzzle.png", 16, 16);
+	    bigShadow = screen.load("/art/shadows/big_shadow.png");
 	}
 }
