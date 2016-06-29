@@ -148,6 +148,30 @@ public class Font {
 	
 	/**
 	 * 
+	 * @param screen
+	 * @param text
+	 * @param x
+	 * @param y
+	 * @param align
+	 */
+	public void draw(IAbstractScreen screen, String text, int x, int y, Align align) {
+		switch (align) {
+		case LEFT :
+			draw(screen, text, x, y);
+			break;
+		case CENTER :
+			draw(screen, text, x - calculateStringWidth(text) / 2, y);
+			break;
+		case RIGHT :
+			draw(screen, text, x - calculateStringWidth(text), y);
+			break;
+		default :
+			break;
+		}
+	}
+	
+	/**
+	 * 
 	 * @param text
 	 * @return
 	 */

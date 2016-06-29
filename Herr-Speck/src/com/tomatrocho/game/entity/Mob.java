@@ -1,11 +1,13 @@
 package com.tomatrocho.game.entity;
 
+import com.tomatrocho.game.HerrSpeck;
 import com.tomatrocho.game.entity.mob.Player;
 import com.tomatrocho.game.entity.mob.Team;
 import com.tomatrocho.game.entity.weapon.Weapon;
 import com.tomatrocho.game.gfx.Art;
 import com.tomatrocho.game.gfx.IAbstractBitmap;
 import com.tomatrocho.game.gfx.IAbstractScreen;
+import com.tomatrocho.game.gui.Font;
 import com.tomatrocho.game.math.Vec2;
 import com.tomatrocho.game.world.level.World;
 import com.tomatrocho.game.world.tile.Tile;
@@ -25,12 +27,12 @@ public abstract class Mob extends Entity {
 	/**
 	 * Max amount of health a {@link Mob} can have.
 	 */
-	protected static final float MAX_HEALTH = 100;
+	protected float maxHealth = 100;
 	
 	/**
 	 * Amount of health the {@link Mob} currently has.
 	 */
-	protected float health = MAX_HEALTH;
+	protected float health;
 	
 	/**
 	 * 
@@ -95,6 +97,7 @@ public abstract class Mob extends Entity {
 	 */
 	public Mob(World level, int x, int y, Team team) {
 		super(level, x, y, team);
+		health = maxHealth;
 		aimVector = new Vec2(0, 1);
 	}
 
@@ -143,11 +146,18 @@ public abstract class Mob extends Entity {
 
 	@Override
 	public void render(IAbstractScreen screen) {
+		// shadow
 		screen.alphaBlit(Art.bigShadow, (int) (x - Art.bigShadow.getW() / 2), (int) (y - Art.bigShadow.getH() / 2 + yShadowOffset), alphaShadow);
+		// hurt effect
 		final IAbstractBitmap sprite = getSprite();
 		if (hurtTime > 0) {
-			int col = (int) (180 - health * 180 / MAX_HEALTH);
+			int col = (int) (180 - health * 180 / maxHealth);
 			screen.colorBlit(sprite, (int) (x - sprite.getW() / 2), (int) (y - sprite.getH() / 2), (col << 24) + 255 * 65536);
+		}
+		// health
+		if (HerrSpeck.debug()) {
+			final String string = health + "/" + maxHealth;
+			Font.getDefaultFont().draw(screen, string, (int) x, (int) y - 28, Font.Align.CENTER); 
 		}
 	}
 	

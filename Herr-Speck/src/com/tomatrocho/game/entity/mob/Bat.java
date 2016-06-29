@@ -20,7 +20,8 @@ public class Bat extends Mob {
 		super(level, x, y, Team.TEAM_2);
 		yShadowOffset = 28;
 		alphaShadow = 60;
-		health = 50f;
+		maxHealth = 50;
+		health = maxHealth;
 		speed = 1.5;
 	}
 
