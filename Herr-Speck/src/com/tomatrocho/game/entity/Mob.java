@@ -151,8 +151,9 @@ public abstract class Mob extends Entity {
 		// hurt effect
 		final IAbstractBitmap sprite = getSprite();
 		if (hurtTime > 0) {
-			int col = (int) (180 - health * 180 / maxHealth);
-			screen.colorBlit(sprite, (int) (x - sprite.getW() / 2), (int) (y - sprite.getH() / 2), (col << 24) + 255 * 65536);
+			screen.colorBlit(sprite, (int) x - sprite.getW() / 2, (int) y - sprite.getH() / 2, 0x80ff0000);
+		} else {
+			screen.blit(sprite, x - sprite.getW() / 2, y - sprite.getH() / 2);
 		}
 		// health
 		if (HerrSpeck.debug()) {

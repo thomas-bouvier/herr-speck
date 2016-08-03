@@ -36,8 +36,6 @@ public class Bat extends Mob {
 	@Override
 	public void render(IAbstractScreen screen) {
 		super.render(screen);
-		final IAbstractBitmap sprite = getSprite();
-		screen.blit(sprite, x - sprite.getW() / 2, y - sprite.getH() / 2);
 	}
 
 	@Override

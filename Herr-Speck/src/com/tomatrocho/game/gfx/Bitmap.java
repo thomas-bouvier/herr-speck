@@ -192,15 +192,26 @@ public class Bitmap implements IAbstractBitmap {
         Rect blitArea = new Rect(x, y, bmp.w, bmp.h);
         adjustBlitArea(blitArea);
         int blitW = blitArea.getBottomRightX() - blitArea.getTopLeftX();
+        int a2 = (color >> 24) & 0xff;
+		int a1 = 256 - a2;
+		int rr = color & 0xff0000;
+		int gg = color & 0xff00;
+		int bb = color & 0xff;
         for (int yy = blitArea.getTopLeftY(); yy < blitArea.getBottomRightY(); yy++) {
             // coordinate on the big bitmap
             int tp = yy * w + blitArea.getTopLeftX();
             // coordinate on the small bitmap
             int sp = (yy - y) * bmp.w + (blitArea.getTopLeftX() - x);
             for (int xx = 0; xx < blitW; xx++) {
-                int col = bmp.pixels[sp + xx];
+            	int col = bmp.pixels[sp + xx];
                 if (col < 0) {
-                    pixels[tp + xx] = blendPixels(pixels[tp + xx], col);
+                	int r = (col & 0xff0000);
+					int g = (col & 0xff00);
+					int b = (col & 0xff);
+					r = ((r * a1 + rr * a2) >> 8) & 0xff0000;
+					g = ((g * a1 + gg * a2) >> 8) & 0xff00;
+					b = ((b * a1 + bb * a2) >> 8) & 0xff;
+					pixels[tp + xx] = 0xff000000 | r | g | b;
                 }
             }
         }
