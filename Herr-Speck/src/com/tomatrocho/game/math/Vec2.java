@@ -61,7 +61,7 @@ public class Vec2 implements Cloneable {
     }
 
     /**
-     * Normalizes the {@link Vec2}.
+     * Normalize the {@link Vec2}.
      *
      * @return
      *      the normalized {@link Vec2}
@@ -71,6 +71,20 @@ public class Vec2 implements Cloneable {
         x *= factor;
         y *= factor;
         return this;
+    }
+    
+    /**
+     * Calculate the distance to the specified {@link Vec2}.
+     * 
+     * @param to
+     * 		the {@link Vec2} to calculate the distance to
+     * @return
+     * 		the distance to the specified {@link Vec2}
+     */
+    public double dist(Vec2 to) {
+    	double xd = x - to.x;
+    	double yd = y - to.y;
+    	return java.lang.Math.sqrt(xd * xd + yd * yd);
     }
 
     /**

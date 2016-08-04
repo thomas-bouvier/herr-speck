@@ -172,6 +172,18 @@ public class Font {
 	
 	/**
 	 * 
+	 * @param screen
+	 * @param text
+	 * @param x
+	 * @param y
+	 * @param align
+	 */
+	public void draw(IAbstractScreen screen, String text, double x, double y, Align align) {
+		draw(screen, text, (int) x, (int) y, align);
+	}
+	
+	/**
+	 * 
 	 * @param text
 	 * @return
 	 */

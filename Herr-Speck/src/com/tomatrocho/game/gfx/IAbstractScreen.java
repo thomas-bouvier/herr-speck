@@ -50,6 +50,14 @@ public interface IAbstractScreen {
      * @return
      */
     public IAbstractBitmap createBitmap(int[][] pixels2d);
+
+    /**
+     *
+     * @param bitmap
+     * @param x
+     * @param y
+     */
+    public void blit(IAbstractBitmap bitmap, int x, int y);
     
     /**
      * 
@@ -64,18 +72,20 @@ public interface IAbstractScreen {
      * @param bitmap
      * @param x
      * @param y
+     * @param w
+     * @param h
      */
-    public void blit(IAbstractBitmap bitmap, int x, int y);
-
+    public void blit(IAbstractBitmap bitmap, int x, int y, int w, int h);
+    
     /**
-     *
+     * 
      * @param bitmap
      * @param x
      * @param y
      * @param w
      * @param h
      */
-    public void blit(IAbstractBitmap bitmap, int x, int y, int w, int h);
+    public void blit(IAbstractBitmap bitmap, double x, double y, int w, int h);
 
     /**
      *
@@ -85,16 +95,15 @@ public interface IAbstractScreen {
      * @param color
      */
     public void colorBlit(IAbstractBitmap bitmap, int x, int y, int color);
-
+    
     /**
-     *
+     * 
+     * @param bitmap
      * @param x
      * @param y
-     * @param w
-     * @param h
      * @param color
      */
-    public void fill(int x, int y, int w, int h, int color);
+    public void colorBlit(IAbstractBitmap bitmap, double x, double y, int color);
 
     /**
      *
@@ -104,7 +113,26 @@ public interface IAbstractScreen {
      * @param alpha
      */
     public void alphaBlit(IAbstractBitmap bitmap, int x, int y, int alpha);
+    
+    /**
+     * 
+     * @param bitmap
+     * @param x
+     * @param y
+     * @param alpha
+     */
+    public void alphaBlit(IAbstractBitmap bitmap, double x, double y, int alpha);
 
+    /**
+    *
+    * @param x
+    * @param y
+    * @param w
+    * @param h
+    * @param color
+    */
+   public void fill(int x, int y, int w, int h, int color);
+    
     /**
      *
      * @param x

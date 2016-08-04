@@ -181,12 +181,13 @@ public class Player extends Mob {
        } else {
            walkTime++;
        }
+       
        // computing diagonal speed
        final double speed = this.speed / Math.sqrt(xa * xa + ya * ya);
        xa *= speed;
        ya *= speed;
-       x += xa;
-       y += ya;
+       pos.x += xa;
+       pos.y += ya;
    }
    
    /**
@@ -217,7 +218,7 @@ public class Player extends Mob {
     public void render(IAbstractScreen screen) {
     	super.render(screen);
     	final IAbstractBitmap sprite = getSprite();
-        screen.blit(sprite, x - sprite.getW() / 2, y - sprite.getH() / 2);
+        screen.blit(sprite, pos.x - sprite.getW() / 2, pos.y - sprite.getH() / 2);
     }
 
     @Override

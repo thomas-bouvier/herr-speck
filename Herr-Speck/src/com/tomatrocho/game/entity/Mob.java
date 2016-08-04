@@ -62,7 +62,12 @@ public abstract class Mob extends Entity {
 	/**
 	 * 
 	 */
-	protected Vec2 aimVector;
+	protected Vec2 aimVector = new Vec2(0, 1);;
+	
+	/**
+	 * 
+	 */
+	protected Vec2 bumps = new Vec2();
 	
     /**
      * Orientation of the {@link Mob}.
@@ -98,7 +103,6 @@ public abstract class Mob extends Entity {
 	public Mob(World level, int x, int y, Team team) {
 		super(level, x, y, team);
 		health = maxHealth;
-		aimVector = new Vec2(0, 1);
 	}
 
 	@Override
@@ -109,16 +113,22 @@ public abstract class Mob extends Entity {
 		if (freezeTime > 0) {
 			freezeTime--;
 		}
-		if (health <= 0) {
-			remove();
-			return;
+		
+		if (freezeTime > 0) {
+			if (bumps.notNull()) {
+				move(bumps.x, bumps.y);
+			}
+		} else {
+			if (health <= 0) {
+				remove();
+			}
 		}
 	}
 	
 	@Override
 	public void collide(Entity entity, double xa, double ya) {
-		x += xa * 0.5;
-		y += ya * 0.5;
+		pos.x += xa * 0.5;
+		pos.y += ya * 0.5;
 	}
 	
 	/**
@@ -128,18 +138,27 @@ public abstract class Mob extends Entity {
 	public void hurt(Entity source) {
 		if (source instanceof Bullet) {
 			Bullet bullet = (Bullet) source;
+			
 			if (bullet.getShooter() instanceof Player) {
 				if (isFriendOf((Player) bullet.getShooter())) {
 					return;
 				}
 			}
+			
 			if (freezeTime <= 0) {
 				freezeTime = bullet.getFreezeTime();
+				
 				hurtTime = 40;
+				
 				health -= bullet.getDamage();
 				if (health < 0) {
 					health = 0;
 				}
+				
+				// bump effect
+				final double dist = pos.dist(source.getPos());
+				bumps.x = (pos.x - source.getX()) / dist;
+				bumps.y = (pos.y - source.getY()) / dist;
 			}
 		}
 	}
@@ -147,18 +166,24 @@ public abstract class Mob extends Entity {
 	@Override
 	public void render(IAbstractScreen screen) {
 		// shadow
-		screen.alphaBlit(Art.bigShadow, (int) (x - Art.bigShadow.getW() / 2), (int) (y - Art.bigShadow.getH() / 2 + yShadowOffset), alphaShadow);
+		screen.alphaBlit(Art.bigShadow, pos.x - Art.bigShadow.getW() / 2, pos.y - Art.bigShadow.getH() / 2 + yShadowOffset, alphaShadow);
+		
 		// hurt effect
 		final IAbstractBitmap sprite = getSprite();
 		if (hurtTime > 0) {
-			screen.colorBlit(sprite, (int) x - sprite.getW() / 2, (int) y - sprite.getH() / 2, 0x80ff0000);
+			if (hurtTime > 40 - 6 && hurtTime % 2 == 0) {
+				screen.colorBlit(sprite, pos.x - sprite.getW() / 2, pos.y - sprite.getH() / 2, 0x80ffffff);
+			} else {
+				screen.colorBlit(sprite, pos.x - sprite.getW() / 2, pos.y - sprite.getH() / 2, 0x80ff0000);
+			}
 		} else {
-			screen.blit(sprite, x - sprite.getW() / 2, y - sprite.getH() / 2);
+			screen.blit(sprite, pos.x - sprite.getW() / 2, pos.y - sprite.getH() / 2);
 		}
+		
 		// health
 		if (HerrSpeck.debug()) {
 			final String string = health + "/" + maxHealth;
-			Font.getDefaultFont().draw(screen, string, (int) x, (int) y - 28, Font.Align.CENTER); 
+			Font.getDefaultFont().draw(screen, string, pos.x, pos.y - 28, Font.Align.CENTER); 
 		}
 	}
 	
@@ -173,7 +198,7 @@ public abstract class Mob extends Entity {
 	 * @return
 	 */
 	public int getVerticalBaseCoordinate() {
-		return (int) (y + Tile.H) - 6;
+		return (int) (pos.y + Tile.H) - 6;
 	}
 	
 	/**

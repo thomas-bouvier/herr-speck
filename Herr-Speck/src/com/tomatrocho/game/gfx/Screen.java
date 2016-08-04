@@ -84,6 +84,11 @@ public class Screen extends Bitmap implements IAbstractScreen {
     public IAbstractBitmap createBitmap(int[][] pixels2d) {
         return new Bitmap(pixels2d);
     }
+
+    @Override
+    public void blit(IAbstractBitmap bitmap, int x, int y) {
+        super.blit(bitmap, x - xOffset, y - yOffset);
+    }
     
     @Override
     public void blit(IAbstractBitmap bitmap, double x, double y) {
@@ -91,23 +96,33 @@ public class Screen extends Bitmap implements IAbstractScreen {
     }
 
     @Override
-    public void blit(IAbstractBitmap bitmap, int x, int y) {
-        super.blit(bitmap, x - xOffset, y - yOffset);
-    }
-
-    @Override
     public void blit(IAbstractBitmap bitmap, int x, int y, int w, int h) {
         super.blit(bitmap, x - xOffset, y - yOffset, w, h);
     }
-
+    
     @Override
-    public void alphaBlit(IAbstractBitmap bitmap, int x, int y, int alpha) {
-        super.alphaBlit(bitmap, x - xOffset, y - yOffset, alpha);
+    public void blit(IAbstractBitmap bitmap, double x, double y, int w, int h) {
+        super.blit(bitmap, (int) x - xOffset, (int) y - yOffset, w, h);
     }
 
     @Override
     public void colorBlit(IAbstractBitmap bitmap, int x, int y, int color) {
         super.colorBlit(bitmap, x - xOffset, y - yOffset, color);
+    }
+    
+    @Override
+    public void colorBlit(IAbstractBitmap bitmap, double x, double y, int color) {
+        super.colorBlit(bitmap, (int) x - xOffset, (int) y - yOffset, color);
+    }
+    
+    @Override
+    public void alphaBlit(IAbstractBitmap bitmap, int x, int y, int alpha) {
+        super.alphaBlit(bitmap, x - xOffset, y - yOffset, alpha);
+    }
+    
+    @Override
+    public void alphaBlit(IAbstractBitmap bitmap, double x, double y, int alpha) {
+        super.alphaBlit(bitmap, (int) x - xOffset, (int) y - yOffset, alpha);
     }
 
     @Override

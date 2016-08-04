@@ -117,12 +117,12 @@ public class Bullet extends Entity {
 
 	@Override
 	public void render(IAbstractScreen screen) {
-		screen.blit(Art.bullets[facing][0], x - 8, y - 10);
+		screen.blit(Art.bullets[facing][0], pos.x - 8, pos.y - 10);
 	}
 
 	@Override
 	public int getVerticalBaseCoordinate() {
-		return (int) y + Tile.H;
+		return (int) pos.y + Tile.H;
 	}
 	
 	/**

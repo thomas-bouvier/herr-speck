@@ -29,13 +29,13 @@ public class MuzzleAnimation extends Animation {
 		if (HerrSpeck.random.nextInt(10) == 1) {
 			final int frame = HerrSpeck.random.nextInt(numberFrames);
 			final IAbstractBitmap sprite = bitmap[frame % bitmap.length][frame / bitmap.length];
-			screen.blit(sprite, x - sprite.getW() / 2, y - sprite.getH() / 2);
+			screen.blit(sprite, pos.x - sprite.getW() / 2, pos.y - sprite.getH() / 2);
 		}
 	}
 
 	@Override
 	public int getVerticalBaseCoordinate() {
-		return (int) y + 6;
+		return (int) pos.y + 6;
 	}
 
 	@Override

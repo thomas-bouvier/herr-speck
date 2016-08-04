@@ -15,16 +15,11 @@ public abstract class Entity implements IComparableDepth, IBoundingBoxOwner {
 	 * The {@link World} the {@link Entity} is linked with.
 	 */
 	protected World world;
-
+	
 	/**
-	 * x coordinate of the {@link Entity}, in pixels.
+	 * Coordinates of the {@link Entity}, in pixels.
 	 */
-	protected double x;
-
-	/**
-	 * y coordinate of the {@link Entity}, in pixels.
-	 */
-	protected double y;
+	protected Vec2 pos = new Vec2();
 	
 	/**
 	 * 
@@ -66,8 +61,8 @@ public abstract class Entity implements IComparableDepth, IBoundingBoxOwner {
 	 */
 	public Entity(World world, double x, double y, Team team) {
 		this.world = world;
-		this.x = x;
-		this.y = y;
+		this.pos.x = x;
+		this.pos.y = y;
 		this.team = team;
 	}
 	
@@ -80,8 +75,8 @@ public abstract class Entity implements IComparableDepth, IBoundingBoxOwner {
 	 */
 	public Entity(World world, double x, double y) {
 		this.world = world;
-		this.x = x;
-		this.y = y;
+		this.pos.x = x;
+		this.pos.y = y;
 	}
 	
 	/**
@@ -92,8 +87,8 @@ public abstract class Entity implements IComparableDepth, IBoundingBoxOwner {
 	 */
 	public void init(World world, double x, double y) {
 		this.world = world;
-		this.x = x;
-		this.y = y;
+		this.pos.x = x;
+		this.pos.y = y;
 	}
 	
 	/**
@@ -212,8 +207,8 @@ public abstract class Entity implements IComparableDepth, IBoundingBoxOwner {
 			closest.getOwner().handleCollision(this, xxa, yya);
 		}
 		if (xa != 0 || ya != 0) {
-			x += xa;
-			y += ya;
+			pos.x += xa;
+			pos.y += ya;
 			return true;
 		}
 		return false;
@@ -225,8 +220,8 @@ public abstract class Entity implements IComparableDepth, IBoundingBoxOwner {
 	 * @param ya
     */
 	protected void handleMovement(double xa, double ya) {
-		x += xa;
-		y += ya;
+		pos.x += xa;
+		pos.y += ya;
 	}
 	
 	/**
@@ -273,7 +268,7 @@ public abstract class Entity implements IComparableDepth, IBoundingBoxOwner {
 	 * @return
 	 */
 	public BoundingBox getBoundingBox() {
-		return new BoundingBox(this, x - radius.x, y - radius.y, x + radius.x, y + radius.y);
+		return new BoundingBox(this, pos.x - radius.x, pos.y - radius.y, pos.x + radius.x, pos.y + radius.y);
 	}
 	
 	/**
@@ -297,7 +292,7 @@ public abstract class Entity implements IComparableDepth, IBoundingBoxOwner {
 	 * @param x
 	 */
 	public void setX(double x) {
-		this.x = x;
+		this.pos.x = x;
 	}
 	
 	/**
@@ -305,7 +300,7 @@ public abstract class Entity implements IComparableDepth, IBoundingBoxOwner {
 	 * @param y
 	 */
 	public void setY(double y) {
-		this.y = y;
+		this.pos.y = y;
 	}
 	
 	/**
@@ -327,29 +322,39 @@ public abstract class Entity implements IComparableDepth, IBoundingBoxOwner {
 	/**
 	 *
 	 * @return
-   */
+	 */
 	public World getWorld() {
 		return world;
 	}
 	
 	/**
-	 * Retrieves the x coordinate of the {@link DrawableObject}.
+	 * Retrieve the coordinates of the {@link Entity}.
+	 * 
+	 * @return
+	 * 		the coordinates of the {@link Entity}
+	 */
+	public Vec2 getPos() {
+		return pos;
+	}
+	
+	/**
+	 * Retrieve the x coordinate of the {@link Entity}.
 	 *
 	 * @return
-	 * 		the x coordinate of the {@link DrawableObject}
-   */
+	 * 		the x coordinate of the {@link Entity}
+     */
 	public double getX() {
-		return x;
+		return pos.x;
 	}
 
 	/**
-	 * Retrieves the y coordinate of the {@link DrawableObject}.
+	 * Retrieve the y coordinate of the {@link Entity}.
 	 * 
 	 * @return
-	 * 		the y coordinate of the {@link DrawableObject}
-   */
+	 * 		the y coordinate of the {@link Entity}
+     */
 	public double getY() {
-		return y;
+		return pos.y;
 	}
 	
 	/**
