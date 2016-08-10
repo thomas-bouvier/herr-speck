@@ -5,6 +5,7 @@ import com.tomatrocho.game.entity.Mob;
 import com.tomatrocho.game.gfx.IAbstractScreen;
 import com.tomatrocho.game.gfx.Art;
 import com.tomatrocho.game.gfx.IAbstractBitmap;
+import com.tomatrocho.game.world.level.Material;
 import com.tomatrocho.game.world.level.World;
 
 public class Bat extends Mob {
@@ -18,8 +19,6 @@ public class Bat extends Mob {
 	 */
 	public Bat(World level, int x, int y) {
 		super(level, x, y, Team.TEAM_2);
-		yShadowOffset = 28;
-		alphaShadow = 60;
 		maxHealth = 50;
 		health = maxHealth;
 		speed = 1.5;
@@ -29,8 +28,24 @@ public class Bat extends Mob {
 	public void tick() {
 		super.tick();
 		ticks++;
+		
 		dir += (HerrSpeck.random.nextDouble() - HerrSpeck.random.nextDouble()) * 0.5;
 		handleMovement(Math.cos(dir) * speed, Math.sin(dir) * speed);
+		
+		final Material below = getMaterialBelow();
+		System.out.println(below);
+		if (below != null) {			
+			if (below == Material.SANDSTONE_WALL) {
+				yShadowOffset = 15;
+			} else {
+				yShadowOffset = 28;
+			}
+			if (below == Material.WATER) {
+				alphaShadow = 30;
+			} else {
+				alphaShadow = 60;
+			}
+		}
 	}
 
 	@Override

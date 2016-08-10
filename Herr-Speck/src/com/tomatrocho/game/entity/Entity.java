@@ -7,7 +7,9 @@ import com.tomatrocho.game.gfx.IComparableDepth;
 import com.tomatrocho.game.math.BoundingBox;
 import com.tomatrocho.game.math.IBoundingBoxOwner;
 import com.tomatrocho.game.math.Vec2;
+import com.tomatrocho.game.world.level.Material;
 import com.tomatrocho.game.world.level.World;
+import com.tomatrocho.game.world.tile.Tile;
 
 public abstract class Entity implements IComparableDepth, IBoundingBoxOwner {
 	
@@ -285,6 +287,20 @@ public abstract class Entity implements IComparableDepth, IBoundingBoxOwner {
 	 */
 	public void remove() {
 		removed = true;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public Material getMaterialBelow() {
+		System.out.println("x: " + pos.x + ", y: " + pos.y);
+		final Tile tile = world.getTile((int) pos.x, (int) pos.y);
+		if (tile != null) {
+			System.out.println("-----------------------------------");
+			return tile.getMaterial();
+		}
+		return null;
 	}
 	
 	/**

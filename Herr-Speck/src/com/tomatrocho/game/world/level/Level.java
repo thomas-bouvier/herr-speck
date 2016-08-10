@@ -10,18 +10,18 @@ import java.io.IOException;
 public class Level {
 
     /**
-     * The {@link World} linked to the {@link Level}
+     * The {@link World} linked to the {@link Level}.
      */
     protected World world;
 
     /**
-     *
+     * The {@link TMXTileMap} linked to the {@link Level}.
      */
     protected TMXTileMap map;
 
 
     /**
-     * Generates a {@link World} from its {@link WorldInformation}.
+     * Generate a {@link World} from its {@link WorldInformation}.
      *
      * @param wi
      * 		the {@link WorldInformation} object linked to the {@link World} to generate
@@ -31,6 +31,7 @@ public class Level {
      */
     public World generateWorld(WorldInformation wi) throws IOException {
     	System.out.println("\n");
+    	
         int w = 0, h = 0, layers = 0;
         try {
             map = new TMXTileMap(HerrSpeck.class.getResourceAsStream(wi.getFilePath()));
@@ -43,12 +44,16 @@ public class Level {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+        
         world = new World(wi.getName(), w, h);
         processLevelMap(w, h, layers);
+        
         System.out.println(String.format("Validating loaded world \"%s\"..", world.getName()));
         world.validateTileMap();
+        
         System.out.println("Calculating bitmasking values..");
-        world.computeTileConnections();
+        world.calculateTileConnections();
+        
         return world;
     }
 

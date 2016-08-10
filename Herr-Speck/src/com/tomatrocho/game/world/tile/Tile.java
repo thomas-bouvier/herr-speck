@@ -104,7 +104,7 @@ public abstract class Tile implements IComparableDepth, IBoundingBoxOwner {
 	public void applyBitmask() {
 		if (isConnectable()) {
 			int res = 0, pow = 1;
-			for (final List<Tile> tiles : world.getAdjacentTiles(this)) {
+			for (final List<Tile> tiles : world.getMooreNeighborhoodTiles(this)) {
 				if (tiles != null && tiles.size() > z) {
 					res += pow * (isConnectableWith(tiles.get(z)) ? 1 : 0);
 				}

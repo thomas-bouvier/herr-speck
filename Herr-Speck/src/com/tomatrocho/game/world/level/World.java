@@ -2,7 +2,6 @@ package com.tomatrocho.game.world.level;
 
 import com.tomatrocho.game.HerrSpeck;
 import com.tomatrocho.game.entity.Entity;
-import com.tomatrocho.game.entity.mob.Bat;
 import com.tomatrocho.game.entity.predicates.EntityIntersectsBB;
 import com.tomatrocho.game.gfx.IAbstractScreen;
 import com.tomatrocho.game.gfx.Art;
@@ -54,11 +53,6 @@ public class World {
 	 * 
 	 */
 	private List<List<Entity>> entityMap = new ArrayList<>();
-	
-	/**
-	 *
-	 */
-	private static int[] neighbourOffsets;
 
 	/**
 	 * Time of the {@link World}.
@@ -94,31 +88,14 @@ public class World {
 		this.name = name;
 		this.w = w;
 		this.h = h;
-		initNeighbourOffsets();
-		initTileMap();
+
+		for (int i = 0; i < w * h; i++) {
+			tiles.add(new LinkedList<>());
+		}
 		for (int i = 0; i < w * h; i++) {
 			entityMap.add(new ArrayList<>());
 		}
 		seen = new boolean[(w + 1) * (h + 1)];
-	}
-
-	/**
-	 * Initializes the relative offset to be add to the the index of a {@link Tile}
-	 * to retrieve adjacent {@link Tile} objects.
-	 */
-	private void initNeighbourOffsets() {
-		neighbourOffsets = new int[] {-w - 1, -w, -w + 1, -1, 1, w - 1, w, w + 1};
-	}
-
-	/**
-	 *
-	 */
-	private void initTileMap() {
-		for (int y = 0; y < h; y++) {
-			for (int x = 0; x < w; x++) {
-				tiles.add(new LinkedList<>());
-			}
-		}
 	}
 	
 	/**
@@ -133,11 +110,12 @@ public class World {
         		}
         	}
         }
+
         //
         for (int y = 0; y < h; y++) {
         	for (int x = 0; x < w; x++) {
         		final Tile tile = getTiles(x, y).get(0);
-        		for (final List<Tile> tiles : getAdjacentTiles(tile)) {
+        		for (final List<Tile> tiles : getMooreNeighborhoodTiles(tile)) {
     				if (tiles != null) {
     					final Tile adjacentTile = tiles.get(0);
     					if (tile.getNeighbourMaterial() != null) {
@@ -154,14 +132,12 @@ public class World {
 	/**
 	 * 
 	 */
-	public void computeTileConnections() {
+	public void calculateTileConnections() {
 		WorldUtils.loadBitmaskingValues();
-		for (int y = 0; y < h; y++) {
-			for (int x = 0; x < w; x++) {
-				final List<Tile> tiles = this.tiles.get(y * w + x);
-				for (int z = 0; z < tiles.size(); z++) {
-					tiles.get(z).applyBitmask();
-				}
+		for (int i = 0; i < w * h; i++) {
+			final List<Tile> tiles = this.tiles.get(i);
+			for (int z = 0; z < tiles.size(); z++) {
+				tiles.get(z).applyBitmask();
 			}
 		}
 	}
@@ -170,10 +146,16 @@ public class World {
 	 * 
 	 * @return
 	 */
-	public List<List<Tile>> getAdjacentTiles(final Tile tile) {
+	public List<List<Tile>> getMooreNeighborhoodTiles(final Tile tile) {
 		List<List<Tile>> tiles = new ArrayList<>();
-		for (int offset : World.getNeighbourOffsets()) {
-			tiles.add(getTiles(tile.getY() * w + tile.getX() + offset));
+		final int x = tile.getX(), y = tile.getY();
+		for (int j = y - 1; j <= y + 1; j++) {
+			for (int i = x - 1; i <= x + 1; i++) {
+				if (i == x && j == y) {
+					continue;
+				}
+				tiles.add(getTiles(i, j));
+			}
 		}
 		return tiles;
 	}
@@ -300,6 +282,7 @@ public class World {
 		}
 		// setting offsets equal to xScroll, yScroll
 		screen.setOffset(xScroll, yScroll);
+		
 		// level rendering
 		Set<IComparableDepth> objectsToRender = new TreeSet<>(new DepthComparator());
 		// adding entities to render list
@@ -323,6 +306,7 @@ public class World {
 		if (HerrSpeck.debug()) {			
 			renderBoundingBoxes(screen);
 		}
+		
 		// reseting offset
 		screen.setOffset(0, 0);
 	}
@@ -461,9 +445,9 @@ public class World {
 	 */
 	public void tick() {
 		//TODO spawners
-		if (HerrSpeck.random.nextInt(250) == 0) {
-			addEntity(new Bat(this, time % (w * 16), time % (h * 16)));
-		}
+//		if (HerrSpeck.random.nextInt(250) == 0) {
+//			addEntity(new Bat(this, time % (w * 16), time % (h * 16)));
+//		}
 		for (int i = 0; i < entities.size(); i++) {
 			Entity entity = entities.get(i);
 			if (!entity.removed()) {
@@ -501,15 +485,15 @@ public class World {
 	 * 		the {@link Tile} to update
 	 */
 	public void updateTiles(int x, int y, Tile tile) {
-		for (int offset : neighbourOffsets) {
-			final int index = y * w + x + offset;
-			if (index >= 0 && index < w * h) {
-				final Tile neighbour = tiles.get(index).peekLast();
-				if (neighbour != null) {
-					//neighbour.neighbourUpdated(tile);
-				}
-			}
-		}
+//		for (int offset : mooreNeighborhoodOffsets) {
+//			final int index = y * w + x + offset;
+//			if (index >= 0 && index < w * h) {
+//				final Tile neighbour = tiles.get(index).peekLast();
+//				if (neighbour != null) {
+//					//neighbour.neighbourUpdated(tile);
+//				}
+//			}
+//		}
 	}
 	
 	/**
@@ -614,7 +598,7 @@ public class World {
 	 * @param y
 	 * 		y coordinate of the {@link Tile} to set, in tiles
 	 * @param tile
-	 * 		the {@link Tile} to insert
+	 * 		the {@link Tile} to set
 	 */
 	public void setTile(int x, int y, Tile tile) {
 		if (x < 0 || x >= w || y < 0 || y >= h) {
@@ -623,6 +607,26 @@ public class World {
 		tiles.get(y * w + x).clear();
 		tile.init(this, x, y, tiles.get(y * w + x).size());
 		tiles.get(y * w + x).add(tile);
+	}
+	
+	/**
+	 * Sets the {@link Tile} at the specified location, including layer.
+	 * 
+	 * @param x
+	 * 		x coordinate of the {@link Tile} to set, in tiles
+	 * @param y
+	 * 		y coordinate of the {@link Tile} to set, in tiles
+	 * @param tile
+	 * 		the {@link Tile} to set
+	 * @param layer
+	 * 		
+	 */
+	public void setTile(int x, int y, Tile tile, int layer) {
+		if (x < 0 || x >= w || y < 0 || y >= h) {
+			return;
+		}
+		tile.init(this, x, y, layer);
+		tiles.get(y * w + x).set(layer, tile);
 	}
 
 	/**
@@ -681,14 +685,6 @@ public class World {
 	 */
 	public List<Tile> getTiles(int pos) {
 		return getTiles(pos % w, pos / h);
-	}
-	
-	/**
-	 * 
-	 * @return
-	 */
-	public static int[] getNeighbourOffsets() {
-		return neighbourOffsets;
 	}
 
 	/**

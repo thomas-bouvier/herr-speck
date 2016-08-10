@@ -2,6 +2,7 @@ package com.tomatrocho.game.world.tile;
 
 import com.tomatrocho.game.entity.Entity;
 import com.tomatrocho.game.gfx.IAbstractScreen;
+import com.tomatrocho.game.world.level.Material;
 import com.tomatrocho.game.gfx.Art;
 
 public class SandstoneWallTile extends Tile {
@@ -10,6 +11,7 @@ public class SandstoneWallTile extends Tile {
      * Default constructor for the {@link SandstoneWallTile} class.
      */
     public SandstoneWallTile() {
+    	material = Material.SANDSTONE_WALL;
     	img = Tile.PLAIN_IMG;
     }
 

@@ -180,14 +180,17 @@ public class HerrSpeck extends Canvas implements Runnable, MouseListener, MouseM
      */
     private synchronized void start() {
         requestFocus();
+        
         try {
             init();
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+        
         // screen
         screen = new Screen(W, H);
         screen.loadResources();
+        
         // thread
         thread = new Thread(this, "Display");
         thread.start();
@@ -199,6 +202,7 @@ public class HerrSpeck extends Canvas implements Runnable, MouseListener, MouseM
     private void init() {
         initInput();
         initLevel();
+        
         // sound
         soundPlayer = new SoundPlayer();
     }
@@ -210,6 +214,7 @@ public class HerrSpeck extends Canvas implements Runnable, MouseListener, MouseM
     	// keyboard
         input = new Input(keys);
         addKeyListener(input);
+        
         // mouse
         addMouseListener(this);
         addMouseMotionListener(this);
@@ -219,11 +224,12 @@ public class HerrSpeck extends Canvas implements Runnable, MouseListener, MouseM
     *
     */
    private synchronized void initLevel() {
-   	createWorld(WorldList.getLevelByName("test"));
-       if (world != null) {
-           player = new Player(world, keys, mouse);
-           world.addEntity(player);
-       }
+	   createWorld(WorldList.getLevelByName("test"));
+	   
+	   if (world != null) {
+	       player = new Player(world, keys, mouse);
+	       world.addEntity(player);
+	   }
    }
     
     /**
@@ -292,11 +298,13 @@ public class HerrSpeck extends Canvas implements Runnable, MouseListener, MouseM
     private void tick() {
     	tickInput();
         world.tick();
+        
         // fullscreen mode
         //TODO
         if (keys.fullscreen.wasPressed()) {
         	setFullscreen(!fullscreen);
         }
+        
         // sound system update
         soundPlayer.setListenerPosition((int) player.getX(), (int) player.getY());
         if (System.currentTimeMillis() > nextMusicInterval) {
@@ -315,6 +323,7 @@ public class HerrSpeck extends Canvas implements Runnable, MouseListener, MouseM
     	if (keys.debug.wasPressed()) {
     		debug = !debug;
     	}
+    	
     	// mouse
     	final Point mousePosition = getMousePosition();
     	if (mousePosition != null) {
