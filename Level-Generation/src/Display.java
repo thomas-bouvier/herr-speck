@@ -1,9 +1,8 @@
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 
 import javax.swing.JPanel;
-
-import com.sun.prism.paint.Color;
 
 public class Display extends JPanel {
 
@@ -17,16 +16,10 @@ public class Display extends JPanel {
 	
 	/**
 	 * 
-	 */
-	public Display() {
-		
-	}
-	
-	/**
-	 * 
 	 * @param map
 	 */
 	public Display(Cave map) {
+		setMinimumSize(new Dimension(500, 500));
 		setMap(map);
 	}
 	
@@ -46,11 +39,7 @@ public class Display extends JPanel {
 	 */
 	public void update() {
 		for (int i = 0; i < pixels.length; i++) {
-			if (map.grid[i] == Cell.FLOOR) {
-				pixels[i] = 0x996633;
-			} else  {
-				pixels[i] = 0x555555;
-			}
+			pixels[i] = map.grid[i].getColor();
 		}
 		image.setRGB(0, 0, map.size, map.size, pixels, 0, map.size);
 		repaint();

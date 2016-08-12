@@ -26,17 +26,41 @@ public class Cave {
 	 * @param size
 	 */
 	public Cave(int size) {
-		this(size, random.nextLong());
+		setSize(size);
+		populate();
+	}
+	
+	/**
+	 * 
+	 * @param size
+	 * @param chanceToStartAlive
+	 * @param birthLimit
+	 * @param deathLimit
+	 */
+	public Cave(int size, float chanceToStartAlive, int birthLimit, int deathLimit) {
+		setSize(size);
+		this.chanceToStartAlive = chanceToStartAlive;
+		this.birthLimit = birthLimit;
+		this.deathLimit = deathLimit;
+		populate();
 	}
 	
 	/**
 	 * 
 	 * @param size
 	 * @param seed
+	 * @param chanceToStartAlive
+	 * @param birthLimit
+	 * @param deathLimit
 	 */
-	public Cave(int size, long seed) {
+	public Cave(int size, long seed, float chanceToStartAlive, int birthLimit, int deathLimit) {
 		setSize(size);
-		populate(chanceToStartAlive, birthLimit, deathLimit, seed);
+		this.seed = seed;
+		random.setSeed(seed);
+		this.chanceToStartAlive = chanceToStartAlive;
+		this.birthLimit = birthLimit;
+		this.deathLimit = deathLimit;
+		populate();
 	}
 	
 	/**
@@ -56,12 +80,7 @@ public class Cave {
 	 * @param deathLimit
 	 * @param seed
 	 */
-	public void populate(float chanceToStartAlive, int birthLimit, int deathLimit, long seed) {
-		this.chanceToStartAlive = chanceToStartAlive;
-		this.seed = seed;
-		this.stepCount = 0;
-		random.setSeed(seed);
-		
+	private void populate() {
 		System.out.println('\n' + "Generating cave with seed " + seed + "...");
 		final long start = System.currentTimeMillis();
 		
@@ -74,24 +93,19 @@ public class Cave {
 	        	}
 	        }
 	    }
-	    doStep(birthLimit, deathLimit);
+	    doStep();
 	    
 	    System.out.println("Generated cave in " + (System.currentTimeMillis() - start) + " ms");
 	}
 	
 	/**
 	 * 
-	 * @param birthLimit
-	 * @param deathLimit
 	 */
-	public void doStep(int birthLimit, int deathLimit) {
+	public void doStep() {
 		stepCount++;
 		System.out.println("Performing transition step " + stepCount);
-		
-		this.birthLimit = birthLimit;
-		this.deathLimit = deathLimit;
+
 		Cell[] temp = new Cell[grid.length];
-		
 		for (int y = 0; y < size; y++) {
 			for (int x = 0; x < size; x++) {
 				int countAlive = countAliveMooreNeighbors(x, y);
@@ -136,7 +150,7 @@ public class Cave {
 				}
 			}
 		}
-		System.out.println(caverns.size() + " caverns");
+		System.out.println(countCaverns() + " caverns");
 	}
 	
 	/**
@@ -190,10 +204,13 @@ public class Cave {
 		}
 	}
 	
+	public boolean removedCaverns = false;
+	
 	/**
 	 * 
 	 */
 	public void removeDisconnectedCaverns() {
+		removedCaverns = true;
 		fillDisconnectedCavernsWith(Cell.WALL);
 	}
 	
@@ -201,7 +218,19 @@ public class Cave {
 	 * 
 	 */
 	public void restoreDisconnectedCaverns() {
+		removedCaverns = false;
 		fillDisconnectedCavernsWith(Cell.FLOOR);
+	}
+	
+	/**
+	 * 
+	 */
+	public void swapDisconnectedCavernsState() {
+		if (removedCaverns) {
+			restoreDisconnectedCaverns();
+		} else {
+			removeDisconnectedCaverns();
+		}
 	}
 	
 	/**
@@ -244,5 +273,13 @@ public class Cave {
 			}
 		}
 		return count;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public int countCaverns() {
+		return caverns.size();
 	}
 }
