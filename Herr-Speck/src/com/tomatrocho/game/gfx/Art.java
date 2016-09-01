@@ -41,8 +41,8 @@ public class Art {
 	public static void loadAllRessources(IAbstractScreen screen) {
 		System.out.println('\n' + "Loading ressources..");
 		font = screen.cut("/art/font/font.png", 9);
-		player = screen.cut("/art/mob/player.png", 32, 32);
-		bat = screen.cut("/art/mob/bat.png", 32, 32);
+		player = screen.cut("/art/mobs/player.png", 32, 32);
+		bat = screen.cut("/art/mobs/bat.png", 32, 32);
 	    stoneTiles = screen.cut("/art/map/stone.png", 16, 16);
 	    rocksTiles = screen.cut("/art/map/rocks.png", 16, 16);
 	    sandstoneTiles = screen.cut("/art/map/sandstone.png", 16, 16);

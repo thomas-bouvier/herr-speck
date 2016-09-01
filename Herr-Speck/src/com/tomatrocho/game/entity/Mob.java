@@ -100,8 +100,8 @@ public abstract class Mob extends Entity {
 	 * @param x
 	 * @param y
 	 */
-	public Mob(World level, int x, int y, Team team) {
-		super(level, x, y, team);
+	public Mob(World world, int x, int y, Team team) {
+		super(world, x, y, team);
 		health = maxHealth;
 	}
 

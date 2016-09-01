@@ -108,12 +108,14 @@ public class Player extends Mob {
         if (keys.right.down()) {
             xa++;
         }
+        
         // update orientation for rendering
         if (!mouseAiming && xa * xa + ya * ya != 0) {
             aimVector.set(xa, ya);
             aimVector.normalize();
             updateFacing();
         }
+        
         // shooting
         double xaShot = 0, yaShot = 0;
         if (keys.fireUp.down()) {
@@ -128,18 +130,22 @@ public class Player extends Mob {
         if (keys.fireRight.down()) {
         	xaShot++;
         }
+        
         // update orientation for rendering
         if (!mouseAiming && fireKeyDown() && xaShot * xaShot + yaShot * yaShot != 0) {
         	aimVector.set(xaShot, yaShot);
         	aimVector.normalize();
         	updateFacing();
         }
+        
         // handle movement
         if (xa != 0 || ya != 0) {
             handleMovement(xa, ya);
             moving = true;
         }
+        
         handleShooting(xa, ya);
+        
         // handle map revealing
         //world.reveal(World.getTileFromPosition(new Vec2(x, y)), 10);
     }

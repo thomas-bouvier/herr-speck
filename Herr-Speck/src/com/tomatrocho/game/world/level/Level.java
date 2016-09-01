@@ -45,7 +45,7 @@ public class Level {
             ex.printStackTrace();
         }
         
-        world = new World(wi.getName(), w, h);
+        this.world = new World(wi.getName(), w, h);
         processLevelMap(w, h, layers);
         
         System.out.println(String.format("Validating loaded world \"%s\"..", world.getName()));
