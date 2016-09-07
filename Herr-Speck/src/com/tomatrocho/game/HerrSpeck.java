@@ -149,7 +149,7 @@ public class HerrSpeck extends Canvas implements Runnable, MouseListener, MouseM
      * Delay, in milliseconds, between background musics.
      * Sets to 4 minutes.
      */
-    private long nextMusicInterval = System.currentTimeMillis() + 1000 * 60 * 4;
+    private long nextMusicInterval = System.currentTimeMillis() + 1000 * 60 * 1;
 
     /**
      * Global {@link Random} object.
@@ -312,6 +312,7 @@ public class HerrSpeck extends Canvas implements Runnable, MouseListener, MouseM
         	soundPlayer.startBackgroundMusic();
         	nextMusicInterval = System.currentTimeMillis() + nextMusicInterval;
         }
+        
         ticks++;
     }
     

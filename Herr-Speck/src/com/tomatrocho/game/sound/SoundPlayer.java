@@ -63,19 +63,23 @@ public class SoundPlayer {
 	public SoundPlayer() {
 		try {
 			SoundSystemConfig.setCodec("ogg", CodecJOrbis.class);
-		} catch (SoundSystemException ex) {
+		}
+		catch (SoundSystemException ex) {
 			oggPlaybackSupport = false;
 		}
 		try {
 			SoundSystemConfig.setCodec("wav", CodecWav.class);
-		} catch (SoundSystemException ex) {
+		}
+		catch (SoundSystemException ex) {
 			wavPlaybackSupport = false;
 		}
 		try {
 			soundSystem = new SoundSystem(LibraryJavaSound.class);
-		} catch (SoundSystemException ex) {
+		}
+		catch (SoundSystemException ex) {
 			ex.printStackTrace();
 		}
+		
 		if (soundSystem != null) {
 			soundSystem.setMasterVolume(volume);
 			soundSystem.setVolume(BACKGROUND_MUSIC, musicVolume);
@@ -86,17 +90,20 @@ public class SoundPlayer {
 	 * 
 	 */
 	public void startBackgroundMusic() {
-		System.out.println("Starting background music");
+		System.out.println("\nStarting background music");
+		
 		if (!muted && hasOggPlaybackSupport()) {
-			String musicPath = "/resources/sounds/ambient.ogg";
+			String musicPath = "/resources/sounds/ambient.mp3";
+			
 			try {
 			    File musicFile = new File(OS.getAppDirectory("game"), musicPath);
 			    URL musicUrl = musicFile.toURI().toURL();
 			    if (musicFile.exists()){
 			    	soundSystem.backgroundMusic(BACKGROUND_MUSIC, musicUrl, musicPath, true);
 			    }
-			} catch (MalformedURLException e) {
-			    e.printStackTrace();
+			}
+			catch (MalformedURLException ex) {
+			    ex.printStackTrace();
 			}
 		}
 	}
