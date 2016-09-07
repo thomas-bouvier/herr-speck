@@ -4,12 +4,12 @@ import java.util.List;
 
 import com.tomatrocho.game.entity.mob.Team;
 import com.tomatrocho.game.gfx.IComparableDepth;
+import com.tomatrocho.game.level.Material;
+import com.tomatrocho.game.level.World;
+import com.tomatrocho.game.level.tile.Tile;
 import com.tomatrocho.game.math.BoundingBox;
 import com.tomatrocho.game.math.IBoundingBoxOwner;
 import com.tomatrocho.game.math.Vec2;
-import com.tomatrocho.game.world.level.Material;
-import com.tomatrocho.game.world.level.World;
-import com.tomatrocho.game.world.tile.Tile;
 
 public abstract class Entity implements IComparableDepth, IBoundingBoxOwner {
 	

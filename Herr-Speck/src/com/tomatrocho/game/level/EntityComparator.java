@@ -1,4 +1,4 @@
-package com.tomatrocho.game.world.level;
+package com.tomatrocho.game.level;
 
 import java.util.Comparator;
 

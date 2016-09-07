@@ -23,12 +23,12 @@ import com.tomatrocho.game.gui.Font;
 import com.tomatrocho.game.input.Input;
 import com.tomatrocho.game.input.Keys;
 import com.tomatrocho.game.input.Mouse;
+import com.tomatrocho.game.level.Level;
+import com.tomatrocho.game.level.World;
+import com.tomatrocho.game.level.WorldInformation;
+import com.tomatrocho.game.level.WorldList;
+import com.tomatrocho.game.level.tile.Tile;
 import com.tomatrocho.game.sound.SoundPlayer;
-import com.tomatrocho.game.world.level.Level;
-import com.tomatrocho.game.world.level.World;
-import com.tomatrocho.game.world.level.WorldInformation;
-import com.tomatrocho.game.world.level.WorldList;
-import com.tomatrocho.game.world.tile.Tile;
 
 public class HerrSpeck extends Canvas implements Runnable, MouseListener, MouseMotionListener {
 	
@@ -166,6 +166,7 @@ public class HerrSpeck extends Canvas implements Runnable, MouseListener, MouseM
      */
     private HerrSpeck(JFrame frame) {
         this.frame = frame;
+        
         frame.setPreferredSize(new Dimension(W * SCALE, H * SCALE));
         frame.setResizable(false);
         frame.add(this);
@@ -224,7 +225,7 @@ public class HerrSpeck extends Canvas implements Runnable, MouseListener, MouseM
     *
     */
    private synchronized void initLevel() {
-	   createWorld(WorldList.getLevelByName("test"));
+	   createWorld(WorldList.getLevelByName("tmx_level"));
 	   
 	   if (world != null) {
 	       player = new Player(world, keys, mouse);
@@ -345,14 +346,14 @@ public class HerrSpeck extends Canvas implements Runnable, MouseListener, MouseM
      * Render all the graphics using the given {@link Graphics} object.
      */
     private synchronized void render(Graphics g) {
-    	// world
         renderWorld(screen);
-        // gui
         renderGui(screen);
+        
         // rendering
         g.fillRect(0, 0, getWidth(), getHeight());
         g.translate((getWidth() - W * SCALE) / 2, (getHeight() - H * SCALE) / 2);
         g.clipRect(0, 0, W * SCALE, H * SCALE);
+        
         // drawing the optimized image
         g.drawImage(screen.toCompatibleImage(), 0, 0, W * SCALE, H * SCALE, null);
         frames++;
@@ -365,6 +366,7 @@ public class HerrSpeck extends Canvas implements Runnable, MouseListener, MouseM
     	if (world != null) {
             int xScroll = (int) (player.getX() - screen.getW() / 2);
             int yScroll = (int) (player.getY() - screen.getH() / 2);
+            
             world.render(screen, xScroll, yScroll);
         }
     }
@@ -393,9 +395,11 @@ public class HerrSpeck extends Canvas implements Runnable, MouseListener, MouseM
     	frame.setVisible(false);
     	frame.dispose();
     	frame.setUndecorated(fullscreen);
+    	
     	// change options
     	GraphicsDevice device = frame.getGraphicsConfiguration().getDevice();
     	device.setFullScreenWindow(fullscreen ? frame : null);
+    	
     	// displaying window
     	frame.setLocationRelativeTo(null);
     	frame.setVisible(true);

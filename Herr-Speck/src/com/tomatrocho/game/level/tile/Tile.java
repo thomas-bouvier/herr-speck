@@ -1,15 +1,15 @@
-package com.tomatrocho.game.world.tile;
+package com.tomatrocho.game.level.tile;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import com.tomatrocho.game.entity.Entity;
 import com.tomatrocho.game.gfx.IComparableDepth;
+import com.tomatrocho.game.level.Material;
+import com.tomatrocho.game.level.World;
+import com.tomatrocho.game.level.WorldUtils;
 import com.tomatrocho.game.math.BoundingBox;
 import com.tomatrocho.game.math.IBoundingBoxOwner;
-import com.tomatrocho.game.world.level.Material;
-import com.tomatrocho.game.world.level.World;
-import com.tomatrocho.game.world.level.WorldUtils;
 
 public abstract class Tile implements IComparableDepth, IBoundingBoxOwner {
 

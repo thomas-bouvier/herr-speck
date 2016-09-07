@@ -1,4 +1,4 @@
-package com.tomatrocho.game.world.level.tmx;
+package com.tomatrocho.game.level.tmx;
 
 /**
  * A class for holding information about a particular {@link TMXTile} on a particular {@link TMXLayer}.

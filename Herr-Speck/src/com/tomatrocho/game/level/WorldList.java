@@ -1,4 +1,4 @@
-package com.tomatrocho.game.world.level;
+package com.tomatrocho.game.level;
 
 import com.tomatrocho.game.HerrSpeck;
 
@@ -14,7 +14,8 @@ public class WorldList {
     private static List<WorldInformation> levels = new ArrayList<>();
 
     static {
-        levels.add(new WorldInformation("test", "/levels/test.tmx"));
+//    	levels.add(new WorldInformation("generated_level", 25, 25, 0));
+    	levels.add(new WorldInformation("tmx_level", "/levels/test.tmx"));
     }
 
 
@@ -24,6 +25,7 @@ public class WorldList {
     public static void createLevelList() {
         System.out.println(new File(HerrSpeck.getDir(), "levels"));
         File levelsLocation = new File(HerrSpeck.getDir(), "levels");
+        
         if (!levelsLocation.exists()) {
             if (levelsLocation.mkdirs()) {
                 loadDir(levelsLocation);
@@ -43,10 +45,12 @@ public class WorldList {
                     loadDir(child);
                     continue;
                 }
+                
                 final String fileName = child.getName();
                 final int dotIndex = fileName.lastIndexOf(".");
                 final String name = fileName.substring(0, dotIndex).toLowerCase();
                 final String ext = fileName.substring(dotIndex + 1).toLowerCase();
+                
                 if (ext.equals("tmx")) {
                     levels.add(new WorldInformation(name, child.getPath()));
                     System.out.println("   Found level: " + name + '.' + ext);
@@ -66,7 +70,24 @@ public class WorldList {
     			return levelInformation;
     		}
     	}
-    	return null;
+    	
+    	throw new UnknownWorldException("Unknown world: " + name);
+    }
+    
+    
+    /**
+     * 
+     *
+     */
+    public static class UnknownWorldException extends RuntimeException {
+		private static final long serialVersionUID = 1L;
+
+		/**
+    	 * 
+    	 */
+    	public UnknownWorldException(String message) {
+    		super(message);
+    	}
     }
 
     /**

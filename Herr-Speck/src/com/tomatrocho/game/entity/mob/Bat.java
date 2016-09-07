@@ -3,10 +3,10 @@ package com.tomatrocho.game.entity.mob;
 import com.tomatrocho.game.HerrSpeck;
 import com.tomatrocho.game.entity.Mob;
 import com.tomatrocho.game.gfx.IAbstractScreen;
+import com.tomatrocho.game.level.Material;
+import com.tomatrocho.game.level.World;
 import com.tomatrocho.game.gfx.Art;
 import com.tomatrocho.game.gfx.IAbstractBitmap;
-import com.tomatrocho.game.world.level.Material;
-import com.tomatrocho.game.world.level.World;
 
 public class Bat extends Mob {
 	

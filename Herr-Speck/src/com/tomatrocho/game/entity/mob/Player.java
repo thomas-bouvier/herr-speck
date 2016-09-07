@@ -2,7 +2,6 @@ package com.tomatrocho.game.entity.mob;
 
 import com.tomatrocho.game.HerrSpeck;
 import com.tomatrocho.game.entity.Mob;
-import com.tomatrocho.game.entity.animation.MuzzleAnimation;
 import com.tomatrocho.game.entity.weapon.Rifle;
 import com.tomatrocho.game.entity.weapon.WeaponInventory;
 import com.tomatrocho.game.gfx.IAbstractScreen;
@@ -11,8 +10,8 @@ import com.tomatrocho.game.gfx.Bitmap;
 import com.tomatrocho.game.gfx.IAbstractBitmap;
 import com.tomatrocho.game.input.Keys;
 import com.tomatrocho.game.input.Mouse;
+import com.tomatrocho.game.level.World;
 import com.tomatrocho.game.math.Vec2;
-import com.tomatrocho.game.world.level.World;
 
 public class Player extends Mob {
 	
@@ -55,7 +54,18 @@ public class Player extends Mob {
      * 
      */
     private Vec2 muzzlePosition;
+    
+    /**
+     * 
+     */
+    private int muzzleTicks = 0;
+    
+    /**
+     * 
+     */
+    private int muzzleFrame = 0;
 
+    
     /**
      * 
      * @param keys
@@ -146,6 +156,12 @@ public class Player extends Mob {
         
         handleShooting(xa, ya);
         
+        // muzzle
+        muzzleFrame = (muzzleFrame + 1) & 1;
+        if (muzzleTicks > 0) {
+        	muzzleTicks--;
+        }
+        
         // handle map revealing
         //world.reveal(World.getTileFromPosition(new Vec2(x, y)), 10);
     }
@@ -206,8 +222,6 @@ public class Player extends Mob {
 	   if (fireKeyDown() || mouse.isDown(FIRE_MOUSE_BUTTON)) {
 		   if (weapon instanceof Rifle) {
 			   ((Rifle) weapon).fire(xa, ya);
-			   // muzzle animation
-			   world.addEntity(new MuzzleAnimation(world, muzzlePosition.x, muzzlePosition.y, 1));
 		   }
 	   }
    }
@@ -223,8 +237,14 @@ public class Player extends Mob {
     @Override
     public void render(IAbstractScreen screen) {
     	super.render(screen);
-    	final IAbstractBitmap sprite = getSprite();
+    	IAbstractBitmap sprite = getSprite();
         screen.blit(sprite, pos.x - sprite.getW() / 2, pos.y - sprite.getH() / 2);
+        
+        // muzzle
+        if (muzzleTicks > 0 && facing != 4) {
+        	sprite = Art.muzzle[muzzleFrame][0];
+        	screen.blit(sprite, muzzlePosition.x, muzzlePosition.y);
+        }
     }
 
     @Override
@@ -252,6 +272,14 @@ public class Player extends Mob {
      */
     public void setMuzzlePosition(Vec2 position) {
     	this.muzzlePosition = position;
+    }
+    
+    /**
+     * 
+     * @param ticks
+     */
+    public void setMuzzleTicks(int ticks) {
+    	this.muzzleTicks = ticks;
     }
     
     /**

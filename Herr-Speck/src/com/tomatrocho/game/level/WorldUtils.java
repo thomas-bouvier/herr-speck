@@ -1,4 +1,4 @@
-package com.tomatrocho.game.world.level;
+package com.tomatrocho.game.level;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -11,7 +11,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-import com.tomatrocho.game.world.tile.*;
+import com.tomatrocho.game.level.tile.*;
 
 public class WorldUtils {
 	

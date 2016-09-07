@@ -2,7 +2,7 @@ package com.tomatrocho.game.entity.animation;
 
 import com.tomatrocho.game.entity.Entity;
 import com.tomatrocho.game.gfx.IAbstractBitmap;
-import com.tomatrocho.game.world.level.World;
+import com.tomatrocho.game.level.World;
 
 public abstract class Animation extends Entity {
 	

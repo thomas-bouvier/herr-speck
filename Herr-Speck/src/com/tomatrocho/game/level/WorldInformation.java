@@ -1,7 +1,9 @@
-package com.tomatrocho.game.world.level;
+package com.tomatrocho.game.level;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import com.tomatrocho.game.HerrSpeck;
 
 public class WorldInformation {
 
@@ -19,12 +21,27 @@ public class WorldInformation {
      *
      */
     private String filePath;
+    
+    /**
+     * 
+     */
+    private long seed = -1;
+    
+    /**
+     * 
+     */
+    private int w = -1;
+    
+    /**
+     * 
+     */
+    private int h = -1;
 
     /**
      *
      */
     private String description;
-
+    
 
     /**
      * Constructor for the {@link WorldInformation} class.
@@ -35,7 +52,34 @@ public class WorldInformation {
     public WorldInformation(String name, String filePath) {
         this.name = name;
         this.filePath = filePath;
-        System.out.println("Level info added: " + filePath);
+        
+        System.out.println("World info added: " + filePath);
+    }
+    
+    /**
+     * 
+     * @param name
+     * @param w
+     * @param h
+     */
+    public WorldInformation(String name, int w, int h) {
+    	this(name, w, h, HerrSpeck.random.nextLong());
+    }
+    
+    /**
+     * 
+     * @param name
+     * @param w
+     * @param h
+     * @param seed
+     */
+    public WorldInformation(String name, int w, int h, long seed) {
+    	this.name = name;
+    	this.w = w;
+    	this.h = h;
+    	this.seed = seed;
+    	
+    	System.out.println("World seed added: " + seed);
     }
 
     /**
@@ -45,6 +89,7 @@ public class WorldInformation {
      */
     public static WorldInformation getForPath(String path){
         System.out.println("Path -> info: " + path);
+        
         return filesToInfo.get(sanitizePath(path));
     }
 
@@ -63,6 +108,30 @@ public class WorldInformation {
      */
     public String getName() {
         return name;
+    }
+    
+    /**
+     * 
+     * @return
+     */
+    public long getSeed() {
+    	return seed;
+    }
+    
+    /**
+     * 
+     * @return
+     */
+    public int getW() {
+    	return w;
+    }
+    
+    /**
+     * 
+     * @return
+     */
+    public int getH() {
+    	return h;
     }
 
     /**

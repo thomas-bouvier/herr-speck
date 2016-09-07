@@ -39,7 +39,8 @@ public class Art {
 	* @param screen
 	*/
 	public static void loadAllRessources(IAbstractScreen screen) {
-		System.out.println('\n' + "Loading ressources..");
+		System.out.println("Loading ressources...");
+		
 		font = screen.cut("/art/font/font.png", 9);
 		player = screen.cut("/art/mobs/player.png", 32, 32);
 		bat = screen.cut("/art/mobs/bat.png", 32, 32);
@@ -54,5 +55,7 @@ public class Art {
 	    darkness = screen.cut("/art/effects/darkness.png", 16, 16);
 	    muzzle = screen.cut("/art/effects/muzzle.png", 16, 16);
 	    bigShadow = screen.load("/art/shadows/big_shadow.png");
+	    
+	    System.out.println("Ressources loaded.");
 	}
 }

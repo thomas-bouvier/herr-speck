@@ -1,4 +1,4 @@
-package com.tomatrocho.game.world.level.tmx;
+package com.tomatrocho.game.level.tmx;
 
 import org.w3c.dom.Element;
 

@@ -1,3 +1,4 @@
+package com.tomatrocho.generator;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
@@ -8,7 +9,7 @@ public class Display extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 
-	public Cave map;
+	public WorldGenerator generator;
 	
 	private int[] pixels;
 	private BufferedImage image;
@@ -16,21 +17,23 @@ public class Display extends JPanel {
 	
 	/**
 	 * 
-	 * @param map
+	 * @param generator
 	 */
-	public Display(Cave map) {
+	public Display(WorldGenerator generator) {
 		setMinimumSize(new Dimension(500, 500));
-		setMap(map);
+		setWorldGenerator(generator);
 	}
 	
 	/**
 	 * 
-	 * @param map
+	 * @param generator
 	 */
-	public void setMap(Cave map) {
-		this.map = map;
-		pixels = new int[map.size * map.size];
-		image = new BufferedImage(map.size, map.size, BufferedImage.TYPE_INT_RGB);
+	public void setWorldGenerator(WorldGenerator generator) {
+		this.generator = generator;
+		
+		pixels = new int[generator.getW() * generator.getH()];
+		image = new BufferedImage(generator.getW(), generator.getH(), BufferedImage.TYPE_INT_RGB);
+		
 		update();
 	}
 	
@@ -39,15 +42,17 @@ public class Display extends JPanel {
 	 */
 	public void update() {
 		for (int i = 0; i < pixels.length; i++) {
-			pixels[i] = map.grid[i].getColor();
+			pixels[i] = generator.grid[i].getColor();
 		}
-		image.setRGB(0, 0, map.size, map.size, pixels, 0, map.size);
+		image.setRGB(0, 0, generator.getW(), generator.getH(), pixels, 0, generator.getW());
+		
 		repaint();
 	}
 	
 	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
+		
 		g.drawImage(image.getScaledInstance(getWidth(), getHeight(), 0), 0, 0, null) ;
 	}
 }

@@ -1,21 +1,29 @@
-package com.tomatrocho.game.world.tile;
+package com.tomatrocho.game.level.tile;
 
+import com.tomatrocho.game.HerrSpeck;
 import com.tomatrocho.game.entity.Entity;
 import com.tomatrocho.game.gfx.IAbstractScreen;
+import com.tomatrocho.game.level.Material;
 import com.tomatrocho.game.gfx.Art;
 
-public class RockTile extends Tile {
+public class StoneTile extends Tile {
 
     /**
      * Default constructor for the {@link StoneTile} class.
      */
-    public RockTile() {
-        img = 0;
+    public StoneTile() {
+    	material = Material.STONE;
+    	img = HerrSpeck.random.nextInt(4);
     }
 
     @Override
     public void render(IAbstractScreen screen) {
-        screen.blit(Art.rocksTiles[img & 7][img / 8], x * Tile.W, y * Tile.H);
+        screen.blit(Art.stoneTiles[img & 3][img / 4], x * Tile.W, y * Tile.H);
+    }
+    
+    @Override
+    public boolean forceRender() {
+    	return true;
     }
 
     @Override

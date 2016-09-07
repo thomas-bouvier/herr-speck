@@ -1,4 +1,4 @@
-package com.tomatrocho.game.world.level;
+package com.tomatrocho.game.level;
 
 import com.tomatrocho.game.HerrSpeck;
 import com.tomatrocho.game.entity.Entity;
@@ -6,14 +6,14 @@ import com.tomatrocho.game.entity.predicates.EntityIntersectsBB;
 import com.tomatrocho.game.gfx.IAbstractScreen;
 import com.tomatrocho.game.gfx.Art;
 import com.tomatrocho.game.gfx.IComparableDepth;
+import com.tomatrocho.game.level.tile.SandstoneTile;
+import com.tomatrocho.game.level.tile.StoneTile;
+import com.tomatrocho.game.level.tile.Tile;
 import com.tomatrocho.game.gfx.DepthComparator;
 import com.tomatrocho.game.gfx.IAbstractBitmap;
 import com.tomatrocho.game.math.BoundingBox;
 import com.tomatrocho.game.math.IBoundingBoxPredicate;
 import com.tomatrocho.game.math.Vec2;
-import com.tomatrocho.game.world.tile.SandstoneTile;
-import com.tomatrocho.game.world.tile.StoneTile;
-import com.tomatrocho.game.world.tile.Tile;
 
 import java.util.*;
 
@@ -101,7 +101,7 @@ public class World {
 	/**
 	 * 
 	 */
-	public void validateTileMap() {
+	public void sanitizeTileMap() {
 		// empty tiles
         for (int y = 0; y < h; y++) {
         	for(int x = 0; x < w; x++) {

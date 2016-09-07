@@ -1,9 +1,9 @@
 package com.tomatrocho.game.entity;
 
 import com.tomatrocho.game.gfx.IAbstractScreen;
+import com.tomatrocho.game.level.World;
+import com.tomatrocho.game.level.tile.Tile;
 import com.tomatrocho.game.gfx.Art;
-import com.tomatrocho.game.world.level.World;
-import com.tomatrocho.game.world.tile.Tile;
 
 public class Bullet extends Entity {
 
@@ -61,8 +61,10 @@ public class Bullet extends Entity {
 	 */
 	public Bullet(World world, Mob shooter, double x, double y, double xa, double ya, float damage) {
 		super(world, x, y, shooter.getTeam());
+		
 		this.xa = xa * 9;
 		this.ya = ya * 9;
+		
 		this.shooter = shooter;
 		this.damage = damage;
 		this.facing = shooter.getFacing();

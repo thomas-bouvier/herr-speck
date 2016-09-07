@@ -1,4 +1,4 @@
-package com.tomatrocho.game.world.tile;
+package com.tomatrocho.game.level.tile;
 
 import com.tomatrocho.game.entity.Entity;
 import com.tomatrocho.game.gfx.IAbstractScreen;

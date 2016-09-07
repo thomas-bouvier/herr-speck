@@ -1,9 +1,9 @@
-package com.tomatrocho.game.world.tile;
+package com.tomatrocho.game.level.tile;
 
 import com.tomatrocho.game.entity.Entity;
 import com.tomatrocho.game.gfx.IAbstractScreen;
+import com.tomatrocho.game.level.Material;
 import com.tomatrocho.game.gfx.Art;
-import com.tomatrocho.game.world.level.Material;
 
 public class SandstoneTile extends Tile {
 

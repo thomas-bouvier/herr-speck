@@ -1,75 +1,154 @@
+package com.tomatrocho.generator;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 import com.tomatrocho.game.math.Vec2;
 
-public class Cave {
+public class WorldGenerator {
 	
-	public int size;
+	/**
+	 * 
+	 */
+	private int w;
+	
+	/**
+	 * 
+	 */
+	private int h;
+	
+	/**
+	 * 
+	 */
 	public Cell[] grid;
+	
+	/**
+	 * 
+	 */
 	public int[] gridFloodFill;
 	
-	public long seed;
+	/**
+	 * 
+	 */
+	private long seed;
+	
+	/**
+	 * 
+	 */
 	private static Random random = new Random();
 	
+	/**
+	 * 
+	 */
 	public float chanceToStartAlive = 0.45f;
 	
+	/**
+	 * 
+	 */
 	public int birthLimit = 4;
+	
+	/**
+	 * 
+	 */
 	public int deathLimit = 3;
 	
+	/**
+	 * 
+	 */
 	public int stepCount = 0;
+	
+	/**
+	 * 
+	 */
+	public List<List<Vec2>> caverns = new ArrayList<>();
+	
+	/**
+	 * 
+	 */
+	public boolean removedCaverns = false;
+	
+	/**
+	 * 
+	 */
+	public boolean borderCellsFilledWithSand = false;
 	
 	
 	/**
 	 * 
-	 * @param size
+	 * @param w
+	 * @param h
 	 */
-	public Cave(int size) {
-		setSize(size);
+	public WorldGenerator(int w, int h) {
+		setDimensions(w, h);
+		
 		populate();
 	}
 	
 	/**
 	 * 
-	 * @param size
+	 * @param w
+	 * @param h
+	 * @param seed
+	 */
+	public WorldGenerator(int w, int h, long seed) {
+		setDimensions(w, h);
+		this.seed = seed;
+		
+		random.setSeed(seed);
+		
+		populate();
+	}
+	
+	/**
+	 * 
+	 * @param w
+	 * @param h
 	 * @param chanceToStartAlive
 	 * @param birthLimit
 	 * @param deathLimit
 	 */
-	public Cave(int size, float chanceToStartAlive, int birthLimit, int deathLimit) {
-		setSize(size);
+	public WorldGenerator(int w, int h, float chanceToStartAlive, int birthLimit, int deathLimit) {
+		setDimensions(w, h);
+		
 		this.chanceToStartAlive = chanceToStartAlive;
 		this.birthLimit = birthLimit;
 		this.deathLimit = deathLimit;
+		
 		populate();
 	}
 	
 	/**
 	 * 
-	 * @param size
+	 * @param w
+	 * @param h
 	 * @param seed
 	 * @param chanceToStartAlive
 	 * @param birthLimit
 	 * @param deathLimit
 	 */
-	public Cave(int size, long seed, float chanceToStartAlive, int birthLimit, int deathLimit) {
-		setSize(size);
+	public WorldGenerator(int w, int h, long seed, float chanceToStartAlive, int birthLimit, int deathLimit) {
+		setDimensions(w, h);
 		this.seed = seed;
+		
 		random.setSeed(seed);
+		
 		this.chanceToStartAlive = chanceToStartAlive;
 		this.birthLimit = birthLimit;
 		this.deathLimit = deathLimit;
+		
 		populate();
 	}
 	
 	/**
 	 * 
-	 * @param size
+	 * @param w
+	 * @param h
 	 */
-	public void setSize(int size) {
-		this.size = size;
-		grid = new Cell[size * size];
+	public void setDimensions(int w, int h) {
+		this.w = w;
+		this.h = h;
+		
+		grid = new Cell[w * h];
 		gridFloodFill = new int[grid.length];
 	}
 	
@@ -84,12 +163,12 @@ public class Cave {
 		System.out.println('\n' + "Generating cave with seed " + seed + "...");
 		final long start = System.currentTimeMillis();
 		
-	    for (int y = 0; y < size; y++) {
-	        for (int x = 0; x < size; x++) {
+	    for (int y = 0; y < h; y++) {
+	        for (int x = 0; x < w; x++) {
 	        	if (random.nextFloat() < chanceToStartAlive) {
-	        		grid[y * size + x] = Cell.FLOOR;
+	        		grid[y * w + x] = Cell.FLOOR;
 	        	} else {
-	        		grid[y * size + x] = Cell.WALL;
+	        		grid[y * w + x] = Cell.WALL;
 	        	}
 	        }
 	    }
@@ -106,17 +185,19 @@ public class Cave {
 		System.out.println("Performing transition step " + stepCount);
 
 		Cell[] temp = new Cell[grid.length];
-		for (int y = 0; y < size; y++) {
-			for (int x = 0; x < size; x++) {
+		for (int y = 0; y < h; y++) {
+			for (int x = 0; x < w; x++) {
 				int countAlive = countAliveMooreNeighbors(x, y);
-				final int index = y * size + x;
+				final int index = y * w + x;
+				
 				if (grid[index] == Cell.FLOOR) {
 					if (!(countAlive < deathLimit)) {
 						temp[index] = Cell.FLOOR;
 					} else {
 						temp[index] = Cell.WALL;
 					}
-				} else {
+				}
+				else {
 					if (countAlive > birthLimit) {
 						temp[index] = Cell.FLOOR;
 					} else {
@@ -126,10 +207,46 @@ public class Cave {
 			}
 		}
 		grid = temp;
+		
 		identityCaverns();
 	}
 	
-	public List<List<Vec2>> caverns = new ArrayList<>();
+	/**
+	 * 
+	 * @param cellToInsert
+	 * @param cellToReplace
+	 */
+	public void replaceCells(Cell cellToInsert, Cell cellToReplace) {
+		for (int i = 0; i < grid.length; i++) {
+			if (grid[i] == cellToReplace) {
+				grid[i] = cellToInsert;
+			}
+		}
+		
+		if (cellToReplace == Cell.SAND) {
+			borderCellsFilledWithSand = false;
+		}
+	}
+	
+	/**
+	 * 
+	 * @param cell
+	 */
+	public void fillBorderCellsWithSand() {
+		for (int y = 0; y < h; y++) {
+			for (int x = 0; x < w; x++) {
+				final int index = y * w + x;
+				
+				if (grid[index] == Cell.FLOOR) {
+					if (countMooreNeighborsOfType(x, y, Cell.WALL) >= 1) {
+						grid[index] = Cell.SAND;
+					}
+				}
+			}
+		}
+		
+		borderCellsFilledWithSand = true;
+	}
 	
 	/**
 	 * 
@@ -141,9 +258,9 @@ public class Cave {
 		caverns.clear();
 		
 		int floodFillId = 0;
-		for (int y = 0; y < size; y++) {
-			for (int x = 0; x < size; x++) {
-				if (grid[y * size + x] == Cell.FLOOR && gridFloodFill[y * size + x] == -1) {
+		for (int y = 0; y < h; y++) {
+			for (int x = 0; x < w; x++) {
+				if (grid[y * w + x] == Cell.FLOOR && gridFloodFill[y * w + x] == -1) {
 					caverns.add(new ArrayList<>());
 					floodFillCavern(x, y, floodFillId);
 					floodFillId++;
@@ -161,28 +278,30 @@ public class Cave {
 	 */
 	public void floodFillCavern(int x, int y, int floodFillId) {
 		// make sure this cell hasn't been visited yet
-		if (gridFloodFill[y * size + x] != -1) {
+		if (gridFloodFill[y * w + x] != -1) {
 			return;
 		}
+		
 		// make sure this cell can be filled
-		if (grid[y * size + x] == Cell.WALL) {
+		if (grid[y * w + x] == Cell.WALL) {
 			return;
 		}
+		
 		// mark this cell as visited
-		gridFloodFill[y * size + x] = floodFillId;
+		gridFloodFill[y * w + x] = floodFillId;
 		caverns.get(caverns.size() - 1).add(new Vec2(x, y));
 		
 		// recursively fill surrounding pixels
 		if (x > 0) {
 			floodFillCavern(x - 1, y, floodFillId);
 		}
-		if (x < size - 1) {
+		if (x < w - 1) {
 			floodFillCavern(x + 1, y, floodFillId);
 		}
 		if (y > 0) {
 			floodFillCavern(x, y - 1, floodFillId);
 		}
-		if (y < size - 1) {
+		if (y < h - 1) {
 			floodFillCavern(x, y + 1, floodFillId);
 		}
 	}
@@ -197,14 +316,12 @@ public class Cave {
 			for (int i = 0; i < caverns.size(); i++) {
 				if (i != mainCavernIndex) {
 					for (Vec2 pos : caverns.get(i)) {
-						grid[(int) (pos.y * size + pos.x)] = cell;
+						grid[(int) (pos.y * w + pos.x)] = cell;
 					}
 				}
 			}
 		}
 	}
-	
-	public boolean removedCaverns = false;
 	
 	/**
 	 * 
@@ -257,17 +374,30 @@ public class Cave {
 	 * @return
 	 */
 	private int countAliveMooreNeighbors(int x, int y) {
+		return countMooreNeighborsOfType(x, y, Cell.FLOOR);
+	}
+	
+	/**
+	 * 
+	 * @param x
+	 * @param y
+	 * @param cell
+	 * @return
+	 */
+	private int countMooreNeighborsOfType(int x, int y, Cell cell) {
 		int count = 0;
 		for (int j = y - 1; j <= y + 1; j++) {
 			for (int i = x - 1; i <= x + 1; i++) {
 				if (i == x && j == y) {
 					continue;
 				}
-				final int index = j * size + i;
-				if (index < 0 || index >= size * size) {
+				
+				final int index = j * w + i;
+				if (index < 0 || index >= w * h) {
 					continue;
 				}
-				if (grid[index] == Cell.FLOOR) {
+				
+				if (grid[index] == cell) {
 					count++;
 				}
 			}
@@ -281,5 +411,29 @@ public class Cave {
 	 */
 	public int countCaverns() {
 		return caverns.size();
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public int getW() {
+		return w;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public int getH() {
+		return h;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public long getSeed() {
+		return seed;
 	}
 }

@@ -8,9 +8,9 @@ import com.tomatrocho.game.gfx.Art;
 import com.tomatrocho.game.gfx.IAbstractBitmap;
 import com.tomatrocho.game.gfx.IAbstractScreen;
 import com.tomatrocho.game.gui.Font;
+import com.tomatrocho.game.level.World;
+import com.tomatrocho.game.level.tile.Tile;
 import com.tomatrocho.game.math.Vec2;
-import com.tomatrocho.game.world.level.World;
-import com.tomatrocho.game.world.tile.Tile;
 
 public abstract class Mob extends Entity {
 
