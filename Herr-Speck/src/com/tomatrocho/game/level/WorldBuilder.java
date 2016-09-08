@@ -2,8 +2,10 @@ package com.tomatrocho.game.level;
 
 import java.io.IOException;
 
-import com.tomatrocho.game.HerrSpeck;
 import com.tomatrocho.game.entity.Entity;
+import com.tomatrocho.game.level.tile.SandstoneTile;
+import com.tomatrocho.game.level.tile.SandstoneWallTile;
+import com.tomatrocho.game.level.tile.StoneTile;
 import com.tomatrocho.game.level.tile.Tile;
 import com.tomatrocho.game.level.tmx.TMXTileMap;
 import com.tomatrocho.generator.WorldGenerator;
@@ -14,11 +16,6 @@ public class WorldBuilder {
      * The {@link World} linked to the {@link WorldBuilder}.
      */
     protected World world;
-
-    /**
-     * The {@link TMXTileMap} linked to the {@link WorldBuilder}.
-     */
-    protected TMXTileMap map;
 
 
     /**
@@ -31,32 +28,38 @@ public class WorldBuilder {
      * @throws IOException
      */
     public World buildWorld(WorldInformation wi) throws IOException {
-    	if (wi.getFilePath() != null) {
-    		// tilemap is loaded from TMX file
-            try {
-                map = new TMXTileMap(HerrSpeck.class.getResourceAsStream(wi.getFilePath()));
-                
-                if (map.getLayerCount() < 1) {
-                    throw new IOException("The world has no layer!");
-                }
-            }
-            catch (Exception ex) {
-                ex.printStackTrace();
-            }
-            
-            this.world = new World(wi.getName(), wi.getW(), wi.getH());
-            processLevelMap(map);
+    	this.world = new World(wi.getName(), wi.getW(), wi.getH());
+    	
+    	if (wi.randomlyGenerated()) {
+    		WorldGenerator generator = new WorldGenerator(wi.getW(), wi.getH(), wi.getSeed(), wi.getFrequency());
+    		for (int i = 0; i < 5; i++) {
+    			generator.doStep();
+    		}
+    		generator.removeDisconnectedCaverns();
+    		generator.fillBorderCellsWithSand();
+    		
+    		for (int y = 0; y < generator.getH(); y++) {
+    			for (int x = 0; x < generator.getW(); x++) {
+    				world.addTile(x, y, new SandstoneTile());
+    				
+    				switch (generator.grid[y * generator.getW() + x]) {
+    				case WALL:
+    					world.addTile(x, y, new SandstoneWallTile());
+    					break;
+    				case FLOOR:
+    					world.setTile(x, y, new StoneTile());
+    					break;
+    				default:
+    					break;
+    				}
+    			}
+    		}
     	}
     	else {
-    		// tilemap has to be generated
-    		WorldGenerator generator = new WorldGenerator(wi.getW(), wi.getH(), wi.getSeed());
-    		
+    		processLevelMap(wi.getTileMap());
     	}
         
-        System.out.println(String.format("Sanitizing loaded world \"%s\"...", world.getName()));
         world.sanitizeTileMap();
-        
-        System.out.println("Calculating bitmasking values...");
         world.calculateTileConnections();
         
         return world;

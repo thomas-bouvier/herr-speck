@@ -10,6 +10,21 @@ public class WorldGenerator {
 	/**
 	 * 
 	 */
+	public static float DEFAULT_FREQUENCY = 0.45f;
+	
+	/**
+	 * 
+	 */
+	public static int DEFAULT_BIRTH_THRESHOLD = 4;
+	
+	/**
+	 * 
+	 */
+	public static int DEFAULT_DEATH_THRESHOLD = 3;
+	
+	/**
+	 * 
+	 */
 	private int w;
 	
 	/**
@@ -25,7 +40,7 @@ public class WorldGenerator {
 	/**
 	 * 
 	 */
-	public int[] gridFloodFill;
+	public int[] floodFillData;
 	
 	/**
 	 * 
@@ -40,22 +55,22 @@ public class WorldGenerator {
 	/**
 	 * 
 	 */
-	public float chanceToStartAlive = 0.45f;
+	private float frequency = DEFAULT_FREQUENCY;
 	
 	/**
 	 * 
 	 */
-	public int birthLimit = 4;
+	private int birthThreshold = DEFAULT_BIRTH_THRESHOLD;
 	
 	/**
 	 * 
 	 */
-	public int deathLimit = 3;
+	private int deathThreshold = DEFAULT_DEATH_THRESHOLD;
 	
 	/**
 	 * 
 	 */
-	public int stepCount = 0;
+	private int stepCount = 0;
 	
 	/**
 	 * 
@@ -80,9 +95,7 @@ public class WorldGenerator {
 	 */
 	public WorldGenerator(int w, int h) {
 		setDimensions(w, h);
-		this.seed = random.nextLong();
-		
-		random.setSeed(seed);
+		setRandomSeed();
 		
 		populate();
 	}
@@ -95,9 +108,9 @@ public class WorldGenerator {
 	 */
 	public WorldGenerator(int w, int h, long seed) {
 		setDimensions(w, h);
-		this.seed = seed;
-		
 		random.setSeed(seed);
+		
+		this.seed = seed;
 		
 		populate();
 	}
@@ -106,19 +119,32 @@ public class WorldGenerator {
 	 * 
 	 * @param w
 	 * @param h
-	 * @param chanceToStartAlive
+	 * @param frequency
+	 */
+	public WorldGenerator(int w, int h, float frequency) {
+		setDimensions(w, h);
+		setRandomSeed();
+		
+		this.frequency = frequency;
+		
+		populate();
+	}
+	
+	/**
+	 * 
+	 * @param w
+	 * @param h
+	 * @param frequency
 	 * @param birthLimit
 	 * @param deathLimit
 	 */
-	public WorldGenerator(int w, int h, float chanceToStartAlive, int birthLimit, int deathLimit) {
+	public WorldGenerator(int w, int h, float frequency, int birthLimit, int deathLimit) {
 		setDimensions(w, h);
-		this.seed = random.nextLong();
+		setRandomSeed();
 		
-		random.setSeed(seed);
-		
-		this.chanceToStartAlive = chanceToStartAlive;
-		this.birthLimit = birthLimit;
-		this.deathLimit = deathLimit;
+		this.frequency = frequency;
+		this.birthThreshold = birthLimit;
+		this.deathThreshold = deathLimit;
 		
 		populate();
 	}
@@ -128,19 +154,35 @@ public class WorldGenerator {
 	 * @param w
 	 * @param h
 	 * @param seed
-	 * @param chanceToStartAlive
+	 * @param frequency
+	 */
+	public WorldGenerator(int w, int h, long seed, float frequency) {
+		setDimensions(w, h);
+		random.setSeed(seed);
+		
+		this.seed = seed;
+		this.frequency = frequency;
+		
+		populate();
+	}
+	
+	/**
+	 * 
+	 * @param w
+	 * @param h
+	 * @param seed
+	 * @param frequency
 	 * @param birthLimit
 	 * @param deathLimit
 	 */
-	public WorldGenerator(int w, int h, long seed, float chanceToStartAlive, int birthLimit, int deathLimit) {
-		setDimensions(w, h);
-		this.seed = seed;
-		
+	public WorldGenerator(int w, int h, long seed, float frequency, int birthLimit, int deathLimit) {
+		setDimensions(w, h);		
 		random.setSeed(seed);
 		
-		this.chanceToStartAlive = chanceToStartAlive;
-		this.birthLimit = birthLimit;
-		this.deathLimit = deathLimit;
+		this.seed = seed;
+		this.frequency = frequency;
+		this.birthThreshold = birthLimit;
+		this.deathThreshold = deathLimit;
 		
 		populate();
 	}
@@ -155,13 +197,21 @@ public class WorldGenerator {
 		this.h = h;
 		
 		grid = new Cell[w * h];
-		gridFloodFill = new int[grid.length];
+		floodFillData = new int[grid.length];
 	}
 	
 	/**
 	 * 
-	 * @param chanceToStartAlive
-	 * @param birthLimit
+	 */
+	public void setRandomSeed() {
+		this.seed = random.nextLong();
+		random.setSeed(seed);
+	}
+	
+	/**
+	 * 
+	 * @param frequency
+	 * @param birthThreshold
 	 * @param deathLimit
 	 * @param seed
 	 */
@@ -171,7 +221,7 @@ public class WorldGenerator {
 		
 	    for (int y = 0; y < h; y++) {
 	        for (int x = 0; x < w; x++) {
-	        	if (random.nextFloat() < chanceToStartAlive) {
+	        	if (random.nextFloat() < frequency) {
 	        		grid[y * w + x] = Cell.FLOOR;
 	        	}
 	        	else {
@@ -179,7 +229,6 @@ public class WorldGenerator {
 	        	}
 	        }
 	    }
-	    doStep();
 	    
 	    System.out.println("Generated cave in " + (System.currentTimeMillis() - start) + " ms.");
 	}
@@ -198,14 +247,14 @@ public class WorldGenerator {
 				final int index = y * w + x;
 				
 				if (grid[index] == Cell.FLOOR) {
-					if (!(countAlive < deathLimit)) {
+					if (!(countAlive < deathThreshold)) {
 						temp[index] = Cell.FLOOR;
 					} else {
 						temp[index] = Cell.WALL;
 					}
 				}
 				else {
-					if (countAlive > birthLimit) {
+					if (countAlive > birthThreshold) {
 						temp[index] = Cell.FLOOR;
 					} else {
 						temp[index] = Cell.WALL;
@@ -259,15 +308,15 @@ public class WorldGenerator {
 	 * 
 	 */
 	public void identityCaverns() {
-		for (int i = 0; i < gridFloodFill.length; i++) {
-			gridFloodFill[i] = -1;
+		for (int i = 0; i < floodFillData.length; i++) {
+			floodFillData[i] = -1;
 		}
 		caverns.clear();
 		
 		int floodFillId = 0;
 		for (int y = 0; y < h; y++) {
 			for (int x = 0; x < w; x++) {
-				if (grid[y * w + x] == Cell.FLOOR && gridFloodFill[y * w + x] == -1) {
+				if (grid[y * w + x] == Cell.FLOOR && floodFillData[y * w + x] == -1) {
 					caverns.add(new ArrayList<>());
 					floodFillCavern(x, y, floodFillId);
 					floodFillId++;
@@ -285,7 +334,7 @@ public class WorldGenerator {
 	 */
 	public void floodFillCavern(int x, int y, int floodFillId) {
 		// make sure this cell hasn't been visited yet
-		if (gridFloodFill[y * w + x] != -1) {
+		if (floodFillData[y * w + x] != -1) {
 			return;
 		}
 		
@@ -295,7 +344,7 @@ public class WorldGenerator {
 		}
 		
 		// mark this cell as visited
-		gridFloodFill[y * w + x] = floodFillId;
+		floodFillData[y * w + x] = floodFillId;
 		caverns.get(caverns.size() - 1).add(new Vec2(x, y));
 		
 		// recursively fill surrounding pixels
@@ -442,5 +491,37 @@ public class WorldGenerator {
 	 */
 	public long getSeed() {
 		return seed;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public float getFrequency() {
+		return frequency;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public int getBirthThreshold() {
+		return birthThreshold;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public int getDeathThreshold() {
+		return deathThreshold;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public int getStepCount() {
+		return stepCount;
 	}
 }

@@ -60,19 +60,19 @@ public class WorldGeneratorUI extends JPanel implements ActionListener {
 		
 		JLabel frequencyLabel = new JLabel("Frequency");
 		frequencyField = new JTextField(3);
-		frequencyField.setText(String.valueOf(generator.chanceToStartAlive));
+		frequencyField.setText(String.valueOf(generator.getFrequency()));
 		cellularAutomataPanel.add(frequencyLabel, "gap unrelated");
 		cellularAutomataPanel.add(frequencyField);
 	    
-		JLabel birtLimitLabel = new JLabel("Birth limit");
+		JLabel birtLimitLabel = new JLabel("Birth threshold");
 		birthLimitField = new JTextField(1);
-		birthLimitField.setText(String.valueOf(generator.birthLimit));
+		birthLimitField.setText(String.valueOf(generator.getBirthThreshold()));
 		cellularAutomataPanel.add(birtLimitLabel, "gap unrelated");
 		cellularAutomataPanel.add(birthLimitField);
 		
-		JLabel deathLimitLabel = new JLabel("Death limit");
+		JLabel deathLimitLabel = new JLabel("Death threshold");
 		deathLimitField = new JTextField(1);
-		deathLimitField.setText(String.valueOf(generator.deathLimit));
+		deathLimitField.setText(String.valueOf(generator.getDeathThreshold()));
 		cellularAutomataPanel.add(deathLimitLabel, "gap unrelated");
 		cellularAutomataPanel.add(deathLimitField);
 		

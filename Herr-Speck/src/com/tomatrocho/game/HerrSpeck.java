@@ -225,7 +225,7 @@ public class HerrSpeck extends Canvas implements Runnable, MouseListener, MouseM
     *
     */
    private synchronized void initLevel() {
-	   createWorld(WorldList.getLevelByName("tmx_level"));
+	   createWorld(WorldList.getLevelByName("generated_level"));
 	   
 	   if (world != null) {
 	       player = new Player(world, keys, mouse);

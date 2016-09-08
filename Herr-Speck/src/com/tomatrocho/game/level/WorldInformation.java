@@ -1,9 +1,12 @@
 package com.tomatrocho.game.level;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
 import com.tomatrocho.game.HerrSpeck;
+import com.tomatrocho.game.level.tmx.TMXTileMap;
+import com.tomatrocho.generator.WorldGenerator;
 
 public class WorldInformation {
 
@@ -20,12 +23,12 @@ public class WorldInformation {
     /**
      *
      */
-    private String filePath;
+    private String tileMapPath;
     
     /**
-     * 
+     * The {@link TMXTileMap} linked to the {@link WorldBuilder}.
      */
-    private long seed = -1;
+    protected TMXTileMap tileMap;
     
     /**
      * 
@@ -45,6 +48,16 @@ public class WorldInformation {
     /**
      * 
      */
+    private long seed = -1;
+    
+    /**
+     * 
+     */
+    private float frequency;
+    
+    /**
+     * 
+     */
     private boolean randomlyGenerated;
     
 
@@ -56,11 +69,23 @@ public class WorldInformation {
      */
     public WorldInformation(String name, String filePath) {
         this.name = name;
-        this.filePath = filePath;
+        this.tileMapPath = filePath;
         
+        try {
+            this.tileMap = new TMXTileMap(HerrSpeck.class.getResourceAsStream(filePath));
+            if (tileMap.getLayerCount() < 1) {
+                throw new IOException("The world has no layer!");
+            }
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        
+        this.w = tileMap.getW();
+        this.h = tileMap.getH();
         this.randomlyGenerated = false;
         
-        System.out.println("World info added: " + filePath);
+        System.out.println("World info " + filePath + " added.");
     }
     
     /**
@@ -78,17 +103,33 @@ public class WorldInformation {
      * @param name
      * @param w
      * @param h
+     * @param frequency
+     */
+    public WorldInformation(String name, int w, int h, float frequency) {
+    	this(name, w, h, HerrSpeck.random.nextLong(), frequency);
+    }
+    
+    /**
+     * 
+     * @param name
+     * @param w
+     * @param h
      * @param seed
      */
     public WorldInformation(String name, int w, int h, long seed) {
+    	this(name, w, h, seed, WorldGenerator.DEFAULT_FREQUENCY);
+    }
+    
+    public WorldInformation(String name, int w, int h, long seed, float frequency) {
     	this.name = name;
     	this.w = w;
     	this.h = h;
     	this.seed = seed;
+    	this.frequency = frequency;
     	
     	this.randomlyGenerated = true;
     	
-    	System.out.println("World seed added: " + seed);
+    	System.out.println("World seed " + seed + " added.");
     }
 
     /**
@@ -120,11 +161,19 @@ public class WorldInformation {
     }
     
     /**
+     *
+     * @return
+     */
+    public String getTileMapPath() {
+    	return tileMapPath;
+    }
+    
+    /**
      * 
      * @return
      */
-    public long getSeed() {
-    	return seed;
+    public TMXTileMap getTileMap() {
+    	return tileMap;
     }
     
     /**
@@ -143,13 +192,6 @@ public class WorldInformation {
     	return h;
     }
 
-    /**
-     *
-     * @return
-     */
-    public String getFilePath() {
-        return filePath;
-    }
 
     /**
      *
@@ -157,6 +199,22 @@ public class WorldInformation {
      */
     public String getDescription() {
         return description;
+    }
+    
+    /**
+     * 
+     * @return
+     */
+    public long getSeed() {
+    	return seed;
+    }
+    
+    /**
+     * 
+     * @return
+     */
+    public float getFrequency() {
+    	return frequency;
     }
     
     /**

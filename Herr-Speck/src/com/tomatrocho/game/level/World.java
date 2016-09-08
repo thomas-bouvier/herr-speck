@@ -95,6 +95,7 @@ public class World {
 		for (int i = 0; i < w * h; i++) {
 			entityMap.add(new ArrayList<>());
 		}
+		
 		seen = new boolean[(w + 1) * (h + 1)];
 	}
 	
@@ -102,6 +103,8 @@ public class World {
 	 * 
 	 */
 	public void sanitizeTileMap() {
+		System.out.println(String.format("Sanitizing loaded world \"%s\"...", name));
+		
 		// empty tiles
         for (int y = 0; y < h; y++) {
         	for(int x = 0; x < w; x++) {
@@ -133,7 +136,10 @@ public class World {
 	 * 
 	 */
 	public void calculateTileConnections() {
+		System.out.println("Calculating bitmasking values...");
+		
 		WorldUtils.loadBitmaskingValues();
+		
 		for (int i = 0; i < w * h; i++) {
 			final List<Tile> tiles = this.tiles.get(i);
 			for (int z = 0; z < tiles.size(); z++) {
