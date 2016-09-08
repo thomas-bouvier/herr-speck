@@ -123,11 +123,14 @@ public class Font {
 			final char character = text.charAt(i);
 			final IAbstractBitmap sprite = getCharacterSprite(character);
 			int heightOffset = 0;
+			
 			if (characters.indexOf(character) < 0) {
 				heightOffset = getHeightOffset(character);
 			}
+			
 			screen.blit(sprite, x, y + heightOffset);
 			x += sprite.getW() + letterSpacing;
+			
 			if (x + sprite.getW() > w) {
 				x = startX;
 				y += glyphHeight + 2;
@@ -212,7 +215,7 @@ public class Font {
 	/**
 	 * Stores already builed sprites for missing characters.
 	 */
-	private Map<Character, IAbstractBitmap> characterCache = new HashMap<>();
+	private static Map<Character, IAbstractBitmap> characterCache = new HashMap<>();
 	
 	/**
 	 * 
@@ -231,16 +234,20 @@ public class Font {
 		if (characterCache.containsKey(character)) {
 			return characterCache.get(character);
 		}
+		
 		java.awt.Font font = new java.awt.Font("SansSerif", java.awt.Font.BOLD, systemFontHeight);
+		
 		// drawing the character
 		final int size = font.getSize() * 3;
 		BufferedImage image = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
+		
 		Graphics2D g2 = image.createGraphics();
 		g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
 		g2.setFont(font);
 		g2.setColor(Color.MAGENTA);
 		g2.drawString(Character.toString(character), font.getStyle(), 2 * font.getSize());
 		g2.dispose();
+		
 		// building the sprite
 		int[][] pixels2d = new int[size][size];
 		for (int y = size - 1; y >= 0; y--) {
@@ -250,6 +257,7 @@ public class Font {
 				}
 			}
 		}
+		
 		int emptyRowsTop = 0;
 		top :
 		for (int y = 0; y < size; y++) {
@@ -260,9 +268,11 @@ public class Font {
 			}
 			emptyRowsTop++;
 		}
+		
 		characterHeightOffset.put(character, emptyRowsTop - font.getSize() - heightOffset);
 		IAbstractBitmap sprite = HerrSpeck.getScreen().createBitmap(cropCharacterSprite(pixels2d));
 		characterCache.put(character, sprite);
+		
 		return sprite;
 	}
 	
@@ -274,6 +284,7 @@ public class Font {
 	private int[][] cropCharacterSprite(int[][] pixels2d) {
 		final int w = pixels2d.length;
 		final int h = pixels2d[0].length;
+		
 		int emptyRowsTop = 0;
 		top :
 		for (int y = 0; y < h; y++) {
@@ -284,6 +295,7 @@ public class Font {
 			}
 			emptyRowsTop++;
 		}
+		
 		int emptyRowsBottom = 0;
 		bottom :
 		for (int y = h - 1; y >= 0; y--) {
@@ -294,6 +306,7 @@ public class Font {
 			}
 			emptyRowsBottom++;
 		}
+		
 		int emptyColsLeft = 0;
 		left :
 		for (int x = 0; x < w; x++) {
@@ -304,6 +317,7 @@ public class Font {
 			}
 			emptyColsLeft++;
 		}
+		
 		int emptyColsRight = 0;
 		right :
 		for (int x = w - 1; x >= 0; x--) {
@@ -314,15 +328,18 @@ public class Font {
 			}
 			emptyColsRight++;
 		}
+		
 		if (emptyRowsTop + emptyRowsBottom >= h || emptyColsLeft + emptyColsRight >= w) {
 			return new int[0][0];
 		}
+		
 		int[][] pixels2dCropped = new int[w - emptyColsLeft - emptyColsRight][h - emptyRowsTop - emptyRowsBottom];
 		for (int y = emptyRowsTop; y < h - emptyRowsBottom; y++) {
 			for (int x = emptyColsLeft; x < w - emptyColsRight; x++) {
 				pixels2dCropped[x - emptyColsLeft][y - emptyRowsTop] = pixels2d[x][y]; 
 			}
 		}
+		
 		return pixels2dCropped;
 	}
 	
@@ -330,6 +347,7 @@ public class Font {
 		if (!characterHeightOffset.containsKey(character)) {
 			buildCharacterSprite(character);
 		}
+		
 		return characterHeightOffset.get(character);
 	}
 	
@@ -351,5 +369,13 @@ public class Font {
 	 */
 	public static void setDefaultFont(Font font) {
 		DEFAULT_FONT = font;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public int getGlyphHeight() {
+		return glyphHeight;
 	}
 }

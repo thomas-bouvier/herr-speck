@@ -19,12 +19,13 @@ import javax.swing.WindowConstants;
 import com.tomatrocho.game.entity.mob.Player;
 import com.tomatrocho.game.gfx.IAbstractScreen;
 import com.tomatrocho.game.gfx.Screen;
-import com.tomatrocho.game.gui.Font;
+import com.tomatrocho.game.gui.Hud;
+import com.tomatrocho.game.gui.Hud.TextLocation;
 import com.tomatrocho.game.input.Input;
 import com.tomatrocho.game.input.Keys;
 import com.tomatrocho.game.input.Mouse;
-import com.tomatrocho.game.level.WorldBuilder;
 import com.tomatrocho.game.level.World;
+import com.tomatrocho.game.level.WorldBuilder;
 import com.tomatrocho.game.level.WorldInformation;
 import com.tomatrocho.game.level.WorldList;
 import com.tomatrocho.game.level.tile.Tile;
@@ -94,6 +95,11 @@ public class HerrSpeck extends Canvas implements Runnable, MouseListener, MouseM
      *
      */
     private static Screen screen;
+    
+    /**
+     * 
+     */
+    private static Hud hud;
 
     /**
      *
@@ -191,6 +197,8 @@ public class HerrSpeck extends Canvas implements Runnable, MouseListener, MouseM
         // screen
         screen = new Screen(W, H);
         screen.loadResources();
+        
+        hud = new Hud(screen);
         
         // thread
         thread = new Thread(this, "Display");
@@ -389,13 +397,24 @@ public class HerrSpeck extends Canvas implements Runnable, MouseListener, MouseM
      */
     private synchronized void renderGui(IAbstractScreen screen) {
     	// fonts
-    	if (debug) {    		
-    		final Font font = Font.getDefaultFont();
-    		font.draw(screen, String.format("%s (%s * %s, *%s)", NAME, W, H, SCALE), 5, 8);
-    		font.draw(screen, String.format("%d ups, %d fps", ups, fps), 5, 18);
-    		font.draw(screen, String.format("x: %f (%d)", player.getX(), (int) (player.getX() / Tile.W)), 5, 28);
-    		font.draw(screen, String.format("y: %f (%d)", player.getY(), (int) (player.getY() / Tile.H)), 5, 38);
-    		font.draw(screen, String.format("%d entities", world.getEntities().size()), 5, 48);
+    	if (debug) {
+    		// top left
+    		hud.add(String.format("%s (%s * %s, *%s)", NAME, W, H, SCALE));
+    		hud.add(String.format("%d ups, %d fps", ups, fps));
+   
+    		final WorldInformation worldInformation = WorldList.getLevelByName(world.getName());
+    		if (worldInformation.randomlyGenerated()) {
+    			hud.add("Seed: " + worldInformation.getSeed());
+    		}
+    		
+    		hud.add(String.format("x: %f (%d)", player.getX(), (int) (player.getX() / Tile.W)));
+    		hud.add(String.format("y: %f (%d)", player.getY(), (int) (player.getY() / Tile.H)));
+    		hud.add(String.format("%d entities", world.getEntities().size()));
+    		
+    		// top right
+    		hud.add("F3 to generate new world", TextLocation.TOP_RIGHT);
+    		
+    		hud.render();
     	}
     }
     
