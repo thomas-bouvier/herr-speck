@@ -96,12 +96,14 @@ public abstract class Mob extends Entity {
 
 	/**
 	 * 
-	 * @param level
+	 * @param world
 	 * @param x
 	 * @param y
+	 * @param team
 	 */
 	public Mob(World world, int x, int y, Team team) {
 		super(world, x, y, team);
+		
 		health = maxHealth;
 	}
 
@@ -118,7 +120,8 @@ public abstract class Mob extends Entity {
 			if (bumps.notNull()) {
 				move(bumps.x, bumps.y);
 			}
-		} else {
+		}
+		else {
 			if (health <= 0) {
 				remove();
 			}

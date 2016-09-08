@@ -14,7 +14,7 @@ public class WorldList {
     private static List<WorldInformation> levels = new ArrayList<>();
 
     static {
-    	levels.add(new WorldInformation("generated_level", 100, 100, 0.48f));
+    	levels.add(new WorldInformation("generated_level", 100, 100, 0.475f));
 //    	levels.add(new WorldInformation("tmx_level", "/levels/test.tmx"));
     }
 

@@ -38,6 +38,8 @@ public class WorldBuilder {
     		generator.removeDisconnectedCaverns();
     		generator.fillBorderCellsWithSand();
     		
+    		world.setSpawnLocation(generator.placeEntrance());
+    		
     		for (int y = 0; y < generator.getH(); y++) {
     			for (int x = 0; x < generator.getW(); x++) {
     				world.addTile(x, y, new SandstoneTile());
@@ -47,6 +49,7 @@ public class WorldBuilder {
     					world.addTile(x, y, new SandstoneWallTile());
     					break;
     				case FLOOR:
+    				case ENTRANCE:
     					world.setTile(x, y, new StoneTile());
     					break;
     				default:

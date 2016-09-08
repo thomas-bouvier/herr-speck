@@ -42,6 +42,11 @@ public class World {
 	/**
 	 * 
 	 */
+	private Vec2 spawnLocation;
+	
+	/**
+	 * 
+	 */
 	private boolean[] seen;
 
 	/**
@@ -146,6 +151,14 @@ public class World {
 				tiles.get(z).applyBitmask();
 			}
 		}
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public boolean canPlayerSpawn() {
+		return spawnLocation != null;
 	}
 	
 	/**
@@ -634,6 +647,14 @@ public class World {
 		tile.init(this, x, y, layer);
 		tiles.get(y * w + x).set(layer, tile);
 	}
+	
+	/**
+	 * 
+	 * @param spawnLocation
+	 */
+	public void setSpawnLocation(Vec2 spawnLocation) {
+		this.spawnLocation = spawnLocation;
+	}
 
 	/**
 	 * Retrieves the {@link Tile} at the specified location.
@@ -747,6 +768,14 @@ public class World {
 	 */
 	public int getH() {
 		return h;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public Vec2 getSpawnLocation() {
+		return spawnLocation;
 	}
 
 	/**

@@ -269,6 +269,28 @@ public class WorldGenerator {
 	
 	/**
 	 * 
+	 * @return
+	 */
+	public Vec2 placeEntrance() {
+		final int mainCavernIndex = getMainCavernIndex();
+		Vec2 pos = null;
+		
+		for (int i = 0; i < caverns.size(); i++) {
+			if (i == mainCavernIndex) {
+				do {
+					pos = caverns.get(i).get(random.nextInt(caverns.get(i).size()));
+				}
+				while (countMooreNeighborsOfType((int) pos.x, (int) pos.y, Cell.WALL) >= 1);
+				
+				grid[(int) (pos.y * w + pos.x)] = Cell.ENTRANCE;
+			}
+		}
+		
+		return pos;
+	}
+	
+	/**
+	 * 
 	 * @param cellToInsert
 	 * @param cellToReplace
 	 */
@@ -401,7 +423,8 @@ public class WorldGenerator {
 	public void swapDisconnectedCavernsState() {
 		if (removedCaverns) {
 			restoreDisconnectedCaverns();
-		} else {
+		}
+		else {
 			removeDisconnectedCaverns();
 		}
 	}

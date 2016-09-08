@@ -23,7 +23,14 @@ public class WorldGeneratorUI extends JPanel implements ActionListener {
 	private Display display;
 	
 	private final JTextField widthField, heightField, frequencyField, birthLimitField, deathLimitField, seedField;
-	private final JButton addSandCells, swapDisconnectedCavernsState, doStepButton, generateCaveButton, generateCaveRandomSeedButton;
+	
+	private final JButton doStepButton;
+	
+	private final JButton addSandCellsButton, placeEntranceButton;
+	
+	private final JButton swapDisconnectedCavernsState;
+	
+	private final JButton generateCaveButton, generateCaveRandomSeedButton;
 	
 	
 	public WorldGeneratorUI(WorldGenerator generator) {
@@ -86,10 +93,15 @@ public class WorldGeneratorUI extends JPanel implements ActionListener {
 		
 		JPanel extraCellsPanel = new JPanel(new MigLayout());
 		
-		addSandCells = new JButton("Add sand cells");
-		addSandCells.addActionListener(this);
-		extraCellsPanel.add(addSandCells);
+		addSandCellsButton = new JButton("Add sand cells");
+		addSandCellsButton.addActionListener(this);
+		extraCellsPanel.add(addSandCellsButton);
 		
+		placeEntranceButton = new JButton("Place entrance");
+		placeEntranceButton.addActionListener(this);
+		placeEntranceButton.setEnabled(false);
+		extraCellsPanel.add(placeEntranceButton);
+
 		extraCellsPanel.setBorder(new TitledBorder("Extra cells"));
 		
 		// caverns panel
@@ -98,6 +110,7 @@ public class WorldGeneratorUI extends JPanel implements ActionListener {
 		
 		swapDisconnectedCavernsState = new JButton("Remove disconnected caverns");
 		swapDisconnectedCavernsState.addActionListener(this);
+		swapDisconnectedCavernsState.setEnabled(false);
 		cavernsPanel.add(swapDisconnectedCavernsState);
 		
 		cavernsPanel.setBorder(new TitledBorder("Caverns"));
@@ -131,7 +144,7 @@ public class WorldGeneratorUI extends JPanel implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent event) {
 		try {
-			if (event.getSource() == addSandCells) {
+			if (event.getSource() == addSandCellsButton) {
 				String text = null;
 				if (display.generator.borderCellsFilledWithSand) {
 					text = "Add sand cells";
@@ -143,7 +156,10 @@ public class WorldGeneratorUI extends JPanel implements ActionListener {
 					
 					display.generator.fillBorderCellsWithSand();
 				}
-				addSandCells.setText(text);
+				addSandCellsButton.setText(text);
+			}
+			else if (event.getSource() == placeEntranceButton) {
+				display.generator.placeEntrance();
 			}
 			else if (event.getSource() == swapDisconnectedCavernsState) {
 				display.generator.swapDisconnectedCavernsState();
@@ -162,6 +178,9 @@ public class WorldGeneratorUI extends JPanel implements ActionListener {
 				swapDisconnectedCavernsState.setText(text);
 			}
 			else if (event.getSource() == doStepButton) {
+				placeEntranceButton.setEnabled(true);
+				swapDisconnectedCavernsState.setEnabled(true);
+				
 				if (display.generator.borderCellsFilledWithSand) {
 					display.generator.replaceCells(Cell.FLOOR, Cell.SAND);
 					display.generator.doStep();
@@ -176,6 +195,9 @@ public class WorldGeneratorUI extends JPanel implements ActionListener {
 				}
 			}
 			else if (event.getSource() == generateCaveButton) {
+				placeEntranceButton.setEnabled(false);
+				swapDisconnectedCavernsState.setEnabled(false);
+				
 				int w = Integer.parseInt(widthField.getText());
 				int h = Integer.parseInt(heightField.getText());
 				long seed = Long.parseLong(seedField.getText());
@@ -185,10 +207,12 @@ public class WorldGeneratorUI extends JPanel implements ActionListener {
 				
 				display.setWorldGenerator(new WorldGenerator(w, h, seed, frequency, birthLimit, deathLimit));
 				
-				swapDisconnectedCavernsState.setEnabled(true);
 				seedField.setText(String.valueOf(display.generator.getSeed()));
 			}
 			else if (event.getSource() == generateCaveRandomSeedButton) {
+				placeEntranceButton.setEnabled(false);
+				swapDisconnectedCavernsState.setEnabled(false);
+				
 				int w = Integer.parseInt(widthField.getText());
 				int h = Integer.parseInt(heightField.getText());
 				float frequency = Float.parseFloat(frequencyField.getText());
@@ -197,7 +221,6 @@ public class WorldGeneratorUI extends JPanel implements ActionListener {
 				
 				display.setWorldGenerator(new WorldGenerator(w, h, frequency, birthLimit, deathLimit));
 				
-				swapDisconnectedCavernsState.setEnabled(true);
 				seedField.setText(String.valueOf(display.generator.getSeed()));
 			}
 

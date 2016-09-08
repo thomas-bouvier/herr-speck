@@ -11,6 +11,7 @@ import com.tomatrocho.game.gfx.IAbstractBitmap;
 import com.tomatrocho.game.input.Keys;
 import com.tomatrocho.game.input.Mouse;
 import com.tomatrocho.game.level.World;
+import com.tomatrocho.game.level.tile.Tile;
 import com.tomatrocho.game.math.Vec2;
 
 public class Player extends Mob {
@@ -68,11 +69,23 @@ public class Player extends Mob {
     
     /**
      * 
+     * @param world
      * @param keys
      * @param mouse
      */
     public Player(World world, Keys keys, Mouse mouse) {
-    	this(world, 0, 0, keys, mouse);
+    	this(world, world.getSpawnLocation(), keys, mouse);
+    }
+    
+    /**
+     * 
+     * @param world
+     * @param pos
+     * @param keys
+     * @param mouse
+     */
+    public Player(World world, Vec2 pos, Keys keys, Mouse mouse) {
+    	this(world, (int) pos.x, (int) pos.y, keys, mouse);
     }
 
     /**
@@ -83,12 +96,15 @@ public class Player extends Mob {
      * @param mouse
      */
     public Player(World world, int x, int y, Keys keys, Mouse mouse) {
-    	super(world, x, y, Team.TEAM_1);
+    	super(world, x * Tile.W, y * Tile.H, Team.TEAM_1);
+    	
     	speed = 2;
     	radius.x = 10;
     	radius.y = 13;
+    	
         this.keys = keys;
         this.mouse = mouse;
+        
         weaponInventory.add(new Rifle(this));
         weapon = weaponInventory.get(weaponInventorySlot);
     }
