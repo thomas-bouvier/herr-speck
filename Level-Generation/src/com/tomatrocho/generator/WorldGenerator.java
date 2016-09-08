@@ -80,6 +80,9 @@ public class WorldGenerator {
 	 */
 	public WorldGenerator(int w, int h) {
 		setDimensions(w, h);
+		this.seed = random.nextLong();
+		
+		random.setSeed(seed);
 		
 		populate();
 	}
@@ -109,6 +112,9 @@ public class WorldGenerator {
 	 */
 	public WorldGenerator(int w, int h, float chanceToStartAlive, int birthLimit, int deathLimit) {
 		setDimensions(w, h);
+		this.seed = random.nextLong();
+		
+		random.setSeed(seed);
 		
 		this.chanceToStartAlive = chanceToStartAlive;
 		this.birthLimit = birthLimit;
@@ -167,14 +173,15 @@ public class WorldGenerator {
 	        for (int x = 0; x < w; x++) {
 	        	if (random.nextFloat() < chanceToStartAlive) {
 	        		grid[y * w + x] = Cell.FLOOR;
-	        	} else {
+	        	}
+	        	else {
 	        		grid[y * w + x] = Cell.WALL;
 	        	}
 	        }
 	    }
 	    doStep();
 	    
-	    System.out.println("Generated cave in " + (System.currentTimeMillis() - start) + " ms");
+	    System.out.println("Generated cave in " + (System.currentTimeMillis() - start) + " ms.");
 	}
 	
 	/**

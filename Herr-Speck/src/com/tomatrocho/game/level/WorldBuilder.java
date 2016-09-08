@@ -8,21 +8,21 @@ import com.tomatrocho.game.level.tile.Tile;
 import com.tomatrocho.game.level.tmx.TMXTileMap;
 import com.tomatrocho.generator.WorldGenerator;
 
-public class Level {
+public class WorldBuilder {
 
     /**
-     * The {@link World} linked to the {@link Level}.
+     * The {@link World} linked to the {@link WorldBuilder}.
      */
     protected World world;
 
     /**
-     * The {@link TMXTileMap} linked to the {@link Level}.
+     * The {@link TMXTileMap} linked to the {@link WorldBuilder}.
      */
     protected TMXTileMap map;
 
 
     /**
-     * Generate a {@link World} from its {@link WorldInformation}.
+     * Build a {@link World} from its {@link WorldInformation}.
      *
      * @param wi
      * 		the {@link WorldInformation} object linked to the {@link World} to generate
@@ -30,7 +30,7 @@ public class Level {
      * 		the generated {@link World}
      * @throws IOException
      */
-    public World generateWorld(WorldInformation wi) throws IOException {
+    public World buildWorld(WorldInformation wi) throws IOException {
     	if (wi.getFilePath() != null) {
     		// tilemap is loaded from TMX file
             try {

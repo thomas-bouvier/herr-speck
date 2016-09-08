@@ -42,6 +42,11 @@ public class WorldInformation {
      */
     private String description;
     
+    /**
+     * 
+     */
+    private boolean randomlyGenerated;
+    
 
     /**
      * Constructor for the {@link WorldInformation} class.
@@ -52,6 +57,8 @@ public class WorldInformation {
     public WorldInformation(String name, String filePath) {
         this.name = name;
         this.filePath = filePath;
+        
+        this.randomlyGenerated = false;
         
         System.out.println("World info added: " + filePath);
     }
@@ -78,6 +85,8 @@ public class WorldInformation {
     	this.w = w;
     	this.h = h;
     	this.seed = seed;
+    	
+    	this.randomlyGenerated = true;
     	
     	System.out.println("World seed added: " + seed);
     }
@@ -148,5 +157,13 @@ public class WorldInformation {
      */
     public String getDescription() {
         return description;
+    }
+    
+    /**
+     * 
+     * @return
+     */
+    public boolean randomlyGenerated() {
+    	return randomlyGenerated;
     }
 }

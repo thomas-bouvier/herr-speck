@@ -23,52 +23,66 @@ public class WorldGeneratorUI extends JPanel implements ActionListener {
 	private Display display;
 	
 	private final JTextField widthField, heightField, frequencyField, birthLimitField, deathLimitField, seedField;
-	private final JButton addSandCells, swapDisconnectedCavernsState, doStepButton, generateCaveButton;
+	private final JButton addSandCells, swapDisconnectedCavernsState, doStepButton, generateCaveButton, generateCaveRandomSeedButton;
 	
 	
 	public WorldGeneratorUI(WorldGenerator generator) {
 		setSize(1000, 1000);
 		setLayout(new MigLayout());
 		
-		JPanel mapGenerationPanel = new JPanel(new MigLayout());
+		// map properties panel
+		
+		JPanel mapPropertiesPanel = new JPanel(new MigLayout());
 		
 		JLabel widthLabel = new JLabel("Width");
 		widthField = new JTextField(3);
 		widthField.setText(String.valueOf(generator.getW()));
-		mapGenerationPanel.add(widthLabel);
-		mapGenerationPanel.add(widthField);
+		mapPropertiesPanel.add(widthLabel);
+		mapPropertiesPanel.add(widthField);
 		
 		JLabel heightLabel = new JLabel("Height");
 		heightField = new JTextField(3);
 		heightField.setText(String.valueOf(generator.getH()));
-		mapGenerationPanel.add(heightLabel);
-		mapGenerationPanel.add(heightField);
+		mapPropertiesPanel.add(heightLabel);
+		mapPropertiesPanel.add(heightField);
 		
 		JLabel seedLabel = new JLabel("Seed");
 		seedField = new JTextField(15);
 		seedField.setText(String.valueOf(generator.getSeed()));
-		mapGenerationPanel.add(seedLabel, "gap unrelated");
-		mapGenerationPanel.add(seedField);
+		mapPropertiesPanel.add(seedLabel, "gap unrelated");
+		mapPropertiesPanel.add(seedField);
+		
+		mapPropertiesPanel.setBorder(new TitledBorder("Map properties"));
+		
+		// cellular automata panel
+		
+		JPanel cellularAutomataPanel = new JPanel(new MigLayout());
 		
 		JLabel frequencyLabel = new JLabel("Frequency");
 		frequencyField = new JTextField(3);
 		frequencyField.setText(String.valueOf(generator.chanceToStartAlive));
-		mapGenerationPanel.add(frequencyLabel, "gap unrelated");
-		mapGenerationPanel.add(frequencyField);
+		cellularAutomataPanel.add(frequencyLabel, "gap unrelated");
+		cellularAutomataPanel.add(frequencyField);
 	    
 		JLabel birtLimitLabel = new JLabel("Birth limit");
 		birthLimitField = new JTextField(1);
 		birthLimitField.setText(String.valueOf(generator.birthLimit));
-		mapGenerationPanel.add(birtLimitLabel, "gap unrelated");
-		mapGenerationPanel.add(birthLimitField);
+		cellularAutomataPanel.add(birtLimitLabel, "gap unrelated");
+		cellularAutomataPanel.add(birthLimitField);
 		
 		JLabel deathLimitLabel = new JLabel("Death limit");
 		deathLimitField = new JTextField(1);
 		deathLimitField.setText(String.valueOf(generator.deathLimit));
-		mapGenerationPanel.add(deathLimitLabel, "gap unrelated");
-		mapGenerationPanel.add(deathLimitField);
+		cellularAutomataPanel.add(deathLimitLabel, "gap unrelated");
+		cellularAutomataPanel.add(deathLimitField);
 		
-		mapGenerationPanel.setBorder(new TitledBorder("Map generation"));
+		doStepButton = new JButton("Apply transition rules");
+		doStepButton.addActionListener(this);
+		cellularAutomataPanel.add(doStepButton, "gapleft 20");
+		
+		cellularAutomataPanel.setBorder(new TitledBorder("Cellular automata"));
+		
+		// extra cells panel
 		
 		JPanel extraCellsPanel = new JPanel(new MigLayout());
 		
@@ -78,27 +92,40 @@ public class WorldGeneratorUI extends JPanel implements ActionListener {
 		
 		extraCellsPanel.setBorder(new TitledBorder("Extra cells"));
 		
-		display = new Display(generator);
-		display.setPreferredSize(new Dimension(600, 600));
-		add(display, BorderLayout.CENTER);
+		// caverns panel
 		
-		JPanel buttons = new JPanel(new MigLayout());
+		JPanel cavernsPanel = new JPanel(new MigLayout());
 		
 		swapDisconnectedCavernsState = new JButton("Remove disconnected caverns");
 		swapDisconnectedCavernsState.addActionListener(this);
-		buttons.add(swapDisconnectedCavernsState);
+		cavernsPanel.add(swapDisconnectedCavernsState);
 		
-		doStepButton = new JButton("Apply transition rules");
-		doStepButton.addActionListener(this);
-		buttons.add(doStepButton);
+		cavernsPanel.setBorder(new TitledBorder("Caverns"));
+		
+		// display panel
+		
+		display = new Display(generator);
+		display.setPreferredSize(new Dimension(600, 600));
+		seedField.setText(String.valueOf(generator.getSeed()));
+		
+		// buttons panel
+		
+		JPanel buttons = new JPanel(new MigLayout());
 
-		generateCaveButton = new JButton("Generate new cave");
+		generateCaveButton = new JButton("Generate new cave with current seed");
 		generateCaveButton.addActionListener(this);
 		buttons.add(generateCaveButton);
 		
-		add(mapGenerationPanel, BorderLayout.NORTH);
-		add(extraCellsPanel, BorderLayout.NORTH);
-		add(buttons, BorderLayout.SOUTH);
+		generateCaveRandomSeedButton = new JButton("Generate new cave with random seed");
+		generateCaveRandomSeedButton.addActionListener(this);
+		buttons.add(generateCaveRandomSeedButton);
+		
+		add(mapPropertiesPanel, "split 2");
+		add(cellularAutomataPanel, "span 1 2, growy, wrap");
+		add(extraCellsPanel, "split 2, growx");
+		add(cavernsPanel, "growx, wrap");
+		add(display, "align center, wrap");
+		add(buttons, "align center");
 	}
 	
 	@Override
@@ -151,7 +178,19 @@ public class WorldGeneratorUI extends JPanel implements ActionListener {
 			else if (event.getSource() == generateCaveButton) {
 				int w = Integer.parseInt(widthField.getText());
 				int h = Integer.parseInt(heightField.getText());
+				long seed = Long.parseLong(seedField.getText());
+				float frequency = Float.parseFloat(frequencyField.getText());
+				int birthLimit = Integer.parseInt(birthLimitField.getText());
+				int deathLimit = Integer.parseInt(deathLimitField.getText());
 				
+				display.setWorldGenerator(new WorldGenerator(w, h, seed, frequency, birthLimit, deathLimit));
+				
+				swapDisconnectedCavernsState.setEnabled(true);
+				seedField.setText(String.valueOf(display.generator.getSeed()));
+			}
+			else if (event.getSource() == generateCaveRandomSeedButton) {
+				int w = Integer.parseInt(widthField.getText());
+				int h = Integer.parseInt(heightField.getText());
 				float frequency = Float.parseFloat(frequencyField.getText());
 				int birthLimit = Integer.parseInt(birthLimitField.getText());
 				int deathLimit = Integer.parseInt(deathLimitField.getText());

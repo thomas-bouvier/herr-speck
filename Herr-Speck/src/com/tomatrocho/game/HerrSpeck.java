@@ -23,7 +23,7 @@ import com.tomatrocho.game.gui.Font;
 import com.tomatrocho.game.input.Input;
 import com.tomatrocho.game.input.Keys;
 import com.tomatrocho.game.input.Mouse;
-import com.tomatrocho.game.level.Level;
+import com.tomatrocho.game.level.WorldBuilder;
 import com.tomatrocho.game.level.World;
 import com.tomatrocho.game.level.WorldInformation;
 import com.tomatrocho.game.level.WorldList;
@@ -118,7 +118,7 @@ public class HerrSpeck extends Canvas implements Runnable, MouseListener, MouseM
     /**
      *
      */
-    private Level level = new Level();
+    private WorldBuilder level = new WorldBuilder();
 
     /**
      *
@@ -239,7 +239,7 @@ public class HerrSpeck extends Canvas implements Runnable, MouseListener, MouseM
      */
     private synchronized void createWorld(WorldInformation worldInformation) {
         try {
-            world = level.generateWorld(worldInformation);
+            world = level.buildWorld(worldInformation);
         } catch (IOException ex) {
             ex.printStackTrace();
         }
@@ -258,20 +258,24 @@ public class HerrSpeck extends Canvas implements Runnable, MouseListener, MouseM
         double deltaU = 0;
         //double deltaR = 0;
         long timer = System.currentTimeMillis();
+        
         while (running) {
             long now = System.nanoTime();
             deltaU += (now - old) / nanoU;
             //deltaR += (now - old) / nanoR;
             old = now;
+            
             if (deltaU >= 1) {
                 tick();
                 deltaU--;
             }
+            
             BufferStrategy bs = getBufferStrategy();
             if (bs == null) {
                 createBufferStrategy(3);
                 continue;
             }
+            
             //if (deltaR >= 1) {
                 render(bs.getDrawGraphics());
                 bs.show();
@@ -284,10 +288,12 @@ public class HerrSpeck extends Canvas implements Runnable, MouseListener, MouseM
                 frames = ticks = 0;
                 timer += 1000;
             }
+            
             try {
 				Thread.sleep(4);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
+			}
+            catch (InterruptedException ex) {
+				ex.printStackTrace();
 			}
         }
         stop();
@@ -331,15 +337,19 @@ public class HerrSpeck extends Canvas implements Runnable, MouseListener, MouseM
     	if (mousePosition != null) {
     		mouse.setPosition(mousePosition.x / SCALE, mousePosition.y / SCALE);
     	}
+    	
     	if (mouse.pressed()) {
     		mouse.setHidden(false);
     		mouse.setHideTime(0);
-    	} else {
+    	}
+    	else {
     		mouse.incrementHideTime();
     	}
+    	
     	if (mouse.getHideTime() > Mouse.HIDE_DELAY) {
     		mouse.setHidden(true);
     	}
+    	
     	mouse.tick();
     }
 
