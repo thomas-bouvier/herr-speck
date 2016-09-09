@@ -3,6 +3,7 @@ package com.tomatrocho.game.level;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 import com.tomatrocho.game.HerrSpeck;
 import com.tomatrocho.game.level.tmx.TMXTileMap;
@@ -60,6 +61,11 @@ public class WorldInformation {
      */
     private boolean randomlyGenerated;
     
+    /**
+     * 
+     */
+    private static Random random = new Random();
+    
 
     /**
      * Constructor for the {@link WorldInformation} class.
@@ -95,7 +101,7 @@ public class WorldInformation {
      * @param h
      */
     public WorldInformation(String name, int w, int h) {
-    	this(name, w, h, HerrSpeck.random.nextLong());
+    	this(name, w, h, getRandomSeed());
     }
     
     /**
@@ -106,7 +112,7 @@ public class WorldInformation {
      * @param frequency
      */
     public WorldInformation(String name, int w, int h, float frequency) {
-    	this(name, w, h, HerrSpeck.random.nextLong(), frequency);
+    	this(name, w, h, getRandomSeed(), frequency);
     }
     
     /**
@@ -120,6 +126,14 @@ public class WorldInformation {
     	this(name, w, h, seed, WorldGenerator.DEFAULT_FREQUENCY);
     }
     
+    /**
+     * 
+     * @param name
+     * @param w
+     * @param h
+     * @param seed
+     * @param frequency
+     */
     public WorldInformation(String name, int w, int h, long seed, float frequency) {
     	this.name = name;
     	this.w = w;
@@ -150,6 +164,21 @@ public class WorldInformation {
      */
     private static String sanitizePath(String path){
         return path.substring(path.indexOf("levels"));
+    }
+    
+    /**
+     * 
+     */
+    public void setRandomSeed() {
+    	this.seed = getRandomSeed();
+    }
+    
+    /**
+     * 
+     * @return
+     */
+    public static long getRandomSeed() {
+    	return random.nextLong();
     }
 
     /**

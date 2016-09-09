@@ -135,7 +135,8 @@ public abstract class Tile implements IComparableDepth, IBoundingBoxOwner {
 		if (canPass(entity)) {
 			return;
 		}
-		bbs.add(new BoundingBox(this, x, y, x + Tile.W, y + Tile.H));
+		
+		bbs.add(new BoundingBox(this, x * Tile.W, y * Tile.H, (x + 1) * Tile.W, (y + 1) * Tile.H));
 	}
 	
 	/**

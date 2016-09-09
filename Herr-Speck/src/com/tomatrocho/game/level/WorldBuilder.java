@@ -32,7 +32,7 @@ public class WorldBuilder {
     	
     	if (wi.randomlyGenerated()) {
     		WorldGenerator generator = new WorldGenerator(wi.getW(), wi.getH(), wi.getSeed(), wi.getFrequency());
-    		for (int i = 0; i < 5; i++) {
+    		for (int i = 0; i < 6; i++) {
     			generator.doStep();
     		}
     		generator.removeDisconnectedCaverns();

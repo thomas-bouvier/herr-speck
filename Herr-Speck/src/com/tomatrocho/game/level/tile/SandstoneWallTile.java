@@ -21,6 +21,11 @@ public class SandstoneWallTile extends Tile {
     }
     
     @Override
+	public boolean canPass(Entity entity) {
+		return false;
+	}
+    
+    @Override
     public boolean isConnectable() {
     	return true;
     }

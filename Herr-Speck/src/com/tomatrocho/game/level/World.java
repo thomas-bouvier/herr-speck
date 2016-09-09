@@ -1,21 +1,25 @@
 package com.tomatrocho.game.level;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
+
 import com.tomatrocho.game.HerrSpeck;
 import com.tomatrocho.game.entity.Entity;
 import com.tomatrocho.game.entity.predicates.EntityIntersectsBB;
-import com.tomatrocho.game.gfx.IAbstractScreen;
 import com.tomatrocho.game.gfx.Art;
+import com.tomatrocho.game.gfx.DepthComparator;
+import com.tomatrocho.game.gfx.IAbstractScreen;
 import com.tomatrocho.game.gfx.IComparableDepth;
 import com.tomatrocho.game.level.tile.SandstoneTile;
 import com.tomatrocho.game.level.tile.StoneTile;
 import com.tomatrocho.game.level.tile.Tile;
-import com.tomatrocho.game.gfx.DepthComparator;
-import com.tomatrocho.game.gfx.IAbstractBitmap;
 import com.tomatrocho.game.math.BoundingBox;
 import com.tomatrocho.game.math.IBoundingBoxPredicate;
 import com.tomatrocho.game.math.Vec2;
-
-import java.util.*;
 
 public class World {
 
@@ -199,16 +203,20 @@ public class World {
 	private void addToEntityMap(Entity entity) {
 		entity.setXTo((int) (entity.getX() - entity.getRadius().x) / Tile.W);
 		entity.setYTo((int) (entity.getY() - entity.getRadius().y) / Tile.H);
+		
 		final int x1 = entity.getXTo() + (int) (entity.getRadius().x * 2 + 1) / Tile.W;
 		final int y1 = entity.getYTo() + (int) (entity.getRadius().y * 2 + 1) / Tile.H;
+		
 		for (int y = entity.getYTo(); y <= y1; y++) {
 			if (y < 0 || y >= h) {
 				continue;
 			}
+			
 			for (int x = entity.getXTo(); x <= x1; x++) {
 				if (x < 0 || x >= w) {
 					continue;
 				}
+				
 				entityMap.get(y * w + x).add(entity);
 			}
 		}
@@ -230,14 +238,17 @@ public class World {
 	private void removeFromEntityMap(Entity entity) {
 		final int x1 = entity.getXTo() + (int) (entity.getRadius().x * 2 + 1) / Tile.W;
 		final int y1 = entity.getYTo() + (int) (entity.getRadius().y * 2 + 1) / Tile.H;
+		
 		for (int y = entity.getYTo(); y <= y1; y++) {
 			if (y < 0 || y >= h) {
 				continue;
 			}
+			
 			for (int x = entity.getXTo(); x <= x1; x++) {
 				if (x < 0 || x >= w) {
 					continue;
 				}
+				
 				entityMap.get(y * w + x).remove(entity);
 			}
 		}
@@ -251,29 +262,35 @@ public class World {
 	public List<BoundingBox> getClipBoundingBoxes(Entity entity) {
 		List<BoundingBox> bbs = new ArrayList<>();
 		BoundingBox bb = entity.getBoundingBox().grow(Tile.W);
+		
 		// computing corner pins
 		int x0 = (int) (bb.x0 / Tile.W);
 		int y0 = (int) (bb.y0 / Tile.H);
 		int x1 = (int) (bb.x1 / Tile.W);
 		int y1 = (int) (bb.y1 / Tile.H);
+		
 		// adding bounding boxes from tiles
 		for (int y = y0; y <= y1; y++) {
 			if (y < 0 || y >= h) {
 				continue;
 			}
+			
 			for (int x = x0; x <= x1; x++) {
 				if (x < 0 || x >= w) {
 					continue;
 				}
+				
 				getTile(x, y).addClipBoundingBoxes(bbs, entity);
 			}
 		}
+		
 		// adding bounding boxes from other entities
 		for (Entity e : getEntities(bb)) {
 			if (e != entity && e.blocks(entity)) {
 				bbs.add(e.getBoundingBox());
 			}
 		}
+		
 		return bbs;
 	}
 	
@@ -293,19 +310,23 @@ public class World {
 		int y0 = (yScroll) / Tile.H;
 		int x1 = (xScroll + screen.getW()) / Tile.W;
 		int y1 = (yScroll + screen.getH()) / Tile.H + Tile.H;
+		
 		if (xScroll < 0) {
 			x0--;
 		}
 		if (yScroll < 0) {
 			y0--;
 		}
+		
 		// setting offsets equal to xScroll, yScroll
 		screen.setOffset(xScroll, yScroll);
 		
 		// level rendering
 		Set<IComparableDepth> objectsToRender = new TreeSet<>(new DepthComparator());
+		
 		// adding entities to render list
 		entities.stream().forEach(entity -> objectsToRender.add(entity));
+		
 		// adding tiles to render list
 		for (int y = y0; y <= y1; y++) {
 			for (int x = x1; x >= x0; x--) {
@@ -313,14 +334,17 @@ public class World {
 					screen.blit(Art.stoneTiles[0][0], x * Tile.W, y * Tile.H);
 					continue;
 				}
+				
 				final List<Tile> tiles = this.tiles.get(y * w + x);
 				for (int i = 0; i < tiles.size(); i++) {
 					objectsToRender.add(tiles.get(i));
 				}
 			}
 		}
+		
 		// objects rendering
 		objectsToRender.stream().forEach(object -> object.render(screen));
+		
 		// rendering bounding boxes
 		if (HerrSpeck.debug()) {			
 			renderBoundingBoxes(screen);
@@ -395,20 +419,15 @@ public class World {
 	 * @param screen
 	 */
 	public void renderBoundingBoxes(IAbstractScreen screen) {
+		Set<BoundingBox> bbs = new HashSet<>();
 		for (Entity entity : entities) {
-			final BoundingBox bb = entity.getBoundingBox();
-			final int w = (int) (bb.x1 - bb.x0);
-			final int h = (int) (bb.y1 - bb.y0);
-			IAbstractBitmap sprite = screen.createBitmap(w, h);
-			for (int x = 0; x <= w; x++) {
-				for (int y = 0; y <= h; y++) {
-					if (x == 0 || x == w - 1 || y == 0|| y == h - 1) {
-						sprite.setPixel(y * w + x, entity.getTeam().getCol());
-					}
-				}
+			bbs.add(entity.getBoundingBox());
+			for (final BoundingBox bb : getClipBoundingBoxes(entity)) {
+				bbs.add(bb);
 			}
-			screen.blit(sprite, bb.x0, bb.y0);
 		}
+		
+		bbs.stream().forEach(bb -> bb.draw(screen));
 	}
 	
 	/**

@@ -120,11 +120,16 @@ public class HerrSpeck extends Canvas implements Runnable, MouseListener, MouseM
      *
      */
     private int frames = 0;
+    
+    /**
+     * 
+     */
+    private String worldName;
 
     /**
      *
      */
-    private WorldBuilder level = new WorldBuilder();
+    private WorldBuilder worldBuilder = new WorldBuilder();
 
     /**
      *
@@ -233,7 +238,9 @@ public class HerrSpeck extends Canvas implements Runnable, MouseListener, MouseM
     *
     */
    private synchronized void initLevel() {
-	   createWorld(WorldList.getLevelByName("generated_level"));
+	   this.worldName = "generated_world";
+	   
+	   createWorld(WorldList.getWorldByName(worldName));
 	   
 	   if (world != null) {
 		   if (world.canPlayerSpawn()) {
@@ -249,8 +256,9 @@ public class HerrSpeck extends Canvas implements Runnable, MouseListener, MouseM
      */
     private synchronized void createWorld(WorldInformation worldInformation) {
         try {
-            world = level.buildWorld(worldInformation);
-        } catch (IOException ex) {
+            this.world = worldBuilder.buildWorld(worldInformation);
+        }
+        catch (IOException ex) {
             ex.printStackTrace();
         }
     }
@@ -341,6 +349,12 @@ public class HerrSpeck extends Canvas implements Runnable, MouseListener, MouseM
     	if (keys.debug.wasPressed()) {
     		debug = !debug;
     	}
+    	if (keys.generateNewWorld.wasPressed()) {
+    		if (debug) {
+    			WorldList.getWorldByName(worldName).setRandomSeed();
+    			initLevel();
+    		}
+    	}
     	
     	// mouse
     	final Point mousePosition = getMousePosition();
@@ -402,7 +416,7 @@ public class HerrSpeck extends Canvas implements Runnable, MouseListener, MouseM
     		hud.add(String.format("%s (%s * %s, *%s)", NAME, W, H, SCALE));
     		hud.add(String.format("%d ups, %d fps", ups, fps));
    
-    		final WorldInformation worldInformation = WorldList.getLevelByName(world.getName());
+    		final WorldInformation worldInformation = WorldList.getWorldByName(world.getName());
     		if (worldInformation.randomlyGenerated()) {
     			hud.add("Seed: " + worldInformation.getSeed());
     		}

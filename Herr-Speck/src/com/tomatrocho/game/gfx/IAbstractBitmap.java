@@ -1,5 +1,7 @@
 package com.tomatrocho.game.gfx;
 
+import java.awt.Color;
+
 public interface IAbstractBitmap {
 
     //TODO fonctions miroirs
@@ -131,6 +133,21 @@ public interface IAbstractBitmap {
      * @param color
      */
     public void setPixel(int x, int y, int color);
+    
+    /**
+     * 
+     * @param pos
+     * @param color
+     */
+    public void setPixel(int pos, Color color);
+    
+    /**
+     * 
+     * @param x
+     * @param y
+     * @param color
+     */
+    public void setPixel(int x, int y, Color color);
 
     /**
      *

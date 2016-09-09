@@ -176,10 +176,12 @@ public abstract class Mob extends Entity {
 		if (hurtTime > 0) {
 			if (hurtTime > 40 - 6 && hurtTime % 2 == 0) {
 				screen.colorBlit(sprite, pos.x - sprite.getW() / 2, pos.y - sprite.getH() / 2, 0x80ffffff);
-			} else {
+			}
+			else {
 				screen.colorBlit(sprite, pos.x - sprite.getW() / 2, pos.y - sprite.getH() / 2, 0x80ff0000);
 			}
-		} else {
+		}
+		else {
 			screen.blit(sprite, pos.x - sprite.getW() / 2, pos.y - sprite.getH() / 2);
 		}
 		

@@ -90,9 +90,11 @@ public class Bullet extends Entity {
 			remove();
 			return;
 		}
+		
 		if (!move(xa, ya)) {
 			hit = true;
 		}
+		
 		if (hit && !removed) {
 			remove();
 		}
@@ -103,6 +105,7 @@ public class Bullet extends Entity {
 		if (entity instanceof Bullet) {
 			return false;
 		}
+		
 		return entity != shooter;
 	}
 	

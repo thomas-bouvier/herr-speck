@@ -111,6 +111,7 @@ public class Keys {
 	public Key fireLeft = new Key("fireLeftp");
 	public Key fireRight = new Key("fireRight");
 	public Key debug = new Key("debug");
+	public Key generateNewWorld = new Key("generateNewWorld");
 
 
 	/**

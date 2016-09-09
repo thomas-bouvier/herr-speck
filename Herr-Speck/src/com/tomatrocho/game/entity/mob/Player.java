@@ -115,7 +115,8 @@ public class Player extends Mob {
     public void tick() {
     	if (!mouse.isHidden()) {
     		aimByMouse(mouse.getX() - HerrSpeck.W / 2, mouse.getY() - HerrSpeck.H / 2);
-    	} else {
+    	}
+    	else {
     		aimByKeyboard();
     	}
     	
@@ -161,6 +162,7 @@ public class Player extends Mob {
         if (!mouseAiming && fireKeyDown() && xaShot * xaShot + yaShot * yaShot != 0) {
         	aimVector.set(xaShot, yaShot);
         	aimVector.normalize();
+        	
         	updateFacing();
         }
         
@@ -169,6 +171,10 @@ public class Player extends Mob {
             handleMovement(xa, ya);
             moving = true;
         }
+        
+        move(xd, yd);
+        xd *= 0.1;
+        yd *= 0.1;
         
         handleShooting(xa, ya);
         
@@ -190,8 +196,10 @@ public class Player extends Mob {
     protected void aimByMouse(int x, int y) {
     	if (x != 0 || y != 0) {
     		mouseAiming = true;
+    		
     		aimVector.set(x, y);
         	aimVector.normalize();
+        	
         	updateFacing();
     	}
     }
@@ -207,6 +215,7 @@ public class Player extends Mob {
     *
     */
    protected void handleMovement(double xa, double ya) {
+	   // facing
        int diffOrient = facing - ((int) (-Math.atan2(xa, ya) * 8 / (2 * Math.PI) + 8.5) & 7);
        if (diffOrient >= 4) {
            diffOrient -= 8;
@@ -214,18 +223,25 @@ public class Player extends Mob {
        if (diffOrient < -4) {
            diffOrient += 8;
        }
+       
+       // walk time
        if (diffOrient > 2 || diffOrient < -4) {
            walkTime--;
-       } else {
+       }
+       else {
            walkTime++;
        }
        
        // computing diagonal speed
        final double speed = this.speed / Math.sqrt(xa * xa + ya * ya);
+       
        xa *= speed;
        ya *= speed;
-       pos.x += xa;
-       pos.y += ya;
+       
+       xd += xa;
+       yd += ya;
+//       pos.x += xa;
+//       pos.y += ya;
    }
    
    /**
@@ -235,6 +251,7 @@ public class Player extends Mob {
     */
    protected void handleShooting(double xa, double ya) {
 	   weapon.tick();
+	   
 	   if (fireKeyDown() || mouse.isDown(FIRE_MOUSE_BUTTON)) {
 		   if (weapon instanceof Rifle) {
 			   ((Rifle) weapon).fire(xa, ya);
@@ -253,6 +270,8 @@ public class Player extends Mob {
     @Override
     public void render(IAbstractScreen screen) {
     	super.render(screen);
+    	
+    	// sprite blit
     	IAbstractBitmap sprite = getSprite();
         screen.blit(sprite, pos.x - sprite.getW() / 2, pos.y - sprite.getH() / 2);
         
@@ -268,10 +287,13 @@ public class Player extends Mob {
     	IAbstractBitmap sprite = null;
     	if (moving) {
     		final int frame = (walkTime / 4 % 6 + 6) % 6;
+    		
     		sprite = (Bitmap) Art.player[frame][facing];
-    	} else {
+    	}
+    	else {
     		sprite = (Bitmap) Art.player[0][facing];
     	}
+    	
     	return sprite;
     }
     
@@ -306,6 +328,7 @@ public class Player extends Mob {
     	Vec2 offsets = new Vec2();
     	offsets.x = -13.5 * Math.sin(facing * Math.PI / 4);
     	offsets.y = Math.sin(facing * Math.PI / 4) + 11 * Math.cos(facing * Math.PI / 4) + 8;
+    	
     	return offsets;
     }
 }

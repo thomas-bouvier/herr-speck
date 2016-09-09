@@ -1,5 +1,6 @@
 package com.tomatrocho.game.gfx;
 
+import java.awt.Color;
 import java.util.Arrays;
 
 public class Bitmap implements IAbstractBitmap {
@@ -333,6 +334,16 @@ public class Bitmap implements IAbstractBitmap {
         if (pos >= 0 && pos < pixels.length) {
             pixels[pos] = color;
         }
+    }
+    
+    @Override
+    public void setPixel(int pos, Color color) {
+    	setPixel(pos, color.getRGB());
+    }
+    
+    @Override
+    public void setPixel(int x, int y, Color color) {
+    	setPixel(x, y, color.getRGB());
     }
 
     @Override

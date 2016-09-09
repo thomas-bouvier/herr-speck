@@ -32,6 +32,7 @@ public class Input implements KeyListener {
         init(keys.fireRight, KeyEvent.VK_RIGHT);
         init(keys.debug, KeyEvent.VK_F2);
         init(keys.fullscreen, KeyEvent.VK_F11);
+        init(keys.generateNewWorld, KeyEvent.VK_F3);
     }
 
     /**

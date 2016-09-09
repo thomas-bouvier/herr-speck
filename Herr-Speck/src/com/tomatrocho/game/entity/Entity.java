@@ -26,6 +26,16 @@ public abstract class Entity implements IComparableDepth, IBoundingBoxOwner {
 	/**
 	 * 
 	 */
+	protected double xd;
+	
+	/**
+	 * 
+	 */
+	protected double yd;
+	
+	/**
+	 * 
+	 */
 	protected int xTo;
 	
 	/**
@@ -114,6 +124,7 @@ public abstract class Entity implements IComparableDepth, IBoundingBoxOwner {
 	 */
 	protected boolean move(double xa, double ya) {
 		List<BoundingBox> bbs = world.getClipBoundingBoxes(this);
+		
 		if (xa == 0 || ya == 0) {
 			boolean moved = false;
 			if (!removed) {
@@ -122,8 +133,10 @@ public abstract class Entity implements IComparableDepth, IBoundingBoxOwner {
 			if (!removed) {
 				moved |= partMove(bbs, 0, ya);
 			}
+			
 			return moved;
-		} else {
+		}
+		else {
 			boolean moved = true;
 			if (!removed) {
 				moved &= partMove(bbs, xa, 0);
@@ -131,6 +144,7 @@ public abstract class Entity implements IComparableDepth, IBoundingBoxOwner {
 			if (!removed) {
 				moved &= partMove(bbs, 0, ya);
 			}
+			
 			return moved;
 		}
 	}
@@ -148,14 +162,17 @@ public abstract class Entity implements IComparableDepth, IBoundingBoxOwner {
 		final BoundingBox from = getBoundingBox();
 		BoundingBox closest = null;
 		final double epsilon = 0.01;
+		
 		for (BoundingBox to : bbs) {
 			if (from.intersects(to)) {
 				continue;
 			}
+			
 			if (ya == 0) {
 				if (to.y0 >= from.y1 || to.y1 <= from.y0) {
 					continue;
 				}
+				
 				if (xa > 0) {
 					final double xrd = to.x0 - from.x1;
 					// to is at right
@@ -166,7 +183,8 @@ public abstract class Entity implements IComparableDepth, IBoundingBoxOwner {
 							xa = 0;
 						}
 					}
-				} else if (xa < 0) {
+				}
+				else if (xa < 0) {
 					final double xld = from.x0 - to.x1;
 					// to is at left
 					if (xld >= 0 && -xa > xld) {
@@ -178,10 +196,12 @@ public abstract class Entity implements IComparableDepth, IBoundingBoxOwner {
 					}
 				}
 			}
+			
 			if (xa == 0) {
 				if (to.x0 >= from.x1 || to.x1 <= from.x0) {
 					continue;
 				}
+				
 				if (ya > 0) {
 					final double yrd = to.y0 - from.y1;
 					// to is down
@@ -192,7 +212,8 @@ public abstract class Entity implements IComparableDepth, IBoundingBoxOwner {
 							ya = 0;
 						}
 					}
-				} else if (ya < 0) {
+				}
+				else if (ya < 0) {
 					final double yld = from.y0 - to.y1;
 					// to is up
 					if (yld >= 0 && -ya > yld) {
@@ -205,14 +226,17 @@ public abstract class Entity implements IComparableDepth, IBoundingBoxOwner {
 				}
 			}
 		}
+		
 		if (closest != null && closest.getOwner() != null) {
 			closest.getOwner().handleCollision(this, xxa, yya);
 		}
+		
 		if (xa != 0 || ya != 0) {
 			pos.x += xa;
 			pos.y += ya;
 			return true;
 		}
+		
 		return false;
 	}
 	

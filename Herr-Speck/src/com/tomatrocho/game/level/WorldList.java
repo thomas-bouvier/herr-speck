@@ -14,7 +14,7 @@ public class WorldList {
     private static List<WorldInformation> levels = new ArrayList<>();
 
     static {
-    	levels.add(new WorldInformation("generated_level", 100, 100, 0.48f));
+    	levels.add(new WorldInformation("generated_world", 100, 100, 0.47f));
 //    	levels.add(new WorldInformation("generated_level", "/levels/test.tmx"));
     }
 
@@ -22,13 +22,13 @@ public class WorldList {
     /**
      *
      */
-    public static void createLevelList() {
-        System.out.println(new File(HerrSpeck.getDir(), "levels"));
-        File levelsLocation = new File(HerrSpeck.getDir(), "levels");
+    public static void createWorldList() {
+        System.out.println(new File(HerrSpeck.getDir(), "worlds"));
+        File worldsLocation = new File(HerrSpeck.getDir(), "worlds");
         
-        if (!levelsLocation.exists()) {
-            if (levelsLocation.mkdirs()) {
-                loadDir(levelsLocation);
+        if (!worldsLocation.exists()) {
+            if (worldsLocation.mkdirs()) {
+                loadDir(worldsLocation);
             }
         }
     }
@@ -61,17 +61,17 @@ public class WorldList {
     
     /**
      * 
-     * @param name
+     * @param worldName
      * @return
      */
-    public static WorldInformation getLevelByName(String name) {
-    	for (WorldInformation levelInformation : levels) {
-    		if (levelInformation.getName().equalsIgnoreCase(name)) {
-    			return levelInformation;
+    public static WorldInformation getWorldByName(String worldName) {
+    	for (WorldInformation wi : levels) {
+    		if (wi.getName().equalsIgnoreCase(worldName)) {
+    			return wi;
     		}
     	}
     	
-    	throw new UnknownWorldException("Unknown world: " + name);
+    	throw new UnknownWorldException("Unknown world: " + worldName);
     }
     
     
@@ -96,7 +96,7 @@ public class WorldList {
      */
     public static List<WorldInformation> getLevels() {
         if (levels == null) {
-            createLevelList();
+            createWorldList();
         }
         return levels;
     }
