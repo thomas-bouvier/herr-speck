@@ -10,7 +10,7 @@ public class RockTile extends Tile {
      * Default constructor for the {@link StoneTile} class.
      */
     public RockTile() {
-        img = 0;
+        this.img = 0;
     }
 
     @Override

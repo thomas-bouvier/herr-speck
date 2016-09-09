@@ -2,17 +2,17 @@ package com.tomatrocho.game.entity.mob;
 
 import com.tomatrocho.game.HerrSpeck;
 import com.tomatrocho.game.entity.Mob;
-import com.tomatrocho.game.entity.weapon.Rifle;
-import com.tomatrocho.game.entity.weapon.WeaponInventory;
-import com.tomatrocho.game.gfx.IAbstractScreen;
 import com.tomatrocho.game.gfx.Art;
 import com.tomatrocho.game.gfx.Bitmap;
 import com.tomatrocho.game.gfx.IAbstractBitmap;
+import com.tomatrocho.game.gfx.IAbstractScreen;
 import com.tomatrocho.game.input.Keys;
 import com.tomatrocho.game.input.Mouse;
 import com.tomatrocho.game.level.World;
 import com.tomatrocho.game.level.tile.Tile;
 import com.tomatrocho.game.math.Vec2;
+import com.tomatrocho.game.weapon.Rifle;
+import com.tomatrocho.game.weapon.WeaponInventory;
 
 public class Player extends Mob {
 	
@@ -98,15 +98,15 @@ public class Player extends Mob {
     public Player(World world, int x, int y, Keys keys, Mouse mouse) {
     	super(world, x * Tile.W, y * Tile.H, Team.TEAM_1);
     	
-    	speed = 2;
-    	radius.x = 10;
-    	radius.y = 13;
+    	this.speed = 2;
+    	this.radius.x = 7;
+    	this.radius.y = 11;
     	
         this.keys = keys;
         this.mouse = mouse;
         
         weaponInventory.add(new Rifle(this));
-        weapon = weaponInventory.get(weaponInventorySlot);
+        this.weapon = weaponInventory.get(weaponInventorySlot);
     }
 
     /**
@@ -172,10 +172,6 @@ public class Player extends Mob {
             moving = true;
         }
         
-        move(xd, yd);
-        xd *= 0.1;
-        yd *= 0.1;
-        
         handleShooting(xa, ya);
         
         // muzzle
@@ -183,6 +179,10 @@ public class Player extends Mob {
         if (muzzleTicks > 0) {
         	muzzleTicks--;
         }
+        
+        move(xd, yd);
+        xd *= 0.1;
+        yd *= 0.1;
         
         // handle map revealing
         //world.reveal(World.getTileFromPosition(new Vec2(x, y)), 10);
@@ -246,6 +246,17 @@ public class Player extends Mob {
    
    /**
     * 
+    * @param xDir
+    * @param yDir
+    * @param strength
+    */
+   public void applyImpulse(double xDir, double yDir, double strength) {
+	   xd -= xDir * strength;
+	   yd -= yDir * strength;
+   }
+   
+   /**
+    * 
     * @param xa
     * @param ya
     */
@@ -254,7 +265,7 @@ public class Player extends Mob {
 	   
 	   if (fireKeyDown() || mouse.isDown(FIRE_MOUSE_BUTTON)) {
 		   if (weapon instanceof Rifle) {
-			   ((Rifle) weapon).fire(xa, ya);
+			   ((Rifle) weapon).fire();
 		   }
 	   }
    }
@@ -286,9 +297,7 @@ public class Player extends Mob {
     public IAbstractBitmap getSprite() {
     	IAbstractBitmap sprite = null;
     	if (moving) {
-    		final int frame = (walkTime / 4 % 6 + 6) % 6;
-    		
-    		sprite = (Bitmap) Art.player[frame][facing];
+    		sprite = (Bitmap) Art.player[(walkTime / 4 % 6 + 6) % 6][facing];
     	}
     	else {
     		sprite = (Bitmap) Art.player[0][facing];

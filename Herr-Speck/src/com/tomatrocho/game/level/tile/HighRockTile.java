@@ -16,8 +16,8 @@ public class HighRockTile extends Tile {
      * Default constructor for the {@link HighRockTile} class.
      */
     public HighRockTile() {
-        img = 0;
-        overlay = true;
+        this.img = 0;
+        this.overlay = true;
     }
 
     @Override
@@ -26,8 +26,8 @@ public class HighRockTile extends Tile {
     }
     
     @Override
-    public void neighbourChanged(Tile tile) { }
+    public void neighbourChanged(Tile tile) {}
 
     @Override
-    public void handleCollision(Entity entity, double xa, double ya) { }
+    public void handleCollision(Entity entity, double xa, double ya) {}
 }

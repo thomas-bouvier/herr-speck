@@ -1,8 +1,11 @@
 package com.tomatrocho.game.entity;
 
+import java.awt.Color;
 import java.util.List;
 
 import com.tomatrocho.game.entity.mob.Team;
+import com.tomatrocho.game.gfx.IAbstractBitmap;
+import com.tomatrocho.game.gfx.IAbstractScreen;
 import com.tomatrocho.game.gfx.IComparableDepth;
 import com.tomatrocho.game.level.Material;
 import com.tomatrocho.game.level.World;
@@ -105,10 +108,20 @@ public abstract class Entity implements IComparableDepth, IBoundingBoxOwner {
 	
 	/**
 	 * 
-	 * @return
 	 */
-	public boolean forceRender() {
-		return false;
+	public void drawDepthLine(IAbstractScreen screen) {
+		final int w = getSprite().getW() / 2;
+		final int h = 1;
+		
+		IAbstractBitmap sprite = screen.createBitmap(w, h);
+		for (int x = 0; x <= w; x++) {
+			for (int y = 0; y <= h; y++) {
+				if (x == 0 || x == w - 1 || y == 0|| y == h - 1)
+					sprite.setPixel(y * w + x, Color.LIGHT_GRAY.getRGB());
+			}
+		}
+		
+		screen.blit(sprite, pos.x - getSprite().getW() / 2 + w / 2, getDepthLine() - getSprite().getH() / 2);
 	}
 
 	/**
@@ -293,6 +306,12 @@ public abstract class Entity implements IComparableDepth, IBoundingBoxOwner {
 	 * 
 	 * @return
 	 */
+	public abstract IAbstractBitmap getSprite();
+	
+	/**
+	 * 
+	 * @return
+	 */
 	public BoundingBox getBoundingBox() {
 		return new BoundingBox(this, pos.x - radius.x, pos.y - radius.y, pos.x + radius.x, pos.y + radius.y);
 	}
@@ -318,12 +337,11 @@ public abstract class Entity implements IComparableDepth, IBoundingBoxOwner {
 	 * @return
 	 */
 	public Material getMaterialBelow() {
-		System.out.println("x: " + pos.x + ", y: " + pos.y);
-		final Tile tile = world.getTile((int) pos.x, (int) pos.y);
+		final Tile tile = world.getTile((int) pos.x / Tile.W, (int) pos.y / Tile.H);
 		if (tile != null) {
-			System.out.println("-----------------------------------");
 			return tile.getMaterial();
 		}
+		
 		return null;
 	}
 	

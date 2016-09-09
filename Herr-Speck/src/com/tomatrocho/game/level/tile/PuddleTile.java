@@ -16,24 +16,17 @@ public class PuddleTile extends Tile {
     * Default constructor for the {@link PuddleTile} class.
     */
    public PuddleTile() {
-       img = 0;
+       this.img = 0;
    }
 
    @Override
    public void render(IAbstractScreen screen) {
        screen.blit(Art.puddleTiles[img & 7][img / 8], x * Tile.W, (y - (PuddleTile.H - Tile.H)) * Tile.H);
    }
-   
-   /**
-    * 
-    */
-   public boolean forceRender() {
-	   return true;
-   }
 
    @Override
-   public void neighbourChanged(Tile tile) { }
+   public void neighbourChanged(Tile tile) {}
 
    @Override
-   public void handleCollision(Entity entity, double xa, double ya) { }
+   public void handleCollision(Entity entity, double xa, double ya) {}
 }

@@ -1,4 +1,4 @@
-package com.tomatrocho.game.entity.weapon;
+package com.tomatrocho.game.weapon;
 
 import com.tomatrocho.game.HerrSpeck;
 import com.tomatrocho.game.entity.Bullet;
@@ -47,32 +47,29 @@ public class Rifle extends Weapon {
 	
 	/**
 	 * 
-	 * @param xd
-	 * @param yd
 	 */
-	public void fire(double xd, double yd) {
+	public void fire() {
 		if (readyToShoot) {
 			double dir = getBulletDirection(accuracy);
-			xd = Math.cos(dir);
-			yd = Math.sin(dir);
+			double xDir = Math.cos(dir);
+			double yDir = Math.sin(dir);
 			
-			Bullet bullet = getAmmo(xd, yd);
+			Bullet bullet = getAmmo(xDir, yDir);
 			owner.getWorld().addEntity(bullet);
 			
-			if (HerrSpeck.random.nextInt(2) == 0) {				
-				if (owner instanceof Player) {
-					final Player player = (Player) owner;
+			if (owner instanceof Player) {
+				final Player player = (Player) owner;
+				
+				if (HerrSpeck.random.nextInt(2) == 0) {				
 					player.setMuzzleTicks(3);
-					player.setMuzzlePosition(new Vec2(bullet.getX() + xd - 7, bullet.getY() - 2 * yd - 8));
+					player.setMuzzlePosition(new Vec2(bullet.getX() + xDir - 7, bullet.getY() - 2 * yDir - 8));					
 				}
+				
+				player.applyImpulse(xDir, yDir, 2);
 			}
 			
 			currentShootDelay = shootDelay;
 			readyToShoot = false;
-			
-			// recoil effect
-			owner.setX(owner.getX() - 2 * xd);
-			owner.setY(owner.getY() - 2 * yd);
 		}
 	}
 	
@@ -80,7 +77,8 @@ public class Rifle extends Weapon {
 		if (!readyToShoot) {
 			if (currentShootDelay > 0) {
 				currentShootDelay--;
-			} else {
+			}
+			else {
 				readyToShoot = true;
 			}
 		}

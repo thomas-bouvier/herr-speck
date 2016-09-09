@@ -1,4 +1,4 @@
-package com.tomatrocho.game.entity.weapon;
+package com.tomatrocho.game.weapon;
 
 import java.util.LinkedList;
 

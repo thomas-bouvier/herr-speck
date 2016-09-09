@@ -1,9 +1,12 @@
 package com.tomatrocho.game.level.tile;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.tomatrocho.game.entity.Entity;
+import com.tomatrocho.game.gfx.IAbstractBitmap;
+import com.tomatrocho.game.gfx.IAbstractScreen;
 import com.tomatrocho.game.gfx.IComparableDepth;
 import com.tomatrocho.game.level.Material;
 import com.tomatrocho.game.level.World;
@@ -52,11 +55,16 @@ public abstract class Tile implements IComparableDepth, IBoundingBoxOwner {
 	 * z coordinate of the {@link Tile}, in tiles.
 	 */
 	protected int z;
+	
+	/**
+	 * 
+	 */
+	protected BoundingBox bb;
 
 	/**
 	 * Index of the sprite to use on the sheet.
 	 */
-	protected int img;
+	protected int img = 0;
 	
 	/**
 	 * 
@@ -73,11 +81,12 @@ public abstract class Tile implements IComparableDepth, IBoundingBoxOwner {
 	 */
 	protected Material neighbour;
 	
+	
 	/**
 	 * Default constructor for the {@link Tile} class.
      */
 	public Tile() {
-		img = 0;
+		
 	}
 	
 	/**
@@ -91,6 +100,8 @@ public abstract class Tile implements IComparableDepth, IBoundingBoxOwner {
 		this.x = x;
 		this.y = y;
 		this.z = z;
+		
+		this.bb = new BoundingBox(this, x * Tile.W, y * Tile.H, (x + 1) * Tile.W, (y + 1) * Tile.H);
 	}
 	
 	/**
@@ -105,19 +116,31 @@ public abstract class Tile implements IComparableDepth, IBoundingBoxOwner {
 		if (isConnectable()) {
 			int res = 0, pow = 1;
 			for (final List<Tile> tiles : world.getMooreNeighborhoodTiles(this)) {
-				if (tiles != null && tiles.size() > z) {
+				if (tiles != null && tiles.size() > z)
 					res += pow * (isConnectableWith(tiles.get(z)) ? 1 : 0);
-				}
 				pow *= 2;
 			}
+			
 			this.img = WorldUtils.getIdForBitmaskValue(res);
 		}
 	}
 	
-
-	@Override
-	public boolean forceRender() {
-		return false;
+	/**
+	 * 
+	 */
+	public void drawDepthLine(IAbstractScreen screen) {
+		final int w = Tile.W;
+		final int h = 1;
+		
+		IAbstractBitmap sprite = screen.createBitmap(w, h);
+		for (int x = 0; x <= w; x++) {
+			for (int y = 0; y <= h; y++) {
+				if (x == 0 || x == w - 1 || y == 0|| y == h - 1)
+					sprite.setPixel(y * w + x, Color.LIGHT_GRAY.getRGB());
+			}
+		}
+		
+		screen.blit(sprite, x * Tile.W, getDepthLine());
 	}
 	
 	/**
@@ -132,11 +155,10 @@ public abstract class Tile implements IComparableDepth, IBoundingBoxOwner {
 	 * @param entity
 	 */
 	public void addClipBoundingBoxes(List<BoundingBox> bbs, Entity entity) {
-		if (canPass(entity)) {
+		if (canPass(entity))
 			return;
-		}
 		
-		bbs.add(new BoundingBox(this, x * Tile.W, y * Tile.H, (x + 1) * Tile.W, (y + 1) * Tile.H));
+		bbs.add(bb);
 	}
 	
 	/**
@@ -170,15 +192,18 @@ public abstract class Tile implements IComparableDepth, IBoundingBoxOwner {
 	 * @return
 	 */
 	public boolean isConnectableWith(Tile tile) {
-		if (connectableWith.contains(tile.getMaterial())) {
+		if (connectableWith.contains(tile.getMaterial()))
 			return true;
-		}
+		
 		return material == tile.getMaterial();
 	}
 	
-	@Override
-	public int getVerticalBaseCoordinate() {
-		return y + Tile.H;
+	/**
+	 * 
+	 * @return
+	 */
+	public int getDepthLine() {
+		return y * Tile.H + Tile.H;
 	}
 	
 	/**
@@ -211,6 +236,22 @@ public abstract class Tile implements IComparableDepth, IBoundingBoxOwner {
 	 */
 	public int getY() {
 		return y;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public int getZ() {
+		return z;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public BoundingBox getBoundingBox() {
+		return bb;
 	}
 	
 	@Override

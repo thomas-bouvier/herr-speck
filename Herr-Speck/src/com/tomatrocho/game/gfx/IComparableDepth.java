@@ -16,11 +16,11 @@ public interface IComparableDepth {
 	 * 
 	 * @return
 	 */
-	public int getVerticalBaseCoordinate();
+	public int getDepthLine();
 	
 	/**
 	 * 
-	 * @return
+	 * @param screen
 	 */
-	public boolean forceRender();
+	public void drawDepthLine(IAbstractScreen screen);
 }

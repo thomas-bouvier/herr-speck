@@ -3,14 +3,13 @@ package com.tomatrocho.game.entity;
 import com.tomatrocho.game.HerrSpeck;
 import com.tomatrocho.game.entity.mob.Player;
 import com.tomatrocho.game.entity.mob.Team;
-import com.tomatrocho.game.entity.weapon.Weapon;
 import com.tomatrocho.game.gfx.Art;
 import com.tomatrocho.game.gfx.IAbstractBitmap;
 import com.tomatrocho.game.gfx.IAbstractScreen;
 import com.tomatrocho.game.gui.Font;
 import com.tomatrocho.game.level.World;
-import com.tomatrocho.game.level.tile.Tile;
 import com.tomatrocho.game.math.Vec2;
+import com.tomatrocho.game.weapon.Weapon;
 
 public abstract class Mob extends Entity {
 
@@ -186,7 +185,7 @@ public abstract class Mob extends Entity {
 		}
 		
 		// health
-		if (HerrSpeck.debug()) {
+		if (HerrSpeck.getDebugLevel() > 0) {
 			final String string = health + "/" + maxHealth;
 			Font.getDefaultFont().draw(screen, string, pos.x, pos.y - 28, Font.Align.CENTER); 
 		}
@@ -202,8 +201,8 @@ public abstract class Mob extends Entity {
 	 * 
 	 * @return
 	 */
-	public int getVerticalBaseCoordinate() {
-		return (int) (pos.y + Tile.H) - 6;
+	public int getDepthLine() {
+		return (int) pos.y + getSprite().getH() - 6;
 	}
 	
 	/**

@@ -11,9 +11,9 @@ public class SandstoneTile extends Tile {
      * Default constructor for the {@link SandstoneTile} class.
      */
     public SandstoneTile() {
-    	material = Material.SANDSTONE;
-    	img = Tile.PLAIN_IMG;
-    	connectableWith.add(Material.WATER);
+    	this.material = Material.SANDSTONE;
+    	this.img = Tile.PLAIN_IMG;
+    	this.connectableWith.add(Material.WATER);
     }
 
     @Override
@@ -22,18 +22,13 @@ public class SandstoneTile extends Tile {
     }
     
     @Override
-    public boolean forceRender() {
-    	return true;
-    }
-    
-    @Override
     public boolean isConnectable() {
     	return true;
     }
 
     @Override
-    public void neighbourChanged(Tile tile) { }
+    public void neighbourChanged(Tile tile) {}
 
     @Override
-    public void handleCollision(Entity entity, double xa, double ya) { }
+    public void handleCollision(Entity entity, double xa, double ya) {}
 }

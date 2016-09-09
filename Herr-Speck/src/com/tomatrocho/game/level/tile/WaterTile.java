@@ -11,9 +11,9 @@ public class WaterTile extends Tile {
      * Default constructor for the {@link WaterTile} class.
      */
     public WaterTile() {
-    	material = Material.WATER;
-        img = Tile.PLAIN_IMG;
-        neighbour = Material.SANDSTONE;
+    	this.material = Material.WATER;
+        this.img = Tile.PLAIN_IMG;
+        this.neighbour = Material.SANDSTONE;
     }
 
     @Override
@@ -25,15 +25,10 @@ public class WaterTile extends Tile {
     public boolean isConnectable() {
     	return true;
     }
-    
-    @Override
-    public boolean forceRender() {
- 	   return true;
-    }
 
     @Override
-    public void neighbourChanged(Tile tile) { }
+    public void neighbourChanged(Tile tile) {}
 
     @Override
-    public void handleCollision(Entity entity, double xa, double ya) { }
+    public void handleCollision(Entity entity, double xa, double ya) {}
 }

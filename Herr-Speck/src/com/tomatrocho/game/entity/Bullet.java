@@ -1,9 +1,10 @@
 package com.tomatrocho.game.entity;
 
+import com.tomatrocho.game.gfx.Art;
+import com.tomatrocho.game.gfx.IAbstractBitmap;
 import com.tomatrocho.game.gfx.IAbstractScreen;
 import com.tomatrocho.game.level.World;
 import com.tomatrocho.game.level.tile.Tile;
-import com.tomatrocho.game.gfx.Art;
 
 public class Bullet extends Entity {
 
@@ -122,11 +123,21 @@ public class Bullet extends Entity {
 
 	@Override
 	public void render(IAbstractScreen screen) {
-		screen.blit(Art.bullets[facing][0], pos.x - 8, pos.y - 10);
+		screen.blit(getSprite(), pos.x - 8, pos.y - 10);
+	}
+	
+	/**
+	 * 
+	 */
+	public IAbstractBitmap getSprite() {
+		return Art.bullets[facing][0];
 	}
 
-	@Override
-	public int getVerticalBaseCoordinate() {
+	/**
+	 * 
+	 * @return
+	 */
+	public int getDepthLine() {
 		return (int) pos.y + Tile.H;
 	}
 	

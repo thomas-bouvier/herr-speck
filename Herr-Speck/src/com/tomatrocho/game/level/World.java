@@ -9,6 +9,7 @@ import java.util.TreeSet;
 
 import com.tomatrocho.game.HerrSpeck;
 import com.tomatrocho.game.entity.Entity;
+import com.tomatrocho.game.entity.mob.Bat;
 import com.tomatrocho.game.entity.predicates.EntityIntersectsBB;
 import com.tomatrocho.game.gfx.Art;
 import com.tomatrocho.game.gfx.DepthComparator;
@@ -321,23 +322,24 @@ public class World {
 		// setting offsets equal to xScroll, yScroll
 		screen.setOffset(xScroll, yScroll);
 		
-		// level rendering
+		// floor rendering
+		renderTiles(screen, x0, y0, x1, y1, 0);
+				
+		// adding entities to render list
 		Set<IComparableDepth> objectsToRender = new TreeSet<>(new DepthComparator());
 		
-		// adding entities to render list
 		entities.stream().forEach(entity -> objectsToRender.add(entity));
 		
 		// adding tiles to render list
 		for (int y = y0; y <= y1; y++) {
 			for (int x = x1; x >= x0; x--) {
-				if (x < 0 || x >= w || y < 0 || y >= h) {
-					screen.blit(Art.stoneTiles[0][0], x * Tile.W, y * Tile.H);
+				if (x < 0 || x >= w || y < 0 || y >= h)
 					continue;
-				}
 				
 				final List<Tile> tiles = this.tiles.get(y * w + x);
-				for (int i = 0; i < tiles.size(); i++) {
-					objectsToRender.add(tiles.get(i));
+				for (int i = 1; i < tiles.size(); i++) {
+					if (tiles.size() > i)
+						objectsToRender.add(tiles.get(i));
 				}
 			}
 		}
@@ -346,12 +348,38 @@ public class World {
 		objectsToRender.stream().forEach(object -> object.render(screen));
 		
 		// rendering bounding boxes
-		if (HerrSpeck.debug()) {			
+		if (HerrSpeck.getDebugLevel() > 0) {			
 			renderBoundingBoxes(screen);
+			
+			if (HerrSpeck.getDebugLevel() > 1)
+				objectsToRender.stream().forEach(object -> object.drawDepthLine(screen));
 		}
 		
 		// reseting offset
 		screen.setOffset(0, 0);
+	}
+	
+	/**
+	 * 
+	 * @param screen
+	 * @param x0
+	 * @param y0
+	 * @param x1
+	 * @param y1
+	 * @param layer
+	 */
+	public void renderTiles(IAbstractScreen screen, int x0, int y0, int x1, int y1, int layer) {
+		for (int y = y0; y <= y1; y++) {
+			for (int x = x1; x >= x0; x--) {
+				if (x < 0 || x >= w || y < 0 || y >= h) {
+					screen.blit(Art.stoneTiles[0][0], x * Tile.W, y * Tile.H);
+					continue;
+				}
+				
+				if (tiles.get(y * w + x).size() > layer)
+					tiles.get(y * w + x).get(layer).render(screen);
+			}
+		}
 	}
 	
 	/**
@@ -465,16 +493,17 @@ public class World {
 		final int yy0 = Math.max((int) (y0) / Tile.H, 0);
 		final int xx1 = Math.min((int) (x1) / Tile.W, w - 1);
 		final int yy1 = Math.min((int) (y1) / Tile.H, h - 1);
+		
 		final Set<Entity> ret = new TreeSet<Entity>(new EntityComparator());
 		for (int y = yy0; y <= yy1; y++) {
 			for (int x = xx0; x <= xx1; x++) {
 				for (Entity entity : entityMap.get(y * w + x)) {
-					if (predicate.appliesTo(entity, x0, y0, x1, y1)) {
+					if (predicate.appliesTo(entity, x0, y0, x1, y1))
 						ret.add(entity);
-					}
 				}
 			}
 		}
+		
 		return ret;
 	}
 	
@@ -482,26 +511,30 @@ public class World {
 	 * 
 	 */
 	public void tick() {
-		//TODO spawners
-//		if (HerrSpeck.random.nextInt(250) == 0) {
-//			addEntity(new Bat(this, time % (w * 16), time % (h * 16)));
-//		}
+		if (HerrSpeck.random.nextInt(250) == 0) {
+			addEntity(new Bat(this, time % (w * 16), time % (h * 16)));
+		}
+		
 		for (int i = 0; i < entities.size(); i++) {
 			Entity entity = entities.get(i);
 			if (!entity.removed()) {
 				entity.tick();
+				
 				// updating entity map
 				final int xTo = ((int) (entity.getX() - entity.getRadius().x)) / Tile.W;
 				final int yTo = ((int) (entity.getY() - entity.getRadius().y)) / Tile.H;
+				
 				if (xTo != entity.getXTo() || yTo != entity.getYTo()) {
 					updateEntityMap(entity);
 				}
 			}
+			
 			if (entity.removed()) {
 				entities.remove(i--);
 				removeFromEntityMap(entity);
 			}
 		}
+		
 		// updating time
 		time++;
 		if (time % 10 == 0) {
@@ -546,6 +579,7 @@ public class World {
 			night = false;
 			day = true;
 		}
+		
 		if (night) {
 			brightnessLevel++;
 			return;
@@ -554,6 +588,7 @@ public class World {
 			brightnessLevel--;
 			return;
 		}
+		
 		brightnessLevel++;
 	}
 	
