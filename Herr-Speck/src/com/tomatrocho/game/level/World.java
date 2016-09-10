@@ -48,11 +48,6 @@ public class World {
 	 * 
 	 */
 	private Vec2 spawnLocation;
-	
-	/**
-	 * 
-	 */
-	private boolean[] seen;
 
 	/**
 	 * {@link List} containing the {@link Entity} objects of this {@link World}.
@@ -101,12 +96,8 @@ public class World {
 
 		for (int i = 0; i < w * h; i++) {
 			tiles.add(new LinkedList<>());
-		}
-		for (int i = 0; i < w * h; i++) {
 			entityMap.add(new ArrayList<>());
 		}
-		
-		seen = new boolean[(w + 1) * (h + 1)];
 	}
 	
 	/**
@@ -118,9 +109,8 @@ public class World {
 		// empty tiles
         for (int y = 0; y < h; y++) {
         	for(int x = 0; x < w; x++) {
-        		if (getTiles(x, y).isEmpty()) {
+        		if (getTiles(x, y).isEmpty())
         			addTile(x, y, new StoneTile());
-        		}
         	}
         }
 
@@ -142,6 +132,29 @@ public class World {
         }
 	}
 	
+	public void initBoundingBoxes() {
+		for (int y = 0; y < h; y++) {
+			for (int x = 0; x < w; x++) {
+				for (int z = 1; z < getTiles(x, y).size(); z++) {
+					final Tile tile = getTiles(x, y).get(z);
+					
+					if (!hasNeighbor(tile, World.NeighborLocation.TOP) && !hasNeighbor(tile, World.NeighborLocation.BOTTOM))
+						tile.setBoundingBox(new BoundingBox(tile, x * Tile.W, y * Tile.H + 2, (x + 1) * Tile.W, (y + 1) * Tile.H - 6));
+					
+					else if (!hasNeighbor(tile, World.NeighborLocation.TOP))
+						tile.setBoundingBox(new BoundingBox(tile, x * Tile.W, y * Tile.H + 2, (x + 1) * Tile.W, (y + 1) * Tile.H));
+					
+					else if (!hasNeighbor(tile, World.NeighborLocation.BOTTOM))
+						tile.setBoundingBox(new BoundingBox(tile, x * Tile.W, y * Tile.H, (x + 1) * Tile.W, (y + 1) * Tile.H - 6));
+						
+					else
+						tile.setBoundingBox(new BoundingBox(tile, x * Tile.W, y * Tile.H, (x + 1) * Tile.W, (y + 1) * Tile.H));
+				}
+			}
+		}
+		
+	}
+	
 	/**
 	 * 
 	 */
@@ -152,9 +165,8 @@ public class World {
 		
 		for (int i = 0; i < w * h; i++) {
 			final List<Tile> tiles = this.tiles.get(i);
-			for (int z = 0; z < tiles.size(); z++) {
+			for (int z = 0; z < tiles.size(); z++)
 				tiles.get(z).applyBitmask();
-			}
 		}
 	}
 	
@@ -175,12 +187,13 @@ public class World {
 		final int x = tile.getX(), y = tile.getY();
 		for (int j = y - 1; j <= y + 1; j++) {
 			for (int i = x - 1; i <= x + 1; i++) {
-				if (i == x && j == y) {
+				if (i == x && j == y)
 					continue;
-				}
+				
 				tiles.add(getTiles(i, j));
 			}
 		}
+		
 		return tiles;
 	}
 
@@ -209,14 +222,12 @@ public class World {
 		final int y1 = entity.getYTo() + (int) (entity.getRadius().y * 2 + 1) / Tile.H;
 		
 		for (int y = entity.getYTo(); y <= y1; y++) {
-			if (y < 0 || y >= h) {
+			if (y < 0 || y >= h)
 				continue;
-			}
 			
 			for (int x = entity.getXTo(); x <= x1; x++) {
-				if (x < 0 || x >= w) {
+				if (x < 0 || x >= w)
 					continue;
-				}
 				
 				entityMap.get(y * w + x).add(entity);
 			}
@@ -241,14 +252,12 @@ public class World {
 		final int y1 = entity.getYTo() + (int) (entity.getRadius().y * 2 + 1) / Tile.H;
 		
 		for (int y = entity.getYTo(); y <= y1; y++) {
-			if (y < 0 || y >= h) {
+			if (y < 0 || y >= h)
 				continue;
-			}
 			
 			for (int x = entity.getXTo(); x <= x1; x++) {
-				if (x < 0 || x >= w) {
+				if (x < 0 || x >= w)
 					continue;
-				}
 				
 				entityMap.get(y * w + x).remove(entity);
 			}
@@ -262,7 +271,7 @@ public class World {
 	 */
 	public List<BoundingBox> getClipBoundingBoxes(Entity entity) {
 		List<BoundingBox> bbs = new ArrayList<>();
-		BoundingBox bb = entity.getBoundingBox().grow(Tile.W);
+		BoundingBox bb = entity.getBoundingBox("body").grow(Tile.W);
 		
 		// computing corner pins
 		int x0 = (int) (bb.x0 / Tile.W);
@@ -272,14 +281,12 @@ public class World {
 		
 		// adding bounding boxes from tiles
 		for (int y = y0; y <= y1; y++) {
-			if (y < 0 || y >= h) {
+			if (y < 0 || y >= h)
 				continue;
-			}
 			
 			for (int x = x0; x <= x1; x++) {
-				if (x < 0 || x >= w) {
+				if (x < 0 || x >= w)
 					continue;
-				}
 				
 				getTile(x, y).addClipBoundingBoxes(bbs, entity);
 			}
@@ -287,9 +294,8 @@ public class World {
 		
 		// adding bounding boxes from other entities
 		for (Entity e : getEntities(bb)) {
-			if (e != entity && e.blocks(entity)) {
-				bbs.add(e.getBoundingBox());
-			}
+			if (e != entity && e.blocks(entity))
+				bbs.add(e.getBoundingBox("body"));
 		}
 		
 		return bbs;
@@ -312,12 +318,10 @@ public class World {
 		int x1 = (xScroll + screen.getW()) / Tile.W;
 		int y1 = (yScroll + screen.getH()) / Tile.H + Tile.H;
 		
-		if (xScroll < 0) {
+		if (xScroll < 0)
 			x0--;
-		}
-		if (yScroll < 0) {
+		if (yScroll < 0)
 			y0--;
-		}
 		
 		// setting offsets equal to xScroll, yScroll
 		screen.setOffset(xScroll, yScroll);
@@ -385,74 +389,15 @@ public class World {
 	/**
 	 * 
 	 * @param screen
-	 * @param x0
-	 * @param y0
-	 * @param x1
-	 * @param y1
-	 */
-//	private void renderDarkness(IAbstractScreen screen, int x0, int y0, int x1, int y1) {
-//		for (int y = y0; y <= y1; y++) {
-//			if (y < 0 || y >= h) {
-//				continue;
-//			}
-//			for (int x = x0; x <= x1; x++) {
-//				if (x < 0 || x >= w) {
-//					continue;
-//				}
-//				boolean unseenC0 = !seen[y * (w + 1) + x];
-//				boolean unseenC1 = !seen[y * (w + 1) + (x + 1)];
-//				boolean unseenC2 = !seen[(y + 1) * (w + 1) + x];
-//				boolean unseenC3 = !seen[(y + 1) * (w + 1) + (x + 1)];
-//				if (!(unseenC0 || unseenC1 || unseenC2 || unseenC3)) {
-//					continue;
-//				}
-//				int count = 0;
-//				if (unseenC0) count++;
-//				if (unseenC1) count++;
-//				if (unseenC2) count++;
-//				if (unseenC3) count++;
-//				switch (count) {
-//				case 1 :
-//					if (unseenC0) screen.blit(Art.darkness[2][2], x * Tile.W, y * Tile.H - Tile.H / 2);
-//                    if (unseenC1) screen.blit(Art.darkness[0][2], x * Tile.W, y * Tile.H - Tile.H / 2);
-//                    if (unseenC2) screen.blit(Art.darkness[2][0], x * Tile.W, y * Tile.H - Tile.H / 2);
-//                    if (unseenC3) screen.blit(Art.darkness[0][0], x * Tile.W, y * Tile.H - Tile.H / 2);
-//					break;
-//				case 2 :
-//					if (unseenC0 && unseenC3) screen.blit(Art.darkness[2][4], x * Tile.W, y * Tile.H - Tile.H / 2);
-//                    if (unseenC1 && unseenC2) screen.blit(Art.darkness[2][3], x * Tile.W, y * Tile.H - Tile.H / 2);
-//                    if (unseenC0 && unseenC1) screen.blit(Art.darkness[1][2], x * Tile.W, y * Tile.H - Tile.H / 2);
-//                    if (unseenC2 && unseenC3) screen.blit(Art.darkness[1][0], x * Tile.W, y * Tile.H - Tile.H / 2);
-//                    if (unseenC0 && unseenC2) screen.blit(Art.darkness[2][1], x * Tile.W, y * Tile.H - Tile.H / 2);
-//                    if (unseenC1 && unseenC3) screen.blit(Art.darkness[0][1], x * Tile.W, y * Tile.H - Tile.H / 2);
-//					break;
-//				case 3 :
-//					if (!unseenC0) screen.blit(Art.darkness[1][4], x * Tile.W, y * Tile.H - Tile.H / 2);
-//					if (!unseenC1) screen.blit(Art.darkness[0][4], x * Tile.W, y * Tile.H - Tile.H / 2);
-//					if (!unseenC2) screen.blit(Art.darkness[1][3], x * Tile.W, y * Tile.H - Tile.H / 2);
-//					if (!unseenC3) screen.blit(Art.darkness[0][3], x * Tile.W, y * Tile.H - Tile.H / 2);
-//					break;
-//				case 4 :
-//					screen.blit(Art.darkness[1][1], x * Tile.W, y * Tile.H - Tile.H / 2);
-//					break;
-//				default :
-//					break;
-//				}
-//			}
-//		}
-//	}
-	
-	/**
-	 * 
-	 * @param screen
 	 */
 	public void renderBoundingBoxes(IAbstractScreen screen) {
 		Set<BoundingBox> bbs = new HashSet<>();
 		for (Entity entity : entities) {
-			bbs.add(entity.getBoundingBox());
-			for (final BoundingBox bb : getClipBoundingBoxes(entity)) {
+			for (final String key : entity.getBBs().keySet())
+				bbs.add(entity.getBoundingBox(key));
+			
+			for (final BoundingBox bb : getClipBoundingBoxes(entity))
 				bbs.add(bb);
-			}
 		}
 		
 		bbs.stream().forEach(bb -> bb.draw(screen));
@@ -489,6 +434,7 @@ public class World {
 	 * @return
 	 */
 	public Set<Entity> getEntities(double x0, double y0, double x1, double y1, IBoundingBoxPredicate<Entity> predicate) {
+		// computing bounds
 		final int xx0 = Math.max((int) (x0) / Tile.W, 0);
 		final int yy0 = Math.max((int) (y0) / Tile.H, 0);
 		final int xx1 = Math.min((int) (x1) / Tile.W, w - 1);
@@ -511,9 +457,8 @@ public class World {
 	 * 
 	 */
 	public void tick() {
-		if (HerrSpeck.random.nextInt(250) == 0) {
+		if (HerrSpeck.random.nextInt(250) == 0)
 			addEntity(new Bat(this, time % (w * 16), time % (h * 16)));
-		}
 		
 		for (int i = 0; i < entities.size(); i++) {
 			Entity entity = entities.get(i);
@@ -524,9 +469,8 @@ public class World {
 				final int xTo = ((int) (entity.getX() - entity.getRadius().x)) / Tile.W;
 				final int yTo = ((int) (entity.getY() - entity.getRadius().y)) / Tile.H;
 				
-				if (xTo != entity.getXTo() || yTo != entity.getYTo()) {
+				if (xTo != entity.getXTo() || yTo != entity.getYTo())
 					updateEntityMap(entity);
-				}
 			}
 			
 			if (entity.removed()) {
@@ -537,12 +481,11 @@ public class World {
 		
 		// updating time
 		time++;
-		if (time % 10 == 0) {
+		if (time % 10 == 0)
 			time();
-		}
-		if (time > 1000000) {
+		
+		if (time > 1000000)
 			time = 0;
-		}
 	}
 	
 	/**
@@ -591,59 +534,6 @@ public class World {
 		
 		brightnessLevel++;
 	}
-	
-	/**
-	 * 
-	 * @param x
-	 * @param y
-	 * @return
-	 */
-	public boolean hasSeen(int x, int y) {
-		return seen[y * (w + 1) + x] || seen[(y + 1) * (w + 1) + x] || seen[y * (w + 1) + (x + 1)] || seen[(y + 1) * (w + 1) + (x + 1)];
-	}
-	
-	/**
-	 * 
-	 * @param pos
-	 * @param radius
-	 */
-	public void reveal(Vec2 pos, int radius) {
-		reveal((int) pos.x, (int) pos.y, radius);
-	}
-	
-	/**
-	 * 
-	 * @param x
-	 * @param y
-	 * @param radius
-	 */
-	public void reveal(int x, int y, int radius) {
-		for (int i = 0; i <= 2 * radius; i++) {
-			revealLine(x, y, x - radius + i, y - radius, radius);
-			revealLine(x, y, x - radius + i, y + radius, radius);
-			revealLine(x, y, x - radius, y - radius + i, radius);
-			revealLine(x, y, x + radius, y - radius + i, radius);
-		}
-	}
-	
-	/**
-	 * 
-	 * @param x0
-	 * @param y0
-	 * @param x1
-	 * @param y1
-	 * @param radius
-	 */
-	public void revealLine(int x0, int y0, int x1, int y1, int radius) {
-		for (int i = 0; i <= radius; i++) {
-			int xx = x0 + (x1 - x0) * i / radius;
-			int yy = y0 + (y1 - y0) * i / radius;
-			if (xx < 0 || xx >= w || yy < 0 || yy >= h) {
-				return;
-			}
-			seen[yy * (w + 1) + xx] = seen[(yy + 1) * (w + 1) + xx] = seen[yy * (w + 1) + (xx + 1)] = seen[(yy + 1) * (w + 1) + (xx + 1)] = true;
-		}
-	}
 
 	/**
 	 * Adds the {@link Tile} at the specified location.
@@ -656,9 +546,9 @@ public class World {
 	 * 		the {@link Tile} to insert
 	 */
 	public void addTile(int x, int y, Tile tile) {
-		if (x < 0 || x >= w || y < 0 || y >= h) {
+		if (x < 0 || x >= w || y < 0 || y >= h)
 			return;
-		}
+		
 		tile.init(this, x, y, tiles.get(y * w + x).size());
 		tiles.get(y * w + x).add(tile);
 	}
@@ -674,9 +564,9 @@ public class World {
 	 * 		the {@link Tile} to set
 	 */
 	public void setTile(int x, int y, Tile tile) {
-		if (x < 0 || x >= w || y < 0 || y >= h) {
+		if (x < 0 || x >= w || y < 0 || y >= h)
 			return;
-		}
+		
 		tiles.get(y * w + x).clear();
 		tile.init(this, x, y, tiles.get(y * w + x).size());
 		tiles.get(y * w + x).add(tile);
@@ -695,9 +585,9 @@ public class World {
 	 * 		
 	 */
 	public void setTile(int x, int y, Tile tile, int layer) {
-		if (x < 0 || x >= w || y < 0 || y >= h) {
+		if (x < 0 || x >= w || y < 0 || y >= h)
 			return;
-		}
+			
 		tile.init(this, x, y, layer);
 		tiles.get(y * w + x).set(layer, tile);
 	}
@@ -721,9 +611,9 @@ public class World {
 	 * 		the {@link Tile} to retrieve
 	 */
 	public Tile getTile(int x, int y) {
-		if (x < 0 || x >= w || y < 0 || y >= h) {
+		if (x < 0 || x >= w || y < 0 || y >= h)
 			return null;
-		}
+
 		return tiles.get(y * w + x).peekLast();
 	}
 
@@ -750,9 +640,9 @@ public class World {
 	 * 		the {@link Tile} to retrieve
 	 */
 	public List<Tile> getTiles(int x, int y) {
-		if (x < 0 || x >= w || y < 0 || y >= h) {
+		if (x < 0 || x >= w || y < 0 || y >= h)
 			return null;
-		}
+		
 		return tiles.get(y * w + x);
 	}
 	
@@ -848,6 +738,47 @@ public class World {
 	 */
 	public List<Entity> getEntities() {
 		return entities;
+	}
+	
+	/**
+	 * 
+	 * @author thoma
+	 *
+	 */
+	public enum NeighborLocation {
+		TOP,
+		RIGHT,
+		BOTTOM,
+		LEFT
+	}
+	
+	/**
+	 * 
+	 * @param tile
+	 * @param neighborLocation
+	 * @return
+	 */
+	public boolean hasNeighbor(Tile tile, NeighborLocation neighborLocation) {
+		switch (neighborLocation) {
+		case TOP:
+			if (tile.getY() - 1 < 0) return false;
+			return tiles.get((tile.getY() - 1) * w + tile.getX()).size() > tile.getZ();
+			
+		case RIGHT:
+			if (tile.getX() + 1 >= w) return false;
+			return tiles.get(tile.getY() * w + (tile.getX() + 1)).size() > tile.getZ();
+			
+		case BOTTOM:
+			if (tile.getY() + 1 >= h) return false;
+			return tiles.get((tile.getY() + 1) * w + tile.getX()).size() > tile.getZ();
+			
+		case LEFT:
+			if (tile.getX() - 1 < 0) return false;
+			return tiles.get(tile.getY() * w + (tile.getX() - 1)).size() > tile.getZ();
+			
+		default:
+			return false;
+		}
 	}
 	
 	@Override

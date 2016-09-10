@@ -5,6 +5,7 @@ import com.tomatrocho.game.gfx.IAbstractBitmap;
 import com.tomatrocho.game.gfx.IAbstractScreen;
 import com.tomatrocho.game.level.World;
 import com.tomatrocho.game.level.tile.Tile;
+import com.tomatrocho.game.math.BoundingBox;
 
 public class Bullet extends Entity {
 
@@ -65,6 +66,8 @@ public class Bullet extends Entity {
 		
 		this.xa = xa * 9;
 		this.ya = ya * 9;
+		
+		bbs.put("body", new BoundingBox(this, -6, -6, 6, 6));
 		
 		this.shooter = shooter;
 		this.damage = damage;

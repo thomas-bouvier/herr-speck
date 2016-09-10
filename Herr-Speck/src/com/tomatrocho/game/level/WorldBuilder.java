@@ -48,10 +48,12 @@ public class WorldBuilder {
     				case WALL:
     					world.addTile(x, y, new SandstoneWallTile());
     					break;
+    					
     				case FLOOR:
     				case ENTRANCE:
     					world.setTile(x, y, new StoneTile());
     					break;
+    					
     				default:
     					break;
     				}
@@ -63,6 +65,7 @@ public class WorldBuilder {
     	}
         
         world.sanitizeTileMap();
+        world.initBoundingBoxes();
         world.calculateTileConnections();
         
         return world;
@@ -89,12 +92,11 @@ public class WorldBuilder {
                 Object obj = WorldUtils.getNewObjectForId(x, y, map.getTileGId(x, y, layer));
                 
                 if (obj != null) {
-                    if (obj instanceof Tile) {
+                    if (obj instanceof Tile) 
                         world.addTile(x, y, (Tile) obj);
-                    }
-                    else if (obj instanceof Entity) {
+                    
+                    else if (obj instanceof Entity)
                         world.addEntity((Entity) obj);
-                    }
                 }
             }
         }

@@ -1,6 +1,5 @@
 package com.tomatrocho.game.entity;
 
-import com.tomatrocho.game.HerrSpeck;
 import com.tomatrocho.game.entity.mob.Player;
 import com.tomatrocho.game.entity.mob.Team;
 import com.tomatrocho.game.gfx.Art;
@@ -22,11 +21,6 @@ public abstract class Mob extends Entity {
 	 * Default height of a {@link Mob} object.
 	 */
 	public static final int W = 32;
-	
-	/**
-	 * Max amount of health a {@link Mob} can have.
-	 */
-	protected float maxHealth = 100;
 	
 	/**
 	 * Amount of health the {@link Mob} currently has.
@@ -102,28 +96,23 @@ public abstract class Mob extends Entity {
 	 */
 	public Mob(World world, int x, int y, Team team) {
 		super(world, x, y, team);
-		
-		health = maxHealth;
 	}
 
 	@Override
 	public void tick() {
-		if (hurtTime > 0) {
+		if (hurtTime > 0)
 			hurtTime--;
-		}
-		if (freezeTime > 0) {
+		
+		if (freezeTime > 0)
 			freezeTime--;
-		}
 		
 		if (freezeTime > 0) {
-			if (bumps.notNull()) {
+			if (bumps.notNull())
 				move(bumps.x, bumps.y);
-			}
 		}
 		else {
-			if (health <= 0) {
+			if (health <= 0)
 				remove();
-			}
 		}
 	}
 	
@@ -142,9 +131,8 @@ public abstract class Mob extends Entity {
 			Bullet bullet = (Bullet) source;
 			
 			if (bullet.getShooter() instanceof Player) {
-				if (isFriendOf((Player) bullet.getShooter())) {
+				if (isFriendOf((Player) bullet.getShooter()))
 					return;
-				}
 			}
 			
 			if (freezeTime <= 0) {
@@ -153,9 +141,8 @@ public abstract class Mob extends Entity {
 				hurtTime = 40;
 				
 				health -= bullet.getDamage();
-				if (health < 0) {
+				if (health < 0)
 					health = 0;
-				}
 				
 				// bump effect
 				final double dist = pos.dist(source.getPos());
@@ -173,22 +160,22 @@ public abstract class Mob extends Entity {
 		// hurt effect
 		final IAbstractBitmap sprite = getSprite();
 		if (hurtTime > 0) {
-			if (hurtTime > 40 - 6 && hurtTime % 2 == 0) {
+			if (hurtTime > 40 - 6 && hurtTime % 2 == 0)
 				screen.colorBlit(sprite, pos.x - sprite.getW() / 2, pos.y - sprite.getH() / 2, 0x80ffffff);
-			}
-			else {
+			else
 				screen.colorBlit(sprite, pos.x - sprite.getW() / 2, pos.y - sprite.getH() / 2, 0x80ff0000);
-			}
 		}
-		else {
+		else
 			screen.blit(sprite, pos.x - sprite.getW() / 2, pos.y - sprite.getH() / 2);
-		}
-		
-		// health
-		if (HerrSpeck.getDebugLevel() > 0) {
-			final String string = health + "/" + maxHealth;
-			Font.getDefaultFont().draw(screen, string, pos.x, pos.y - 28, Font.Align.CENTER); 
-		}
+	}
+	
+	/**
+	 * 
+	 * @param screen
+	 * @param string
+	 */
+	public void renderBubble(IAbstractScreen screen, String string) {
+		Font.getDefaultFont().draw(screen, string, (int) pos.x, (int) pos.y - 28, Font.Align.CENTER, true); 
 	}
 	
 	/**
@@ -202,7 +189,7 @@ public abstract class Mob extends Entity {
 	 * @return
 	 */
 	public int getDepthLine() {
-		return (int) pos.y + getSprite().getH() - 6;
+		return (int) pos.y + getSprite().getH() - 7;
 	}
 	
 	/**

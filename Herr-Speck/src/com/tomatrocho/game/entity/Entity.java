@@ -1,7 +1,9 @@
 package com.tomatrocho.game.entity;
 
 import java.awt.Color;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.tomatrocho.game.entity.mob.Team;
 import com.tomatrocho.game.gfx.IAbstractBitmap;
@@ -49,7 +51,7 @@ public abstract class Entity implements IComparableDepth, IBoundingBoxOwner {
 	/**
 	 * 
 	 */
-	protected Vec2 radius = new Vec2(10, 10);
+	protected Map<String, BoundingBox> bbs = new HashMap<>();
 	
 	/**
 	 * Whether this {@link Entity} is removed from the {@link World}.
@@ -75,9 +77,8 @@ public abstract class Entity implements IComparableDepth, IBoundingBoxOwner {
 	 * @param y
 	 */
 	public Entity(World world, double x, double y, Team team) {
-		this.world = world;
-		this.pos.x = x;
-		this.pos.y = y;
+		init(world, x, y);
+		
 		this.team = team;
 	}
 	
@@ -89,9 +90,7 @@ public abstract class Entity implements IComparableDepth, IBoundingBoxOwner {
 	 * @param y
 	 */
 	public Entity(World world, double x, double y) {
-		this.world = world;
-		this.pos.x = x;
-		this.pos.y = y;
+		init(world, x, y);
 	}
 	
 	/**
@@ -140,23 +139,19 @@ public abstract class Entity implements IComparableDepth, IBoundingBoxOwner {
 		
 		if (xa == 0 || ya == 0) {
 			boolean moved = false;
-			if (!removed) {
+			if (!removed)
 				moved |= partMove(bbs, xa, 0);
-			}
-			if (!removed) {
+			if (!removed)
 				moved |= partMove(bbs, 0, ya);
-			}
 			
 			return moved;
 		}
 		else {
 			boolean moved = true;
-			if (!removed) {
+			if (!removed)
 				moved &= partMove(bbs, xa, 0);
-			}
-			if (!removed) {
+			if (!removed) 
 				moved &= partMove(bbs, 0, ya);
-			}
 			
 			return moved;
 		}
@@ -172,81 +167,84 @@ public abstract class Entity implements IComparableDepth, IBoundingBoxOwner {
 	protected boolean partMove(List<BoundingBox> bbs, double xa, double ya) {
 		double xxa = xa;
 		double yya = ya;
-		final BoundingBox from = getBoundingBox();
+		
+		final BoundingBox from = getBoundingBox("body");
+		
 		BoundingBox closest = null;
 		final double epsilon = 0.01;
 		
 		for (BoundingBox to : bbs) {
-			if (from.intersects(to)) {
+			if (from.intersects(to))
 				continue;
-			}
 			
 			if (ya == 0) {
-				if (to.y0 >= from.y1 || to.y1 <= from.y0) {
+				if (to.y0 >= from.y1 || to.y1 <= from.y0)
 					continue;
-				}
 				
 				if (xa > 0) {
 					final double xrd = to.x0 - from.x1;
+					
 					// to is at right
 					if (xrd >= 0 && xa > xrd) {
 						closest = to;
 						xa = xrd - epsilon;
-						if (xa < 0) {
+						
+						if (xa < 0)
 							xa = 0;
-						}
 					}
 				}
 				else if (xa < 0) {
 					final double xld = from.x0 - to.x1;
+					
 					// to is at left
 					if (xld >= 0 && -xa > xld) {
 						closest = to;
 						xa = -xld + epsilon;
-						if (xa > 0) {
+						
+						if (xa > 0)
 							xa = 0;
-						}
 					}
 				}
 			}
 			
 			if (xa == 0) {
-				if (to.x0 >= from.x1 || to.x1 <= from.x0) {
+				if (to.x0 >= from.x1 || to.x1 <= from.x0)
 					continue;
-				}
 				
 				if (ya > 0) {
 					final double yrd = to.y0 - from.y1;
+					
 					// to is down
 					if (yrd >= 0 && ya > yrd) {
 						closest = to;
 						ya = yrd - epsilon;
-						if (ya < 0) {
+						
+						if (ya < 0)
 							ya = 0;
-						}
 					}
 				}
 				else if (ya < 0) {
 					final double yld = from.y0 - to.y1;
+					
 					// to is up
 					if (yld >= 0 && -ya > yld) {
 						closest = to;
 						ya = -yld + epsilon;
-						if (ya > 0) {
+						
+						if (ya > 0)
 							ya = 0;
-						}
 					}
 				}
 			}
 		}
 		
-		if (closest != null && closest.getOwner() != null) {
+		if (closest != null && closest.getOwner() != null)
 			closest.getOwner().handleCollision(this, xxa, yya);
-		}
 		
 		if (xa != 0 || ya != 0) {
 			pos.x += xa;
 			pos.y += ya;
+			
 			return true;
 		}
 		
@@ -299,7 +297,48 @@ public abstract class Entity implements IComparableDepth, IBoundingBoxOwner {
 	 * @return
 	 */
 	public boolean intersects(double x0, double y0, double x1, double y1) {
-		return getBoundingBox().intersects(x0, y0, x1, y1);
+		for (BoundingBox bb : bbs.values()) {
+			if (bb.intersects(x0, y0, x1, y1))
+				return true;
+		}
+		
+		return false;
+	}
+	
+	/**
+	 * 
+	 * @param key
+	 * @return
+	 */
+	public BoundingBox getBoundingBox(String key) {
+		if (bbs.containsKey(key)) {			
+			final BoundingBox bb = bbs.get(key);
+			return new BoundingBox(this, bb.x0 + pos.x, bb.y0 + pos.y, bb.x1 + pos.x, bb.y1 + pos.y);
+		}
+		
+		return null;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public Vec2 getRadius() {
+		int minX = 0, maxX = 0, minY = 0, maxY = 0;
+		for (final BoundingBox bb : bbs.values()) {
+			if (bb.x0 < minX)
+				minX = (int) bb.x0;
+			if (bb.x1 > maxX)
+				maxX = (int) bb.x1;
+			
+			if (bb.y0 < minY)
+				minY = (int) bb.y0;
+			if (bb.y1 > maxY)
+				maxY = (int) bb.y1;
+			
+		}
+		
+		return new Vec2((maxX - minX) / 2, (maxY - minY) / 2);
 	}
 	
 	/**
@@ -307,14 +346,6 @@ public abstract class Entity implements IComparableDepth, IBoundingBoxOwner {
 	 * @return
 	 */
 	public abstract IAbstractBitmap getSprite();
-	
-	/**
-	 * 
-	 * @return
-	 */
-	public BoundingBox getBoundingBox() {
-		return new BoundingBox(this, pos.x - radius.x, pos.y - radius.y, pos.x + radius.x, pos.y + radius.y);
-	}
 	
 	/**
 	 * 
@@ -338,9 +369,8 @@ public abstract class Entity implements IComparableDepth, IBoundingBoxOwner {
 	 */
 	public Material getMaterialBelow() {
 		final Tile tile = world.getTile((int) pos.x / Tile.W, (int) pos.y / Tile.H);
-		if (tile != null) {
+		if (tile != null)
 			return tile.getMaterial();
-		}
 		
 		return null;
 	}
@@ -435,10 +465,10 @@ public abstract class Entity implements IComparableDepth, IBoundingBoxOwner {
 	 * 
 	 * @return
 	 */
-	public Vec2 getRadius() {
-		return radius;
+	public Map<String, BoundingBox> getBBs() {
+		return bbs;
 	}
-
+	
 	/**
 	 *
 	 * @return

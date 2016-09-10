@@ -10,6 +10,7 @@ import com.tomatrocho.game.input.Keys;
 import com.tomatrocho.game.input.Mouse;
 import com.tomatrocho.game.level.World;
 import com.tomatrocho.game.level.tile.Tile;
+import com.tomatrocho.game.math.BoundingBox;
 import com.tomatrocho.game.math.Vec2;
 import com.tomatrocho.game.weapon.Rifle;
 import com.tomatrocho.game.weapon.WeaponInventory;
@@ -20,6 +21,11 @@ public class Player extends Mob {
 	 * 
 	 */
 	public static final int FIRE_MOUSE_BUTTON = 1;
+	
+	/**
+	 * Max amount of health a {@link Player} can have.
+	 */
+	protected static final float MAX_HEALTH = 100;
 
     /**
      *
@@ -98,9 +104,11 @@ public class Player extends Mob {
     public Player(World world, int x, int y, Keys keys, Mouse mouse) {
     	super(world, x * Tile.W, y * Tile.H, Team.TEAM_1);
     	
+    	this.health = MAX_HEALTH;
     	this.speed = 2;
-    	this.radius.x = 7;
-    	this.radius.y = 11;
+    	
+    	bbs.put("head", new BoundingBox(this, -8, -13, 8, 0));
+    	bbs.put("body", new BoundingBox(this, -6, 2, 6, 10));
     	
         this.keys = keys;
         this.mouse = mouse;
@@ -113,14 +121,14 @@ public class Player extends Mob {
      *
      */
     public void tick() {
-    	if (!mouse.isHidden()) {
+    	// aim input
+    	if (!mouse.isHidden())
     		aimByMouse(mouse.getX() - HerrSpeck.W / 2, mouse.getY() - HerrSpeck.H / 2);
-    	}
-    	else {
+    	else
     		aimByKeyboard();
-    	}
     	
     	moving = false;
+    	
     	// movement
         double xa = 0, ya = 0;
         if (keys.up.down()) {
@@ -291,6 +299,11 @@ public class Player extends Mob {
         	sprite = Art.muzzle[muzzleFrame][0];
         	screen.blit(sprite, muzzlePosition.x, muzzlePosition.y);
         }
+        
+		// health
+		if (HerrSpeck.getDebugLevel() > 0) {
+			renderBubble(screen, health + "/" + MAX_HEALTH);
+		}
     }
 
     @Override

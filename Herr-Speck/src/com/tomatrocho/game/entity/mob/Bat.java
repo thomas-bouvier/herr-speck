@@ -5,10 +5,18 @@ import com.tomatrocho.game.entity.Mob;
 import com.tomatrocho.game.gfx.IAbstractScreen;
 import com.tomatrocho.game.level.Material;
 import com.tomatrocho.game.level.World;
+import com.tomatrocho.game.level.tile.Tile;
+import com.tomatrocho.game.math.BoundingBox;
 import com.tomatrocho.game.gfx.Art;
 import com.tomatrocho.game.gfx.IAbstractBitmap;
 
 public class Bat extends Mob {
+	
+	/**
+	 * Max amount of health a {@link Bat} can have.
+	 */
+	protected static final float MAX_HEALTH = 50;
+	
 	
 	/**
 	 * Constructor for the {@link Bat} class.
@@ -20,9 +28,10 @@ public class Bat extends Mob {
 	public Bat(World level, int x, int y) {
 		super(level, x, y, Team.TEAM_2);
 		
-		maxHealth = 50;
-		health = maxHealth;
-		speed = 1.5;
+		this.health = MAX_HEALTH;
+		this.speed = 1.5;
+		
+		bbs.put("body", new BoundingBox(this, -8, -8, 8, 8));
 	}
 
 	@Override
@@ -35,22 +44,19 @@ public class Bat extends Mob {
 		
 		final Material below = getMaterialBelow();
 		if (below != null) {			
-			if (below == Material.SANDSTONE_WALL) {
-				yShadowOffset = 15;
-			}
-			else {
+			if (below == Material.SANDSTONE_WALL)
+				yShadowOffset = 12;
+			else
 				yShadowOffset = 28;
-			}
 			
-			if (below == Material.WATER) {
+			if (below == Material.WATER)
 				alphaShadow = 30;
-			}
-			else {
+			else
 				alphaShadow = 60;
-			}
 		}
 	}
 	
+	@Override
 	public int getDepthLine() {
 		return (int) pos.y + getSprite().getH() * 2;
 	}
@@ -58,10 +64,23 @@ public class Bat extends Mob {
 	@Override
 	public void render(IAbstractScreen screen) {
 		super.render(screen);
+		
+		// health
+		if (HerrSpeck.getDebugLevel() > 0)
+			renderBubble(screen, health + "/" + MAX_HEALTH);
 	}
 
 	@Override
 	public IAbstractBitmap getSprite() {
 		return Art.bat[(ticks / 4) & 3][0];
+	}
+	
+	@Override
+	public Material getMaterialBelow() {
+		final Tile tile = world.getTile((int) pos.x / Tile.W, (int) (pos.y + Tile.H) / Tile.H);
+		if (tile != null)
+			return tile.getMaterial();
+		
+		return null;
 	}
 }

@@ -100,8 +100,6 @@ public abstract class Tile implements IComparableDepth, IBoundingBoxOwner {
 		this.x = x;
 		this.y = y;
 		this.z = z;
-		
-		this.bb = new BoundingBox(this, x * Tile.W, y * Tile.H, (x + 1) * Tile.W, (y + 1) * Tile.H);
 	}
 	
 	/**
@@ -159,6 +157,14 @@ public abstract class Tile implements IComparableDepth, IBoundingBoxOwner {
 			return;
 		
 		bbs.add(bb);
+	}
+	
+	/**
+	 * 
+	 * @param bb
+	 */
+	public void setBoundingBox(BoundingBox bb) {
+		this.bb = bb;
 	}
 	
 	/**

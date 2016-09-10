@@ -93,9 +93,8 @@ public class BoundingBox {
 			for (int y = 0; y <= h; y++) {
 				if (x == 0 || x == w - 1 || y == 0|| y == h - 1) {
 					int color = Color.ORANGE.getRGB();
-					if (owner instanceof Entity) {
+					if (owner instanceof Entity)
 						color = ((Entity) owner).getTeam().getCol();
-					}
 					
 					sprite.setPixel(y * w + x, color);
 				}

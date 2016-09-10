@@ -124,9 +124,8 @@ public class Font {
 			final IAbstractBitmap sprite = getCharacterSprite(character);
 			int heightOffset = 0;
 			
-			if (characters.indexOf(character) < 0) {
+			if (characters.indexOf(character) < 0)
 				heightOffset = getHeightOffset(character);
-			}
 			
 			screen.blit(sprite, x, y + heightOffset);
 			x += sprite.getW() + letterSpacing;
@@ -152,23 +151,41 @@ public class Font {
 	/**
 	 * 
 	 * @param screen
-	 * @param text
+	 * @param string
 	 * @param x
 	 * @param y
 	 * @param align
+	 * @param alphaBackground
 	 */
-	public void draw(IAbstractScreen screen, String text, int x, int y, Align align) {
+	public void draw(IAbstractScreen screen, String string, int x, int y, Align align, boolean alphaBackground) {
+		final int stringWidth = calculateStringWidth(string);
+		
+		if (alphaBackground) {
+			final int gap = 2;
+			final int w = stringWidth + 2 * gap;
+			final int h = glyphHeight + 2 * gap - 1;
+			
+			IAbstractBitmap sprite = screen.createBitmap(w, h);
+			for (int i = 0; i <= w * h; i++)
+				sprite.setPixel(i, Color.BLACK.getRGB());
+			
+			screen.alphaBlit(sprite, x - stringWidth / 2 - gap, y - gap, 50);
+		}
+		
 		switch (align) {
-		case LEFT :
-			draw(screen, text, x, y);
+		case LEFT:
+			draw(screen, string, x, y);
 			break;
-		case CENTER :
-			draw(screen, text, x - calculateStringWidth(text) / 2, y);
+			
+		case CENTER:
+			draw(screen, string, x - stringWidth / 2, y);
 			break;
-		case RIGHT :
-			draw(screen, text, x - calculateStringWidth(text), y);
+			
+		case RIGHT:
+			draw(screen, string, x - stringWidth, y);
 			break;
-		default :
+			
+		default:
 			break;
 		}
 	}
@@ -192,9 +209,8 @@ public class Font {
 	 */
 	public int calculateStringWidth(String text) {
 		int w = 0;
-		for (int i = 0; i < text.length(); i++) {
+		for (int i = 0; i < text.length(); i++)
 			w += getCharacterSprite(text.charAt(i)).getW() + letterSpacing;
-		}
 		w -= letterSpacing;
 		return w;
 	}
@@ -206,9 +222,9 @@ public class Font {
 	 */
 	private IAbstractBitmap getCharacterSprite(char character) {
 		int charPosition = characters.indexOf(character);
-		if (charPosition >= 0) {
+		if (charPosition >= 0)
 			return bitmap[charPosition % 30][charPosition / 30];
-		}
+		
 		return buildCharacterSprite(character);
 	}
 	
@@ -231,9 +247,8 @@ public class Font {
 	 * @return
 	 */
 	public IAbstractBitmap buildCharacterSprite(char character) {
-		if (characterCache.containsKey(character)) {
+		if (characterCache.containsKey(character))
 			return characterCache.get(character);
-		}
 		
 		java.awt.Font font = new java.awt.Font("SansSerif", java.awt.Font.BOLD, systemFontHeight);
 		
@@ -252,9 +267,8 @@ public class Font {
 		int[][] pixels2d = new int[size][size];
 		for (int y = size - 1; y >= 0; y--) {
 			for (int x = size - 1; x >= 0; x--) {
-				if (image.getRGB(x, y) != 0) {
+				if (image.getRGB(x, y) != 0)
 					pixels2d[x][y] = 0xffffffff;
-				}
 			}
 		}
 		
@@ -262,9 +276,8 @@ public class Font {
 		top :
 		for (int y = 0; y < size; y++) {
 			for (int x = 0; x < size; x++) {
-				if (pixels2d[x][y] != 0) {
+				if (pixels2d[x][y] != 0)
 					break top;
-				}
 			}
 			emptyRowsTop++;
 		}
@@ -289,9 +302,8 @@ public class Font {
 		top :
 		for (int y = 0; y < h; y++) {
 			for (int x = 0; x < w; x++) {
-				if (pixels2d[x][y] != 0) {
+				if (pixels2d[x][y] != 0)
 					break top;
-				}
 			}
 			emptyRowsTop++;
 		}
@@ -300,9 +312,8 @@ public class Font {
 		bottom :
 		for (int y = h - 1; y >= 0; y--) {
 			for (int x = 0; x < w; x++) {
-				if (pixels2d[x][y] != 0) {
+				if (pixels2d[x][y] != 0)
 					break bottom;
-				}
 			}
 			emptyRowsBottom++;
 		}
@@ -311,9 +322,8 @@ public class Font {
 		left :
 		for (int x = 0; x < w; x++) {
 			for (int y = 0; y < h; y++) {
-				if (pixels2d[x][y] != 0) {
+				if (pixels2d[x][y] != 0)
 					break left;
-				}
 			}
 			emptyColsLeft++;
 		}
@@ -322,9 +332,8 @@ public class Font {
 		right :
 		for (int x = w - 1; x >= 0; x--) {
 			for (int y = 0; y < h; y++) {
-				if (pixels2d[x][y] != 0) {
+				if (pixels2d[x][y] != 0)
 					break right;
-				}
 			}
 			emptyColsRight++;
 		}
@@ -335,18 +344,16 @@ public class Font {
 		
 		int[][] pixels2dCropped = new int[w - emptyColsLeft - emptyColsRight][h - emptyRowsTop - emptyRowsBottom];
 		for (int y = emptyRowsTop; y < h - emptyRowsBottom; y++) {
-			for (int x = emptyColsLeft; x < w - emptyColsRight; x++) {
-				pixels2dCropped[x - emptyColsLeft][y - emptyRowsTop] = pixels2d[x][y]; 
-			}
+			for (int x = emptyColsLeft; x < w - emptyColsRight; x++)
+				pixels2dCropped[x - emptyColsLeft][y - emptyRowsTop] = pixels2d[x][y];
 		}
 		
 		return pixels2dCropped;
 	}
 	
 	public int getHeightOffset(char character) {
-		if (!characterHeightOffset.containsKey(character)) {
+		if (!characterHeightOffset.containsKey(character))
 			buildCharacterSprite(character);
-		}
 		
 		return characterHeightOffset.get(character);
 	}
