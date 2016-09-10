@@ -1,7 +1,7 @@
 package com.tomatrocho.game.entity.mob;
 
 import com.tomatrocho.game.HerrSpeck;
-import com.tomatrocho.game.entity.Mob;
+import com.tomatrocho.game.entity.HostileMob;
 import com.tomatrocho.game.gfx.IAbstractScreen;
 import com.tomatrocho.game.level.Material;
 import com.tomatrocho.game.level.World;
@@ -10,7 +10,7 @@ import com.tomatrocho.game.math.BoundingBox;
 import com.tomatrocho.game.gfx.Art;
 import com.tomatrocho.game.gfx.IAbstractBitmap;
 
-public class Bat extends Mob {
+public class Bat extends HostileMob {
 	
 	/**
 	 * Max amount of health a {@link Bat} can have.
@@ -77,7 +77,7 @@ public class Bat extends Mob {
 	
 	@Override
 	public Material getMaterialBelow() {
-		final Tile tile = world.getTile((int) pos.x / Tile.W, (int) (pos.y + Tile.H) / Tile.H);
+		final Tile tile = world.getTile((int) pos.x / Tile.W, (int) (pos.y + Tile.H / 2) / Tile.H);
 		if (tile != null)
 			return tile.getMaterial();
 		

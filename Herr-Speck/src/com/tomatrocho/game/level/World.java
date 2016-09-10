@@ -293,7 +293,8 @@ public class World {
 		}
 		
 		// adding bounding boxes from other entities
-		for (Entity e : getEntities(bb)) {
+		Set<Entity> visibleEntities = getEntities(bb);
+		for (Entity e : visibleEntities) {
 			if (e != entity && e.blocks(entity))
 				bbs.add(e.getBoundingBox("body"));
 		}
@@ -457,11 +458,12 @@ public class World {
 	 * 
 	 */
 	public void tick() {
-		if (HerrSpeck.random.nextInt(250) == 0)
+		if (HerrSpeck.random.nextInt(150) == 0)
 			addEntity(new Bat(this, time % (w * 16), time % (h * 16)));
 		
 		for (int i = 0; i < entities.size(); i++) {
 			Entity entity = entities.get(i);
+			
 			if (!entity.removed()) {
 				entity.tick();
 				

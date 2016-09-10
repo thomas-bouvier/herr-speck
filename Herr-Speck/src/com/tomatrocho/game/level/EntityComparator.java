@@ -8,18 +8,18 @@ public class EntityComparator implements Comparator<Entity> {
 
 	@Override
 	public int compare(Entity entity0, Entity entity1) {
-		if (entity0.getY() < entity1.getY()) {
+		if (entity0.getY() < entity1.getY())
 			return -1;
-		}
-		if (entity0.getY() > entity1.getY()) {
+		
+		if (entity0.getY() > entity1.getY())
 			return +1;
-		}
-		if (entity0.getX() < entity1.getX()) {
+		
+		if (entity0.getX() < entity1.getX())
 			return -1;
-		}
-		if (entity0.getX() > entity1.getX()) {
+		
+		if (entity0.getX() > entity1.getX())
 			return +1;
-		}
+		
 		return 0;
 	}
 }

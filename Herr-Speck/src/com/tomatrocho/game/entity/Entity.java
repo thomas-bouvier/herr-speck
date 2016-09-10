@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.tomatrocho.game.entity.mob.Bat;
 import com.tomatrocho.game.entity.mob.Team;
 import com.tomatrocho.game.gfx.IAbstractBitmap;
 import com.tomatrocho.game.gfx.IAbstractScreen;
@@ -238,8 +239,10 @@ public abstract class Entity implements IComparableDepth, IBoundingBoxOwner {
 			}
 		}
 		
-		if (closest != null && closest.getOwner() != null)
+		if (closest != null && closest.getOwner() != null) {
+			if (closest.getOwner() instanceof Bat) System.out.println("yiuiiii");
 			closest.getOwner().handleCollision(this, xxa, yya);
+		}
 		
 		if (xa != 0 || ya != 0) {
 			pos.x += xa;
@@ -261,9 +264,7 @@ public abstract class Entity implements IComparableDepth, IBoundingBoxOwner {
 		pos.y += ya;
 	}
 	
-	/**
-	 * 
-	 */
+	@Override
 	public void handleCollision(Entity entity, double xa, double ya) {
 		if (blocks(entity)) {
 			collide(entity, xa, ya);
