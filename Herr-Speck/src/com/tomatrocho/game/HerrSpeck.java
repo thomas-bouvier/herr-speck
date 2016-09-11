@@ -1,22 +1,29 @@
 package com.tomatrocho.game;
 
 import java.awt.Canvas;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.GraphicsDevice;
+import java.awt.Image;
 import java.awt.Point;
+import java.awt.Toolkit;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferStrategy;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Random;
 
 import javax.swing.JFrame;
 import javax.swing.WindowConstants;
 
 import com.tomatrocho.game.entity.mob.Player;
+import com.tomatrocho.game.gfx.IAbstractBitmap;
 import com.tomatrocho.game.gfx.IAbstractScreen;
 import com.tomatrocho.game.gfx.Screen;
 import com.tomatrocho.game.gui.Hud;
@@ -213,8 +220,9 @@ public class HerrSpeck extends Canvas implements Runnable, MouseListener, MouseM
 	 */
 	private void init() {
 		initInput();
-		initLevel();
-
+		initWorld();
+		initCursor();
+		
 		// sound
 		soundPlayer = new SoundPlayer();
 	}
@@ -235,7 +243,7 @@ public class HerrSpeck extends Canvas implements Runnable, MouseListener, MouseM
 	/**
 	*
 	*/
-	private synchronized void initLevel() {
+	private void initWorld() {
 		this.worldName = "generated_world";
 
 		createWorld(WorldList.getWorldByName(worldName));
@@ -247,6 +255,13 @@ public class HerrSpeck extends Canvas implements Runnable, MouseListener, MouseM
 			}
 		}
 	}
+	
+	/**
+	 * 
+	 */
+	private void initCursor() {
+		setCursor(Toolkit.getDefaultToolkit().createCustomCursor(new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB), new Point(0, 0), "empty"));
+	}
 
 	/**
 	 *
@@ -255,7 +270,8 @@ public class HerrSpeck extends Canvas implements Runnable, MouseListener, MouseM
 	private synchronized void createWorld(WorldInformation worldInformation) {
 		try {
 			this.world = worldBuilder.buildWorld(worldInformation);
-		} catch (IOException ex) {
+		}
+		catch (IOException ex) {
 			ex.printStackTrace();
 		}
 	}
@@ -266,17 +282,13 @@ public class HerrSpeck extends Canvas implements Runnable, MouseListener, MouseM
 	public void run() {
 		long old = System.nanoTime();
 		final int upsLimiter = 60;
-		// final int fpsLimiter = 120;
 		final double nanoU = 1000000000.0 / upsLimiter;
-		// final double nanoR = 1000000000.0 / fpsLimiter;
 		double deltaU = 0;
-		// double deltaR = 0;
 		long timer = System.currentTimeMillis();
 
 		while (running) {
 			long now = System.nanoTime();
 			deltaU += (now - old) / nanoU;
-			// deltaR += (now - old) / nanoR;
 			old = now;
 
 			if (deltaU >= 1) {
@@ -290,11 +302,9 @@ public class HerrSpeck extends Canvas implements Runnable, MouseListener, MouseM
 				continue;
 			}
 
-			// if (deltaR >= 1) {
 			render(bs.getDrawGraphics());
 			bs.show();
-			// deltaR--;
-			// }
+			
 			// update the fps and ups counters every second
 			if (System.currentTimeMillis() - timer > 1000) {
 				fps = frames;
@@ -320,7 +330,6 @@ public class HerrSpeck extends Canvas implements Runnable, MouseListener, MouseM
 		world.tick();
 
 		// fullscreen mode
-		// TODO
 		if (keys.fullscreen.wasPressed())
 			setFullscreen(!fullscreen);
 
@@ -349,7 +358,7 @@ public class HerrSpeck extends Canvas implements Runnable, MouseListener, MouseM
 		if (keys.generateNewWorld.wasPressed()) {
 			if (debugLevel > 0) {
 				WorldList.getWorldByName(worldName).setRandomSeed();
-				initLevel();
+				initWorld();
 			}
 		}
 
@@ -358,7 +367,8 @@ public class HerrSpeck extends Canvas implements Runnable, MouseListener, MouseM
 		if (mousePosition != null)
 			mouse.setPosition(mousePosition.x / SCALE, mousePosition.y / SCALE);
 
-		if (mouse.pressed()) {
+		if (mouse.moved()) {
+			mouse.setMoved(false);
 			mouse.setHidden(false);
 			mouse.setHideTime(0);
 		}
@@ -375,8 +385,9 @@ public class HerrSpeck extends Canvas implements Runnable, MouseListener, MouseM
 	 * Render all the graphics using the given {@link Graphics} object.
 	 */
 	private synchronized void render(Graphics g) {
-		renderWorld(screen);
-		renderGui(screen);
+		renderWorld();
+		renderGui();
+		renderCursor();
 
 		// rendering
 		g.fillRect(0, 0, getWidth(), getHeight());
@@ -391,7 +402,7 @@ public class HerrSpeck extends Canvas implements Runnable, MouseListener, MouseM
 	/**
 	 * Render the world on the {@link Screen}.
 	 */
-	private synchronized void renderWorld(IAbstractScreen screen) {
+	private void renderWorld() {
 		if (world != null) {
 			int xScroll = (int) (player.getX() - screen.getW() / 2);
 			int yScroll = (int) (player.getY() - screen.getH() / 2);
@@ -403,7 +414,7 @@ public class HerrSpeck extends Canvas implements Runnable, MouseListener, MouseM
 	/**
 	 * Render the GUI elements on the {@link Screen}.
 	 */
-	private synchronized void renderGui(IAbstractScreen screen) {
+	private void renderGui() {
 		// fonts
 		if (debugLevel > 0) {
 			// top left
@@ -424,6 +435,31 @@ public class HerrSpeck extends Canvas implements Runnable, MouseListener, MouseM
 
 			hud.render();
 		}
+	}
+	
+	/**
+	 * 
+	 * @param screen
+	 */
+	private void renderCursor() {
+		if (mouse.isHidden())
+			return;
+		
+		final int crosshairSize = 13;
+		final int crosshairHalfSize = crosshairSize / 2;
+		IAbstractBitmap crosshairSprite = screen.createBitmap(crosshairSize, crosshairSize);
+		
+		for (int i = 0; i < crosshairSize; i++) {
+			if (i >= crosshairHalfSize - 1 && i <= crosshairHalfSize + 1)
+				continue;
+
+			//vertical line
+			crosshairSprite.setPixel(crosshairHalfSize + i * crosshairSize, 0xffff0000);
+			// horizontal line
+			crosshairSprite.setPixel(i + crosshairHalfSize * crosshairSize, 0xffff0000);
+		}
+
+		screen.alphaBlit(crosshairSprite, mouse.getX() - crosshairHalfSize, mouse.getY() - crosshairHalfSize, 128);
 	}
 
 	/**
