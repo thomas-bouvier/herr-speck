@@ -13,7 +13,11 @@ public class StoneTile extends Tile {
      */
     public StoneTile() {
     	this.material = Material.STONE;
-    	this.img = HerrSpeck.random.nextInt(4);
+    	
+    	if (HerrSpeck.random.nextInt(20) == 0)
+    		this.img = 3;
+    	else
+    		this.img = HerrSpeck.random.nextInt(3);
     }
 
     @Override

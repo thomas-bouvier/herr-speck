@@ -1,11 +1,9 @@
 package com.tomatrocho.game;
 
 import java.awt.Canvas;
-import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.GraphicsDevice;
-import java.awt.Image;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.MouseEvent;
@@ -15,8 +13,6 @@ import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Random;
 
 import javax.swing.JFrame;
@@ -50,7 +46,7 @@ public class HerrSpeck extends Canvas implements Runnable, MouseListener, MouseM
 	/**
 	 * Width of the scene, in pixels.
 	 */
-	public static final int W = 500;
+	public static final int W = 475;
 
 	/**
 	 * Height of the scene, in pixels. Computed in order to have a 19/6 format.
@@ -467,18 +463,20 @@ public class HerrSpeck extends Canvas implements Runnable, MouseListener, MouseM
 	 * @param fullscreen
 	 */
 	private void setFullscreen(boolean fullscreen) {
+		GraphicsDevice device = frame.getGraphicsConfiguration().getDevice();
+		
 		// disposing window
 		frame.setVisible(false);
 		frame.dispose();
 		frame.setUndecorated(fullscreen);
 
 		// change options
-		GraphicsDevice device = frame.getGraphicsConfiguration().getDevice();
 		device.setFullScreenWindow(fullscreen ? frame : null);
 
 		// displaying window
 		frame.setLocationRelativeTo(null);
 		frame.setVisible(true);
+		
 		this.fullscreen = fullscreen;
 	}
 
