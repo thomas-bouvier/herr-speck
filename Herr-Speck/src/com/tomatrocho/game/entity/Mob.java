@@ -7,6 +7,7 @@ import com.tomatrocho.game.gfx.IAbstractBitmap;
 import com.tomatrocho.game.gfx.IAbstractScreen;
 import com.tomatrocho.game.gui.Font;
 import com.tomatrocho.game.level.World;
+import com.tomatrocho.game.math.IBoundingBoxOwner;
 import com.tomatrocho.game.math.Vec2;
 import com.tomatrocho.game.weapon.Weapon;
 
@@ -117,7 +118,7 @@ public abstract class Mob extends Entity {
 	}
 	
 	@Override
-	public void collide(Entity entity, double xa, double ya) {
+	public void collide(IBoundingBoxOwner bbOwner, double xa, double ya) {
 		pos.x += xa * 0.5;
 		pos.y += ya * 0.5;
 	}

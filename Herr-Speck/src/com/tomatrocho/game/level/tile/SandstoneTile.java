@@ -1,9 +1,8 @@
 package com.tomatrocho.game.level.tile;
 
-import com.tomatrocho.game.entity.Entity;
+import com.tomatrocho.game.gfx.Art;
 import com.tomatrocho.game.gfx.IAbstractScreen;
 import com.tomatrocho.game.level.Material;
-import com.tomatrocho.game.gfx.Art;
 
 public class SandstoneTile extends Tile {
 
@@ -25,10 +24,4 @@ public class SandstoneTile extends Tile {
     public boolean isConnectable() {
     	return true;
     }
-
-    @Override
-    public void neighbourChanged(Tile tile) {}
-
-    @Override
-    public void handleCollision(Entity entity, double xa, double ya) {}
 }

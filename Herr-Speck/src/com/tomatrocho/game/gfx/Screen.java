@@ -39,8 +39,9 @@ public class Screen extends Bitmap implements IAbstractScreen {
      */
     public Screen(int w, int h) {
         super(w, h);
-        image = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
-        pixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
+        
+        this.image = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+        this.pixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
     }
 
     @Override
@@ -49,18 +50,21 @@ public class Screen extends Bitmap implements IAbstractScreen {
         try {
             buffer = ImageIO.read(Screen.class.getResource(pathFile));
             return load(buffer);
-        } catch (IOException ex) {
+        }
+        catch (IOException ex) {
             ex.printStackTrace();
         }
+        
         return null;
     }
 
     @Override
     public IAbstractBitmap load(BufferedImage buffer) {
-        if (buffer == null) {
+        if (buffer == null)
             return null;
-        }
-        final int w = buffer.getWidth(), h = buffer.getHeight();
+        
+        final int w = buffer.getWidth();
+        final int h = buffer.getHeight();
         return new Bitmap(w, h, buffer.getRGB(0, 0, w, h, null, 0, w));
     }
 
@@ -178,9 +182,11 @@ public class Screen extends Bitmap implements IAbstractScreen {
     	BufferedImage image = null;
     	try {
     		image = ImageIO.read(Screen.class.getResource(pathFile));
-    	} catch (IOException ex) {
+    	}
+    	catch (IOException ex) {
     		ex.printStackTrace();
     	}
+    	
     	if (image != null) {
     		final int yTiles = image.getHeight() / h;
     		Bitmap[][] sprites = new Bitmap[yTiles][];
@@ -193,30 +199,37 @@ public class Screen extends Bitmap implements IAbstractScreen {
     				while (xPosition + w < image.getWidth() && image.getRGB(xPosition + w, y * h) != 0xff00ffff) {
     					w++;
     				}
+    				
     				if (w > 0) {
     					Bitmap sprite = new Bitmap(w, h);
     					image.getRGB(xPosition, y * h, w, h, sprite.pixels, 0, w);
     					row.add(sprite);
     				}
+    				
     				xPosition += w + 1;
     			}
-    			if (xTiles < row.size()) {
+    			
+    			if (xTiles < row.size())
     				xTiles = row.size();
-    			}
+    			
     			sprites[y] = row.toArray(new Bitmap[0]);
     		}
+    		
     		IAbstractBitmap[][] ret = new Bitmap[xTiles][yTiles];
     		for (int y = 0; y < yTiles; y++) {
     			for (int x = 0; x < xTiles; x++) {
     				try {
     					ret[x][y] = sprites[y][x];
-    				} catch (IndexOutOfBoundsException ex) {
+    				}
+    				catch (IndexOutOfBoundsException ex) {
     					ret[x][y] = null;
     				}
     			}
     		}
+    		
     		return ret;
     	}
+    	
     	return null;
     }
 
@@ -224,10 +237,10 @@ public class Screen extends Bitmap implements IAbstractScreen {
     public int[][] getColors(IAbstractBitmap[][] tiles) {
         int[][] ret = new int[tiles.length][tiles[0].length];
         for (int y = 0; y < tiles[0].length; y++) {
-            for (int x = 0; x < tiles.length; x++) {
+            for (int x = 0; x < tiles.length; x++)
                 ret[x][y] = getColor(tiles[x][y]);
-            }
         }
+        
         return ret;
     }
 
@@ -237,15 +250,18 @@ public class Screen extends Bitmap implements IAbstractScreen {
         int r = 0;
         int g = 0;
         int b = 0;
+        
         for (int i = 0; i < bmp.pixels.length; i++) {
             int col = bmp.pixels[i];
             r += (col >> 16) & 0xff;
             g += (col >> 8) & 0xff;
             b += (col) & 0xff;
         }
+        
         r /= bmp.pixels.length;
         g /= bmp.pixels.length;
         b /= bmp.pixels.length;
+        
         return 0xff000000 | r << 16 | g << 8 | b;
     }
 
@@ -270,23 +286,34 @@ public class Screen extends Bitmap implements IAbstractScreen {
     }
 
     /**
-     *
+     * Creates a compatible {@link BufferedImage}.
+     * 
+     * Performance of writing an image to a screen is very much affected
+     * by the format in which the image is stored. If the format is not
+     * optimized for the screen memory, then a conversion must be done,
+     * which can be very slow.
+     * 
      * @return
+     * 		the compatible {@link BufferedImage}
      */
-    public BufferedImage toCompatibleImage() {
+    public BufferedImage toCompatibleFormat() {
         // getting the current system graphical settings
         GraphicsConfiguration gfxConfig = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
+        
         // if image is already compatible and optimized for current system settings, simply return it
-        if (image.getColorModel().equals(gfxConfig.getColorModel())) {
+        if (image.getColorModel().equals(gfxConfig.getColorModel()))
             return image;
-        }
+        
         // image is not optimized, so create a new image that is
         BufferedImage newImage = gfxConfig.createCompatibleImage(image.getWidth(), image.getHeight(), image.getTransparency());
+        
         // getting the graphics context of the new image to draw the old image on
         Graphics2D g2d = (Graphics2D) newImage.getGraphics();
+        
         // drawing the image and dispose of context no longer needed
         g2d.drawImage(image, 0, 0, null);
         g2d.dispose();
+        
         // return the new optimized image
         return newImage;
     }

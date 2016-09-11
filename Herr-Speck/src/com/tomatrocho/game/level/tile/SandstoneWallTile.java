@@ -1,11 +1,11 @@
 package com.tomatrocho.game.level.tile;
 
 import com.tomatrocho.game.entity.Bullet;
-import com.tomatrocho.game.entity.Entity;
 import com.tomatrocho.game.entity.mob.Player;
 import com.tomatrocho.game.gfx.Art;
 import com.tomatrocho.game.gfx.IAbstractScreen;
 import com.tomatrocho.game.level.Material;
+import com.tomatrocho.game.math.IBoundingBoxOwner;
 
 public class SandstoneWallTile extends Tile {
 
@@ -23,18 +23,12 @@ public class SandstoneWallTile extends Tile {
     }
     
     @Override
-	public boolean canPass(Entity entity) {
-		return !(entity instanceof Player) && !(entity instanceof Bullet);
-	}
+    public boolean shouldBlock(IBoundingBoxOwner bbOwner) {
+    	return bbOwner instanceof Player || bbOwner instanceof Bullet;
+    }
     
     @Override
     public boolean isConnectable() {
     	return true;
     }
-
-    @Override
-    public void neighbourChanged(Tile tile) {}
-
-    @Override
-    public void handleCollision(Entity entity, double xa, double ya) {}
 }

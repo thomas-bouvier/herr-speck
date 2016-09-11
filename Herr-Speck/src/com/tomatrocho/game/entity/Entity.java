@@ -240,8 +240,8 @@ public abstract class Entity implements IComparableDepth, IBoundingBoxOwner {
 		}
 		
 		if (closest != null && closest.getOwner() != null) {
-			if (closest.getOwner() instanceof Bat) System.out.println("yiuiiii");
-			closest.getOwner().handleCollision(this, xxa, yya);
+			if (closest.getOwner() instanceof Bat) System.out.println("move()");
+			closest.getOwner().handleCollision(from, xxa, yya);
 		}
 		
 		if (xa != 0 || ya != 0) {
@@ -265,28 +265,22 @@ public abstract class Entity implements IComparableDepth, IBoundingBoxOwner {
 	}
 	
 	@Override
-	public void handleCollision(Entity entity, double xa, double ya) {
-		if (blocks(entity)) {
-			collide(entity, xa, ya);
-			entity.collide(this, -xa, -ya);
+	public void handleCollision(BoundingBox bb, double xa, double ya) {
+		final IBoundingBoxOwner bbOwner = bb.getOwner();
+		if (blocks(bbOwner)) {
+			collide(bbOwner, xa, ya);
+			bbOwner.collide(this, -xa, -ya);
 		}
 	}
 	
-	/**
-	 * 
-	 * @param entity
-	 * @param xa
-	 * @param ya
-	 */
-	public abstract void collide(Entity entity, double xa, double ya);
+	@Override
+	public boolean blocks(IBoundingBoxOwner bbOwner) {
+		return isBlocking && bbOwner.isBlocking() && shouldBlock(bbOwner) && bbOwner.shouldBlock(this);
+	}
 	
-	/**
-	 * 
-	 * @param entity
-	 * @return
-	 */
-	public boolean blocks(Entity entity) {
-		return isBlocking && entity.isBlocking() && shouldBlock(entity) && entity.shouldBlock(this);
+	@Override
+	public boolean shouldBlock(IBoundingBoxOwner bbOwner) {
+		return true;
 	}
 	
 	/**
@@ -347,15 +341,6 @@ public abstract class Entity implements IComparableDepth, IBoundingBoxOwner {
 	 * @return
 	 */
 	public abstract IAbstractBitmap getSprite();
-	
-	/**
-	 * 
-	 * @param entity
-	 * @return
-	 */
-	protected boolean shouldBlock(Entity entity) {
-		return true;
-	}
 
 	/**
 	 *

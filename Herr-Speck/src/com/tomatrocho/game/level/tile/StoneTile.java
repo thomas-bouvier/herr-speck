@@ -1,10 +1,9 @@
 package com.tomatrocho.game.level.tile;
 
 import com.tomatrocho.game.HerrSpeck;
-import com.tomatrocho.game.entity.Entity;
+import com.tomatrocho.game.gfx.Art;
 import com.tomatrocho.game.gfx.IAbstractScreen;
 import com.tomatrocho.game.level.Material;
-import com.tomatrocho.game.gfx.Art;
 
 public class StoneTile extends Tile {
 
@@ -24,10 +23,4 @@ public class StoneTile extends Tile {
     public void render(IAbstractScreen screen) {
         screen.blit(Art.stoneTiles[img & 3][img / 4], x * Tile.W, y * Tile.H);
     }
-
-    @Override
-    public void neighbourChanged(Tile tile) {}
-
-    @Override
-    public void handleCollision(Entity entity, double xa, double ya) {}
 }

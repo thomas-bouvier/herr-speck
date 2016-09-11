@@ -6,6 +6,7 @@ import com.tomatrocho.game.gfx.IAbstractScreen;
 import com.tomatrocho.game.level.World;
 import com.tomatrocho.game.level.tile.Tile;
 import com.tomatrocho.game.math.BoundingBox;
+import com.tomatrocho.game.math.IBoundingBoxOwner;
 
 public class Bullet extends Entity {
 
@@ -105,22 +106,28 @@ public class Bullet extends Entity {
 	}
 	
 	@Override
-	protected boolean shouldBlock(Entity entity) {
-		if (entity instanceof Bullet) {
+	public boolean shouldBlock(IBoundingBoxOwner bbOwner) {
+		if (bbOwner instanceof Bullet) {
 			return false;
 		}
 		
-		return entity != shooter;
+		return bbOwner != shooter;
 	}
 	
 	@Override
-	public void collide(Entity entity, double xa, double ya) {
-		if (entity instanceof Mob) {
-			Mob mob = (Mob) entity;
+	public void collide(IBoundingBoxOwner bbOwner, double xa, double ya) {
+		System.out.println("test");
+		if (bbOwner instanceof Mob) {
+			Mob mob = (Mob) bbOwner;
+			
 			if (!mob.isFriendOf(shooter)) {
 				mob.hurt(this);
 				hit = true;
 			}
+		}
+		
+		if (bbOwner instanceof Tile) {
+			System.out.println("oui");
 		}
 	}
 

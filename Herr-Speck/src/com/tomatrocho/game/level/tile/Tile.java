@@ -145,7 +145,9 @@ public abstract class Tile implements IComparableDepth, IBoundingBoxOwner {
 	 *
 	 * @param tile
 	 */
-	public abstract void neighbourChanged(Tile tile);
+	public void neighbourChanged(Tile tile) {
+		
+	}
 
 	/**
 	 * 
@@ -153,10 +155,40 @@ public abstract class Tile implements IComparableDepth, IBoundingBoxOwner {
 	 * @param entity
 	 */
 	public void addClipBoundingBoxes(List<BoundingBox> bbs, Entity entity) {
-		if (canPass(entity))
+		if (!shouldBlock(entity))
 			return;
 		
 		bbs.add(bb);
+	}
+
+	@Override
+	public void handleCollision(BoundingBox bb, double xa, double ya) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void collide(IBoundingBoxOwner bbOwner, double xa, double ya) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public boolean isBlocking() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean shouldBlock(IBoundingBoxOwner bbOwner) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean blocks(IBoundingBoxOwner bbOwner) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 	
 	/**
@@ -165,15 +197,6 @@ public abstract class Tile implements IComparableDepth, IBoundingBoxOwner {
 	 */
 	public void setBoundingBox(BoundingBox bb) {
 		this.bb = bb;
-	}
-	
-	/**
-	 *
-	 * @param entity
-	 * @return
-     */
-	public boolean canPass(Entity entity) {
-		return true;
 	}
 	
 	/**

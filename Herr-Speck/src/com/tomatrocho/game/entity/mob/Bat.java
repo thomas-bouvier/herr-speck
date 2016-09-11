@@ -77,7 +77,7 @@ public class Bat extends HostileMob {
 	
 	@Override
 	public Material getMaterialBelow() {
-		final Tile tile = world.getTile((int) pos.x / Tile.W, (int) (pos.y + Tile.H / 2) / Tile.H);
+		final Tile tile = world.getTile((int) pos.x / Tile.W, (int) pos.y / Tile.H);
 		if (tile != null)
 			return tile.getMaterial();
 		
