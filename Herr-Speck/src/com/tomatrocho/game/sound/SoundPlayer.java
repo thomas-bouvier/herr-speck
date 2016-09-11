@@ -2,16 +2,17 @@ package com.tomatrocho.game.sound;
 
 import java.io.File;
 import java.net.MalformedURLException;
-import java.net.URL;
 
 import com.tomatrocho.game.OS;
 
+import paulscode.sound.Library;
 import paulscode.sound.SoundSystem;
 import paulscode.sound.SoundSystemConfig;
 import paulscode.sound.SoundSystemException;
 import paulscode.sound.codecs.CodecJOrbis;
 import paulscode.sound.codecs.CodecWav;
 import paulscode.sound.libraries.LibraryJavaSound;
+import paulscode.sound.libraries.LibraryLWJGLOpenAL;
 
 public class SoundPlayer {
 	
@@ -20,6 +21,11 @@ public class SoundPlayer {
 	 * 
 	 */
 	private static final String BACKGROUND_MUSIC = "background";
+	
+	/**
+	 * 
+	 */
+	private final Class<? extends Library> libraryType;
 	
 	/**
 	 * 
@@ -34,12 +40,12 @@ public class SoundPlayer {
 	/**
 	 * 
 	 */
-	private boolean oggPlaybackSupport = true;
+	private boolean oggPlaybackSupport;
 	
 	/**
 	 * 
 	 */
-	private boolean wavPlaybackSupport = true;
+	private boolean wavPlaybackSupport;
 	
 	/**
 	 * 
@@ -63,18 +69,28 @@ public class SoundPlayer {
 	public SoundPlayer() {
 		try {
 			SoundSystemConfig.setCodec("ogg", CodecJOrbis.class);
+			
+			oggPlaybackSupport = true;
 		}
 		catch (SoundSystemException ex) {
 			oggPlaybackSupport = false;
 		}
 		try {
 			SoundSystemConfig.setCodec("wav", CodecWav.class);
+			
+			wavPlaybackSupport = true;
 		}
 		catch (SoundSystemException ex) {
 			wavPlaybackSupport = false;
 		}
+		
+		Class<? extends Library> libraryType = LibraryJavaSound.class;
+//        if (SoundSystem.libraryCompatible(LibraryLWJGLOpenAL.class))
+//        	libraryType = LibraryLWJGLOpenAL.class;
+        this.libraryType = libraryType;
+		
 		try {
-			soundSystem = new SoundSystem(LibraryJavaSound.class);
+			soundSystem = new SoundSystem(libraryType);
 		}
 		catch (SoundSystemException ex) {
 			ex.printStackTrace();
@@ -90,22 +106,22 @@ public class SoundPlayer {
 	 * 
 	 */
 	public void startBackgroundMusic() {
-		System.out.println("\nStarting background music");
+		System.out.println("\nBackground music started.");
 		
 		if (!muted && hasOggPlaybackSupport()) {
-			String musicPath = "/resources/sounds/ambient.mp3";
+			String musicPath = "/resources/sounds/ambient.ogg";
 			
 			try {
 			    File musicFile = new File(OS.getAppDirectory("game"), musicPath);
-			    URL musicUrl = musicFile.toURI().toURL();
-			    if (musicFile.exists()){
-			    	soundSystem.backgroundMusic(BACKGROUND_MUSIC, musicUrl, musicPath, true);
-			    }
+			    if (musicFile.exists())
+			    	soundSystem.backgroundMusic(BACKGROUND_MUSIC, musicFile.toURI().toURL(), musicPath, true);
 			}
 			catch (MalformedURLException ex) {
 			    ex.printStackTrace();
 			}
 		}
+		
+		soundSystem.setVolume(BACKGROUND_MUSIC, musicVolume);
 	}
 	
 	/**
@@ -113,8 +129,15 @@ public class SoundPlayer {
 	 * @param x
 	 * @param y
 	 */
-	public void setListenerPosition(int x, int y) {
+	public void setListenerPosition(double x, double y) {
 		soundSystem.setListenerPosition((float) x, (float) y, 50);
+	}
+	
+	/**
+	 * 
+	 */
+	public void dispose() {
+		soundSystem.cleanup();
 	}
 	
 	/**
@@ -137,7 +160,7 @@ public class SoundPlayer {
 	 * 
 	 * @return
 	 */
-	public boolean isMuted() {
+	public boolean muted() {
 		return muted;
 	}
 }
