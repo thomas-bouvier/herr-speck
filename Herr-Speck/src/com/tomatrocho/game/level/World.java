@@ -118,7 +118,7 @@ public class World {
         for (int y = 0; y < h; y++) {
         	for (int x = 0; x < w; x++) {
         		final Tile tile = getTiles(x, y).get(0);
-        		for (final List<Tile> tiles : getMooreNeighborhoodTiles(tile)) {
+        		for (final List<Tile> tiles : getNeighborTiles(tile, Neighborhood.MOORE)) {
     				if (tiles != null) {
     					final Tile adjacentTile = tiles.get(0);
     					if (tile.getNeighbourMaterial() != null) {
@@ -132,6 +132,9 @@ public class World {
         }
 	}
 	
+	/**
+	 * 
+	 */
 	public void initBoundingBoxes() {
 		for (int y = 0; y < h; y++) {
 			for (int x = 0; x < w; x++) {
@@ -180,18 +183,47 @@ public class World {
 	
 	/**
 	 * 
+	 * @author thomas
+	 *
+	 */
+	public enum Neighborhood {
+		MOORE,
+		VON_NEUMANN
+	}
+	
+	/**
+	 * 
 	 * @return
 	 */
-	public List<List<Tile>> getMooreNeighborhoodTiles(final Tile tile) {
+	public List<List<Tile>> getNeighborTiles(final Tile tile, Neighborhood neighborhood) {
 		List<List<Tile>> tiles = new ArrayList<>();
 		final int x = tile.getX(), y = tile.getY();
-		for (int j = y - 1; j <= y + 1; j++) {
-			for (int i = x - 1; i <= x + 1; i++) {
-				if (i == x && j == y)
-					continue;
-				
-				tiles.add(getTiles(i, j));
+		
+		switch (neighborhood) {
+		case MOORE:
+			for (int j = y - 1; j <= y + 1; j++) {
+				for (int i = x - 1; i <= x + 1; i++) {
+					if (i == x && j == y)
+						continue;
+					
+					tiles.add(getTiles(i, j));
+				}
 			}
+			break;
+			
+		case VON_NEUMANN:
+			if (hasNeighbor(tile, NeighborLocation.TOP))
+				tiles.add(getTiles(x, y - 1));
+			if (hasNeighbor(tile, NeighborLocation.RIGHT))
+				tiles.add(getTiles(x + 1, y));
+			if (hasNeighbor(tile, NeighborLocation.BOTTOM))
+				tiles.add(getTiles(x, y + 1));
+			if (hasNeighbor(tile, NeighborLocation.LEFT))
+				tiles.add(getTiles(x - 1, y));
+			break;
+			
+		default:
+			break;
 		}
 		
 		return tiles;
@@ -324,16 +356,19 @@ public class World {
 		if (yScroll < 0)
 			y0--;
 		
+		final Set<Entity> visibleEntities = getVisibleEntities(screen, xScroll, yScroll);
+		
 		// setting offsets equal to xScroll, yScroll
 		screen.setOffset(xScroll, yScroll);
-		
-		// floor rendering
-		renderTiles(screen, x0, y0, x1, y1, 0);
 				
 		// adding entities to render list
 		Set<IComparableDepth> objectsToRender = new TreeSet<>(new DepthComparator());
 		
-		entities.stream().forEach(entity -> objectsToRender.add(entity));
+		// adding visible entities to render list
+		visibleEntities.stream().forEach(entity -> objectsToRender.add(entity));
+		
+		// floor rendering
+		renderTiles(screen, x0, y0, x1, y1, 0);
 		
 		// adding tiles to render list
 		for (int y = y0; y <= y1; y++) {
@@ -406,6 +441,17 @@ public class World {
 	
 	/**
 	 * 
+	 * @param screen
+	 * @param xScroll
+	 * @param yScroll
+	 * @return
+	 */
+	public Set<Entity> getVisibleEntities(IAbstractScreen screen, int xScroll, int yScroll) {
+		return getEntities(xScroll - Tile.W, yScroll - Tile.H, xScroll + screen.getW() + Tile.W, yScroll + screen.getH() + Tile.H);
+	}
+	
+	/**
+	 * 
 	 * @param bb
 	 * @return
 	 */
@@ -434,18 +480,18 @@ public class World {
 	 * @param predicate
 	 * @return
 	 */
-	public Set<Entity> getEntities(double x0, double y0, double x1, double y1, IBoundingBoxPredicate<Entity> predicate) {
+	public Set<Entity> getEntities(double xx0, double yy0, double xx1, double yy1, IBoundingBoxPredicate<Entity> predicate) {
 		// computing bounds
-		final int xx0 = Math.max((int) (x0) / Tile.W, 0);
-		final int yy0 = Math.max((int) (y0) / Tile.H, 0);
-		final int xx1 = Math.min((int) (x1) / Tile.W, w - 1);
-		final int yy1 = Math.min((int) (y1) / Tile.H, h - 1);
+		final int x0 = Math.max((int) (xx0) / Tile.W, 0);
+		final int y0 = Math.max((int) (yy0) / Tile.H, 0);
+		final int x1 = Math.min((int) (xx1) / Tile.W, w - 1);
+		final int y1 = Math.min((int) (yy1) / Tile.H, h - 1);
 		
 		final Set<Entity> ret = new TreeSet<Entity>(new EntityComparator());
-		for (int y = yy0; y <= yy1; y++) {
-			for (int x = xx0; x <= xx1; x++) {
+		for (int y = y0; y <= y1; y++) {
+			for (int x = x0; x <= x1; x++) {
 				for (Entity entity : entityMap.get(y * w + x)) {
-					if (predicate.appliesTo(entity, x0, y0, x1, y1))
+					if (predicate.appliesTo(entity, xx0, yy0, xx1, yy1))
 						ret.add(entity);
 				}
 			}

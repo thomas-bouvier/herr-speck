@@ -285,15 +285,15 @@ public abstract class Entity implements IComparableDepth, IBoundingBoxOwner {
 	
 	/**
 	 * 
-	 * @param x0
-	 * @param x1
-	 * @param y0
-	 * @param y1
+	 * @param xx0
+	 * @param yy0
+	 * @param xx1
+	 * @param yy1
 	 * @return
 	 */
-	public boolean intersects(double x0, double y0, double x1, double y1) {
+	public boolean intersects(double xx0, double yy0, double xx1, double yy1) {
 		for (BoundingBox bb : bbs.values()) {
-			if (bb.intersects(x0, y0, x1, y1))
+			if (bb.intersects(xx0, yy0, xx1, yy1))
 				return true;
 		}
 		

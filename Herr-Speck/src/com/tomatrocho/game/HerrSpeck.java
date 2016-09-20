@@ -46,7 +46,7 @@ public class HerrSpeck extends Canvas implements Runnable, MouseListener, MouseM
 	/**
 	 * Width of the scene, in pixels.
 	 */
-	public static final int W = 330;
+	public static final int W = 450;
 
 	/**
 	 * Height of the scene, in pixels. Computed in order to have a 19/6 format.
@@ -406,6 +406,7 @@ public class HerrSpeck extends Canvas implements Runnable, MouseListener, MouseM
 
 			world.render(screen, xScroll, yScroll);
 		}
+		
 	}
 
 	/**
