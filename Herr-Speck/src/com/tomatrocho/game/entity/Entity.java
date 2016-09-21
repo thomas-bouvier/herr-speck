@@ -292,9 +292,10 @@ public abstract class Entity implements IComparableDepth, IBoundingBoxOwner {
 	 * @return
 	 */
 	public boolean intersects(double xx0, double yy0, double xx1, double yy1) {
-		for (BoundingBox bb : bbs.values()) {
-			if (bb.intersects(xx0, yy0, xx1, yy1))
+		for (String key : bbs.keySet()) {
+			if (getBoundingBox(key).intersects(xx0, yy0, xx1, yy1)) {
 				return true;
+			}
 		}
 		
 		return false;

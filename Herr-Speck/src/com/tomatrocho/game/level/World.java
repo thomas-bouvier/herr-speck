@@ -461,14 +461,14 @@ public class World {
 	
 	/**
 	 * 
-	 * @param x0
-	 * @param y0
-	 * @param x1
-	 * @param y1
+	 * @param xx0
+	 * @param yy0
+	 * @param xx1
+	 * @param yy1
 	 * @return
 	 */
-	public Set<Entity> getEntities(double x0, double y0, double x1, double y1) {
-		return getEntities(x0, y0, x1, y1, EntityIntersectsBB.INSTANCE);
+	public Set<Entity> getEntities(double xx0, double yy0, double xx1, double yy1) {
+		return getEntities(xx0, yy0, xx1, yy1, EntityIntersectsBB.INSTANCE);
 	}
 	
 	/**

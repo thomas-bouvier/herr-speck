@@ -22,7 +22,7 @@ public enum EntityIntersectsBB implements IBoundingBoxPredicate<Entity> {
 
 	
 	@Override
-	public boolean appliesTo(Entity entity, double x0, double y0, double x1, double y1) {
-		return !entity.removed() && entity.intersects(x0, y0, x1, y1);
+	public boolean appliesTo(Entity entity, double xx0, double yy0, double xx1, double yy1) {
+		return !entity.removed() && entity.intersects(xx0, yy0, xx1, yy1);
 	}
 }
