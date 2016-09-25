@@ -11,7 +11,7 @@ import java.util.List;
 
 import javax.imageio.ImageIO;
 
-public class Screen extends Bitmap implements IAbstractScreen {
+public abstract class Screen extends Bitmap implements IAbstractScreen {
 
     /**
      * The {@link BufferedImage} linked to this {@link Screen}.
@@ -164,16 +164,20 @@ public class Screen extends Bitmap implements IAbstractScreen {
         } catch (IOException ex) {
             ex.printStackTrace();
         }
+        
         if (image != null) {
             final int xTiles = (image.getWidth() - bx) / w, yTiles = (image.getHeight() - by) / h;
             IAbstractBitmap[][] ret = new Bitmap[xTiles][yTiles];
+            
             for (int y = 0; y < yTiles; y++) {
                 for (int x = 0; x < xTiles; x++) {
                     ret[x][y] = new Bitmap(w, h, image.getRGB(bx + x * w, by + y * h, w, h, null, 0, w));
                 }
             }
+            
             return ret;
         }
+        
         return null;
     }
     
@@ -190,10 +194,12 @@ public class Screen extends Bitmap implements IAbstractScreen {
     	if (image != null) {
     		final int yTiles = image.getHeight() / h;
     		Bitmap[][] sprites = new Bitmap[yTiles][];
+    		
     		int xTiles = 0;
     		for (int y = 0; y < yTiles; y++) {
     			List<IAbstractBitmap> row = new ArrayList<>();
     			int xPosition = 0;
+    			
     			while (xPosition < image.getWidth()) {
     				int w = 0;
     				while (xPosition + w < image.getWidth() && image.getRGB(xPosition + w, y * h) != 0xff00ffff) {
@@ -326,5 +332,21 @@ public class Screen extends Bitmap implements IAbstractScreen {
     @Override
     public int getH() {
         return h;
+    }
+    
+    /**
+     * 
+     * @return
+     */
+    public int getXOffset() {
+    	return xOffset;
+    }
+    
+    /**
+     * 
+     * @return
+     */
+    public int getYOffset() {
+    	return yOffset;
     }
 }

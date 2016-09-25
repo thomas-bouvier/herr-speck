@@ -60,7 +60,6 @@ public class Particle extends Entity {
 		
 	}
 
-	@Override
 	public IAbstractBitmap getSprite() {
 		// TODO Auto-generated method stub
 		return null;
@@ -68,6 +67,12 @@ public class Particle extends Entity {
 
 	@Override
 	public void collide(IBoundingBoxOwner bbOwner, double xa, double ya) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void drawDepthLine(IAbstractScreen screen) {
 		// TODO Auto-generated method stub
 		
 	}

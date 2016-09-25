@@ -1,5 +1,7 @@
 package com.tomatrocho.game.entity;
 
+import java.awt.Color;
+
 import com.tomatrocho.game.entity.mob.Player;
 import com.tomatrocho.game.entity.mob.Team;
 import com.tomatrocho.game.gfx.Art;
@@ -177,6 +179,24 @@ public abstract class Mob extends Entity {
 	 */
 	public void renderBubble(IAbstractScreen screen, String string) {
 		Font.getDefaultFont().draw(screen, string, (int) pos.x, (int) pos.y - 28, Font.Align.CENTER, true); 
+	}
+	
+	/**
+	 * 
+	 */
+	public void drawDepthLine(IAbstractScreen screen) {
+		final int w = getSprite().getW() / 2;
+		final int h = 1;
+		
+		IAbstractBitmap sprite = screen.createBitmap(w, h);
+		for (int x = 0; x <= w; x++) {
+			for (int y = 0; y <= h; y++) {
+				if (x == 0 || x == w - 1 || y == 0|| y == h - 1)
+					sprite.setPixel(y * w + x, Color.LIGHT_GRAY.getRGB());
+			}
+		}
+		
+		screen.blit(sprite, pos.x - getSprite().getW() / 2 + w / 2, getDepthLine() - getSprite().getH() / 2);
 	}
 	
 	/**

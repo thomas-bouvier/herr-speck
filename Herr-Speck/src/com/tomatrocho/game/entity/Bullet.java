@@ -174,4 +174,10 @@ public class Bullet extends Entity {
 	public int getFreezeTime() {
 		return freezeTime;
 	}
+
+	@Override
+	public void drawDepthLine(IAbstractScreen screen) {
+		// TODO Auto-generated method stub
+		
+	}
 }

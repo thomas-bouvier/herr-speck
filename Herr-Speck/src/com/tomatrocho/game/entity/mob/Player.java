@@ -301,9 +301,8 @@ public class Player extends Mob {
         }
         
 		// health
-		if (HerrSpeck.getDebugLevel() > 0) {
+		if (HerrSpeck.getDebugLevel() > 0)
 			renderBubble(screen, health + "/" + MAX_HEALTH);
-		}
     }
 
     @Override

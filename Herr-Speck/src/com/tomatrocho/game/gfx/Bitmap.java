@@ -30,7 +30,7 @@ public class Bitmap implements IAbstractBitmap {
     public Bitmap(int w, int h) {
         this.w = w;
         this.h = h;
-        pixels = new int[w * h];
+        this.pixels = new int[w * h];
     }
 
     /**
@@ -92,44 +92,47 @@ public class Bitmap implements IAbstractBitmap {
     public int blendPixels(int backgroundColor, int pixelToBlendColor) {
         final int alphaBlend = (pixelToBlendColor >> 24) & 0xff;
         final int alphaBlendBackground = 256 - alphaBlend;
+        
         final int rr = backgroundColor & 0xff0000;
         final int gg = backgroundColor & 0xff00;
         final int bb = backgroundColor & 0xff;
+        
         int r = pixelToBlendColor & 0xff0000;
         int g = pixelToBlendColor & 0xff00;
         int b = pixelToBlendColor & 0xff;
+        
         r = ((r * alphaBlend + rr * alphaBlendBackground) >> 8) & 0xff0000;
         g = ((g * alphaBlend + gg * alphaBlendBackground) >> 8) & 0xff00;
         b = ((b * alphaBlend + bb * alphaBlendBackground) >> 8) & 0xff;
+        
         return 0xff000000 | r | g | b;
     }
 
     @Override
     public void blit(IAbstractBitmap bitmap, int x, int y) {
         Bitmap bmp = (Bitmap) bitmap;
+        
         Rect blitArea = new Rect(x, y, bmp.w, bmp.h);
         adjustBlitArea(blitArea);
+        
         int blitW = blitArea.getBottomRightX() - blitArea.getTopLeftX();
         for (int yy = blitArea.getTopLeftY(); yy < blitArea.getBottomRightY(); yy++) {
             // coordinate on the big bitmap
             int tp = yy * w + blitArea.getTopLeftX();
+            
             // coordinate on the small bitmap
             int sp = (yy - y) * bmp.w + (blitArea.getTopLeftX() - x);
             for (int xx = 0; xx < blitW; xx++) {
                 int col = bmp.pixels[sp + xx];
                 int alpha = (col >> 24) & 0xff;
+                
                 if (alpha == 255) {
                     if (col != 0xffff00ff) {
-                        pixels[tp + xx] = col;
+                        setPixel(tp + xx, col);
                     }
                 } else {
-                    pixels[tp + xx] = blendPixels(pixels[tp + xx], col);
+                    setPixel(tp + xx, blendPixels(pixels[tp + xx], col));
                 }
-                /*
-                if (sp == 0 || xx == 0) {
-                	pixels[tp + xx] = 0xffff678b;
-                }
-                */
             }
         }
     }
@@ -137,23 +140,27 @@ public class Bitmap implements IAbstractBitmap {
     @Override
     public void blit(IAbstractBitmap bitmap, int x, int y, int w, int h) {
         Bitmap bmp = (Bitmap) bitmap;
+        
         Rect blitArea = new Rect(x, y, w, h);
         adjustBlitArea(blitArea);
+        
         int blitW = blitArea.getBottomRightX() - blitArea.getTopLeftX();
         for (int yy = blitArea.getTopLeftY(); yy < blitArea.getBottomRightY(); yy++) {
             // coordinate on the big bitmap
             int tp = yy * this.w + blitArea.getTopLeftX();
+            
             // coordinate on the small bitmap
             int sp = (yy - y) * bmp.w + (blitArea.getTopLeftX() - x);
             for (int xx = 0; xx < blitW; xx++) {
                 int col = bmp.pixels[sp + xx];
                 int alpha = (col >> 24) & 0xff;
+                
                 if (alpha == 255) {
                     if (col != 0xffff00ff) {
-                        pixels[tp + xx] = col;
+                        setPixel(tp + xx, col);
                     }
                 } else {
-                    pixels[tp + xx] = blendPixels(pixels[tp + xx], col);
+                    setPixel(tp + xx, blendPixels(pixels[tp + xx], col));
                 }
             }
         }
@@ -165,24 +172,24 @@ public class Bitmap implements IAbstractBitmap {
             blit(bitmap, x, y);
             return;
         }
+        
         Bitmap bmp = (Bitmap) bitmap;
+        
         Rect blitArea = new Rect(x, y, bmp.w, bmp.h);
         adjustBlitArea(blitArea);
+        
         int blitW = blitArea.getBottomRightX() - blitArea.getTopLeftX();
         for (int yy = blitArea.getTopLeftY(); yy < blitArea.getBottomRightY(); yy++) {
             // coordinate on the big bitmap
             int tp = yy * w + blitArea.getTopLeftX();
+            
             // coordinate on the small bitmap
             int sp = (yy - y) * bmp.w + (blitArea.getTopLeftX() - x);
             for (int xx = 0; xx < blitW; xx++) {
                 int col = bmp.pixels[sp + xx];
-                if (col < 0) {
-                    int r = (col & 0xff0000);
-                    int g = (col & 0xff00);
-                    int b = (col & 0xff);
-                    col = (alpha << 24) | r | g | b;
-                    pixels[tp + xx] = blendPixels(pixels[tp + xx], col);
-                }
+                
+                if (col < 0)
+                    setPixel(tp + xx, blendPixels(pixels[tp + xx], getAlphaColor(col, alpha)));
             }
         }
     }
@@ -190,29 +197,38 @@ public class Bitmap implements IAbstractBitmap {
     @Override
     public void colorBlit(IAbstractBitmap bitmap, int x, int y, int color) {
         Bitmap bmp = (Bitmap) bitmap;
+        
         Rect blitArea = new Rect(x, y, bmp.w, bmp.h);
         adjustBlitArea(blitArea);
+        
         int blitW = blitArea.getBottomRightX() - blitArea.getTopLeftX();
+        
         int a2 = (color >> 24) & 0xff;
 		int a1 = 256 - a2;
+		
 		int rr = color & 0xff0000;
 		int gg = color & 0xff00;
 		int bb = color & 0xff;
+		
         for (int yy = blitArea.getTopLeftY(); yy < blitArea.getBottomRightY(); yy++) {
             // coordinate on the big bitmap
             int tp = yy * w + blitArea.getTopLeftX();
+            
             // coordinate on the small bitmap
             int sp = (yy - y) * bmp.w + (blitArea.getTopLeftX() - x);
             for (int xx = 0; xx < blitW; xx++) {
             	int col = bmp.pixels[sp + xx];
+            	
                 if (col < 0) {
                 	int r = (col & 0xff0000);
 					int g = (col & 0xff00);
 					int b = (col & 0xff);
+					
 					r = ((r * a1 + rr * a2) >> 8) & 0xff0000;
 					g = ((g * a1 + gg * a2) >> 8) & 0xff00;
 					b = ((b * a1 + bb * a2) >> 8) & 0xff;
-					pixels[tp + xx] = 0xff000000 | r | g | b;
+					
+					setPixel(tp + xx, 0xff000000 | r | g | b);
                 }
             }
         }
@@ -241,11 +257,13 @@ public class Bitmap implements IAbstractBitmap {
     public void fill(int x, int y, int w, int h, int color) {
         Rect blitArea = new Rect(x, y, w, h);
         adjustBlitArea(blitArea);
+        
         int blitW = blitArea.getBottomRightX() - blitArea.getTopLeftX();
         for (int yy = blitArea.getTopLeftY(); yy < blitArea.getBottomRightY(); yy++) {
             int tp = yy * w + blitArea.getTopLeftX();
+            
             for (int xx = 0; xx < blitW; xx++) {
-                pixels[tp + xx] = color;
+                setPixel(tp + xx, color);
             }
         }
     }
@@ -256,6 +274,7 @@ public class Bitmap implements IAbstractBitmap {
             fill(x, y, w, h, color);
             return;
         }
+        
         Bitmap bmp = new Bitmap(w, h);
         bmp.fill(0, 0, w, h, color);
         alphaBlit(bmp, x, y, alpha);
@@ -264,11 +283,13 @@ public class Bitmap implements IAbstractBitmap {
     @Override
     public IAbstractBitmap shrink() {
         Bitmap bmp = new Bitmap(w / 2, h / 2);
+        
         int pos = 0;
         for (int i = 0; i < pixels.length; i++) {
             if (pos >= bmp.pixels.length) {
                 break;
             }
+            
             if (i % 2 == 0) {
                 bmp.pixels[pos++] = pixels[i];
             }
@@ -276,20 +297,24 @@ public class Bitmap implements IAbstractBitmap {
                 i += w;
             }
         }
+        
         return bmp;
     }
 
     @Override
     public IAbstractBitmap scale(int w, int h) {
         Bitmap bmp = new Bitmap(w, h);
+        
         final int scaleRatioW = (this.w << 16) / w;
         final int scaleRatioH = (this.h << 16) / h;
+        
         int pos = 0;
         for (int y = 0; y < h; y++) {
             for (int x = 0; x < w; x++) {
                 bmp.pixels[pos++] = pixels[((y * scaleRatioH) >> 16) * w + ((x * scaleRatioW) >> 16)];
             }
         }
+        
         return null;
     }
 
@@ -299,6 +324,7 @@ public class Bitmap implements IAbstractBitmap {
         int x1 = x + w;
         int y0 = y;
         int y1 = y + h;
+        
         if (x0 < 0) {
             x0 = 0;
         }
@@ -311,6 +337,7 @@ public class Bitmap implements IAbstractBitmap {
         if (y1 > h) {
             y1 = h;
         }
+        
         for (int yy = y0; yy < y1; yy++) {
             setPixel(x0, yy, color);
             setPixel(x1 - 1, yy, color);
@@ -319,6 +346,22 @@ public class Bitmap implements IAbstractBitmap {
             setPixel(xx, y0, color);
             setPixel(xx, y1 - 1, color);
         }
+    }
+    
+    /**
+     * 
+     * @param col
+     * @param alpha
+     * @return
+     */
+    public static int getAlphaColor(int color, int alpha) {
+    	final int r = (color & 0xff0000);
+        final int g = (color & 0xff00);
+        final int b = (color & 0xff);
+        
+        color = (alpha << 24) | r | g | b;
+        
+        return color;
     }
 
     @Override
@@ -330,10 +373,7 @@ public class Bitmap implements IAbstractBitmap {
 
     @Override
     public void setPixel(int x, int y, int color) {
-        final int pos = y * w + x;
-        if (pos >= 0 && pos < pixels.length) {
-            pixels[pos] = color;
-        }
+    	setPixel(y * w + x, color);
     }
     
     @Override

@@ -9,12 +9,15 @@ import java.util.TreeSet;
 
 import com.tomatrocho.game.HerrSpeck;
 import com.tomatrocho.game.entity.Entity;
+import com.tomatrocho.game.entity.Light;
 import com.tomatrocho.game.entity.mob.Bat;
 import com.tomatrocho.game.entity.predicates.EntityIntersectsBB;
 import com.tomatrocho.game.gfx.Art;
 import com.tomatrocho.game.gfx.DepthComparator;
 import com.tomatrocho.game.gfx.IAbstractScreen;
 import com.tomatrocho.game.gfx.IComparableDepth;
+import com.tomatrocho.game.gfx.LightScreen;
+import com.tomatrocho.game.gfx.SceneScreen;
 import com.tomatrocho.game.level.tile.SandstoneTile;
 import com.tomatrocho.game.level.tile.StoneTile;
 import com.tomatrocho.game.level.tile.Tile;
@@ -337,29 +340,31 @@ public class World {
 	/**
 	 * Renders this entire {@link World} to the {@link IAbstractScreen}.
 	 *
-	 * @param screen
-	 * 		{@link IAbstractScreen} to render this {@link World} on
 	 * @param xScroll
 	 *		offset on x axis
 	 * @param yScroll
 	 *		offset on y axis
 	 */
-	public void render(IAbstractScreen screen, int xScroll, int yScroll) {
+	public void render(int xScroll, int yScroll) {
+		SceneScreen sceneScreen = (SceneScreen) HerrSpeck.getSceneScreen();
+		LightScreen lightScreen = (LightScreen) HerrSpeck.getLightScreen();
+		
 		// computing corner pins
 		int x0 = (xScroll) / Tile.W;
 		int y0 = (yScroll) / Tile.H;
-		int x1 = (xScroll + screen.getW()) / Tile.W;
-		int y1 = (yScroll + screen.getH()) / Tile.H + Tile.H;
+		int x1 = (xScroll + sceneScreen.getW()) / Tile.W;
+		int y1 = (yScroll + sceneScreen.getH()) / Tile.H + Tile.H;
 		
 		if (xScroll < 0)
 			x0--;
 		if (yScroll < 0)
 			y0--;
 		
-		final Set<Entity> visibleEntities = getVisibleEntities(screen, xScroll, yScroll);
+		final Set<Entity> visibleEntities = getVisibleEntities(sceneScreen, xScroll, yScroll);
 		
 		// setting offsets equal to xScroll, yScroll
-		screen.setOffset(xScroll, yScroll);
+		sceneScreen.setOffset(xScroll, yScroll);
+		lightScreen.setOffset(xScroll, yScroll);
 				
 		// adding entities to render list
 		Set<IComparableDepth> objectsToRender = new TreeSet<>(new DepthComparator());
@@ -368,7 +373,7 @@ public class World {
 		visibleEntities.stream().forEach(entity -> objectsToRender.add(entity));
 		
 		// floor rendering
-		renderTiles(screen, x0, y0, x1, y1, 0);
+		renderTiles(sceneScreen, x0, y0, x1, y1, 0);
 		
 		// adding tiles to render list
 		for (int y = y0; y <= y1; y++) {
@@ -385,18 +390,21 @@ public class World {
 		}
 		
 		// objects rendering
-		objectsToRender.stream().forEach(object -> object.render(screen));
+		objectsToRender.stream().forEach(object -> object.render(sceneScreen));
+		
+		renderLight(lightScreen);
 		
 		// rendering bounding boxes
 		if (HerrSpeck.getDebugLevel() > 0) {			
-			renderBoundingBoxes(screen);
+			renderBoundingBoxes(sceneScreen);
 			
 			if (HerrSpeck.getDebugLevel() > 1)
-				objectsToRender.stream().forEach(object -> object.drawDepthLine(screen));
+				objectsToRender.stream().forEach(object -> object.drawDepthLine(sceneScreen));
 		}
 		
 		// reseting offset
-		screen.setOffset(0, 0);
+		sceneScreen.setOffset(0, 0);
+		lightScreen.setOffset(0, 0);
 	}
 	
 	/**
@@ -420,6 +428,16 @@ public class World {
 					tiles.get(y * w + x).get(layer).render(screen);
 			}
 		}
+	}
+	
+	Light light = new Light(this, 100, 100, 150, 0xffff00ff);
+	
+	/**
+	 * 
+	 * @param screen
+	 */
+	public void renderLight(IAbstractScreen screen) {
+		light.render(screen);
 	}
 	
 	/**
@@ -490,7 +508,7 @@ public class World {
 		final Set<Entity> ret = new TreeSet<Entity>(new EntityComparator());
 		for (int y = y0; y <= y1; y++) {
 			for (int x = x0; x <= x1; x++) {
-				for (Entity entity : entityMap.get(y * w + x)) {
+				for (final Entity entity : entityMap.get(y * w + x)) {
 					if (predicate.appliesTo(entity, xx0, yy0, xx1, yy1))
 						ret.add(entity);
 				}
@@ -731,6 +749,45 @@ public class World {
 	public static Vec2 getPositionFromTile(int x, int y) {
 		return new Vec2(x * Tile.W + (Tile.W / 2), y * Tile.H + (Tile.H / 2));
 	}
+	
+	/**
+	 *
+	 */
+	public enum NeighborLocation {
+		TOP,
+		RIGHT,
+		BOTTOM,
+		LEFT
+	}
+	
+	/**
+	 * 
+	 * @param tile
+	 * @param neighborLocation
+	 * @return
+	 */
+	public boolean hasNeighbor(Tile tile, NeighborLocation neighborLocation) {
+		switch (neighborLocation) {
+		case TOP:
+			if (tile.getY() - 1 < 0) return false;
+			return tiles.get((tile.getY() - 1) * w + tile.getX()).size() > tile.getZ();
+			
+		case RIGHT:
+			if (tile.getX() + 1 >= w) return false;
+			return tiles.get(tile.getY() * w + (tile.getX() + 1)).size() > tile.getZ();
+			
+		case BOTTOM:
+			if (tile.getY() + 1 >= h) return false;
+			return tiles.get((tile.getY() + 1) * w + tile.getX()).size() > tile.getZ();
+			
+		case LEFT:
+			if (tile.getX() - 1 < 0) return false;
+			return tiles.get(tile.getY() * w + (tile.getX() - 1)).size() > tile.getZ();
+			
+		default:
+			return false;
+		}
+	}
 
 	/**
 	 * Retrieves the name of the {@link World}.
@@ -769,16 +826,6 @@ public class World {
 	public Vec2 getSpawnLocation() {
 		return spawnLocation;
 	}
-
-	/**
-	 * Retrieves the brightness level of this {@link World}.
-	 *
-	 * @return
-	 * 		the brightness level of this {@link World}
-	 */
-	public int getBrightnessLevel() {
-		return brightnessLevel;
-	}
 	
 	/**
 	 * 
@@ -789,45 +836,15 @@ public class World {
 	}
 	
 	/**
-	 * 
-	 * @author thoma
+	 * Retrieves the brightness level of this {@link World}.
 	 *
+	 * @return
+	 * 		the brightness level of this {@link World}
 	 */
-	public enum NeighborLocation {
-		TOP,
-		RIGHT,
-		BOTTOM,
-		LEFT
+	public int getBrightnessLevel() {
+		return brightnessLevel;
 	}
 	
-	/**
-	 * 
-	 * @param tile
-	 * @param neighborLocation
-	 * @return
-	 */
-	public boolean hasNeighbor(Tile tile, NeighborLocation neighborLocation) {
-		switch (neighborLocation) {
-		case TOP:
-			if (tile.getY() - 1 < 0) return false;
-			return tiles.get((tile.getY() - 1) * w + tile.getX()).size() > tile.getZ();
-			
-		case RIGHT:
-			if (tile.getX() + 1 >= w) return false;
-			return tiles.get(tile.getY() * w + (tile.getX() + 1)).size() > tile.getZ();
-			
-		case BOTTOM:
-			if (tile.getY() + 1 >= h) return false;
-			return tiles.get((tile.getY() + 1) * w + tile.getX()).size() > tile.getZ();
-			
-		case LEFT:
-			if (tile.getX() - 1 < 0) return false;
-			return tiles.get(tile.getY() * w + (tile.getX() - 1)).size() > tile.getZ();
-			
-		default:
-			return false;
-		}
-	}
 	
 	@Override
 	public String toString() {

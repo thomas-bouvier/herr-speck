@@ -49,9 +49,9 @@ public class Font {
 	static {
 		final String characters = "0123456789<>=*/+-             " +
 								  "ABCDEFGHIJKLMNOPQRSTU         " +
-								  "VWXYZÄÀÆÉÎÏÔÖÜÇ               " +
+								  "VWXYZï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½               " +
 								  "abcdefghijklmnopqrstuvw       " +
-								  "xyzàâäæéèêëîïôöùûüç           " +
+								  "xyzï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½           " +
 								  ".,'\"(){}[]!?:\\%              ";
 		final int glyphHeight = 9;
 		final int systemFontHeight = 10;
@@ -283,7 +283,7 @@ public class Font {
 		}
 		
 		characterHeightOffset.put(character, emptyRowsTop - font.getSize() - heightOffset);
-		IAbstractBitmap sprite = HerrSpeck.getScreen().createBitmap(cropCharacterSprite(pixels2d));
+		IAbstractBitmap sprite = HerrSpeck.getSceneScreen().createBitmap(cropCharacterSprite(pixels2d));
 		characterCache.put(character, sprite);
 		
 		return sprite;

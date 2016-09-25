@@ -18,9 +18,12 @@ import java.util.Random;
 import javax.swing.JFrame;
 import javax.swing.WindowConstants;
 
+import com.tomatrocho.game.entity.Light;
 import com.tomatrocho.game.entity.mob.Player;
 import com.tomatrocho.game.gfx.IAbstractBitmap;
 import com.tomatrocho.game.gfx.IAbstractScreen;
+import com.tomatrocho.game.gfx.LightScreen;
+import com.tomatrocho.game.gfx.SceneScreen;
 import com.tomatrocho.game.gfx.Screen;
 import com.tomatrocho.game.gui.Hud;
 import com.tomatrocho.game.gui.Hud.TextLocation;
@@ -96,7 +99,12 @@ public class HerrSpeck extends Canvas implements Runnable, MouseListener, MouseM
 	/**
 	 *
 	 */
-	private static Screen screen;
+	private static SceneScreen sceneScreen;
+	
+	/**
+	 * 
+	 */
+	private static LightScreen lightScreen;
 
 	/**
 	 * 
@@ -124,11 +132,6 @@ public class HerrSpeck extends Canvas implements Runnable, MouseListener, MouseM
 	private int frames = 0;
 
 	/**
-	 * 
-	 */
-	private String worldName;
-
-	/**
 	 *
 	 */
 	private WorldBuilder worldBuilder = new WorldBuilder();
@@ -152,6 +155,11 @@ public class HerrSpeck extends Canvas implements Runnable, MouseListener, MouseM
 	 *
 	 */
 	private Mouse mouse = new Mouse();
+
+	/**
+	 * 
+	 */
+	private String worldName;
 
 	/**
 	 * 
@@ -200,11 +208,13 @@ public class HerrSpeck extends Canvas implements Runnable, MouseListener, MouseM
 			ex.printStackTrace();
 		}
 
-		// screen
-		screen = new Screen(W, H);
-		screen.loadResources();
+		// screens
+		sceneScreen = new SceneScreen(W, H);
+		sceneScreen.loadResources();
+		
+		lightScreen = new LightScreen(W, H);
 
-		hud = new Hud(screen);
+		hud = new Hud(sceneScreen);
 
 		// thread
 		thread = new Thread(this, "Display");
@@ -381,6 +391,9 @@ public class HerrSpeck extends Canvas implements Runnable, MouseListener, MouseM
 	 * Render all the graphics using the given {@link Graphics} object.
 	 */
 	private synchronized void render(Graphics g) {
+		// clear light map
+		lightScreen.clear();
+		
 		renderWorld();
 		renderGui();
 		renderCursor();
@@ -390,8 +403,10 @@ public class HerrSpeck extends Canvas implements Runnable, MouseListener, MouseM
 		g.translate((getWidth() - W * SCALE) / 2, (getHeight() - H * SCALE) / 2);
 		g.clipRect(0, 0, W * SCALE, H * SCALE);
 
+		sceneScreen.combine(lightScreen);
+		
 		// drawing the optimized image
-		g.drawImage(screen.toCompatibleFormat(), 0, 0, W * SCALE, H * SCALE, null);
+		g.drawImage(sceneScreen.toCompatibleFormat(), 0, 0, W * SCALE, H * SCALE, null);
 		
 		frames++;
 	}
@@ -401,10 +416,10 @@ public class HerrSpeck extends Canvas implements Runnable, MouseListener, MouseM
 	 */
 	private void renderWorld() {
 		if (world != null) {
-			int xScroll = (int) (player.getX() - screen.getW() / 2);
-			int yScroll = (int) (player.getY() - screen.getH() / 2);
+			int xScroll = (int) (player.getX() - sceneScreen.getW() / 2);
+			int yScroll = (int) (player.getY() - sceneScreen.getH() / 2);
 
-			world.render(screen, xScroll, yScroll);
+			world.render(xScroll, yScroll);
 		}
 		
 	}
@@ -445,7 +460,7 @@ public class HerrSpeck extends Canvas implements Runnable, MouseListener, MouseM
 		
 		final int crosshairSize = 13;
 		final int crosshairHalfSize = crosshairSize / 2;
-		IAbstractBitmap crosshairSprite = screen.createBitmap(crosshairSize, crosshairSize);
+		IAbstractBitmap crosshairSprite = sceneScreen.createBitmap(crosshairSize, crosshairSize);
 		
 		for (int i = 0; i < crosshairSize; i++) {
 			if (i >= crosshairHalfSize - 1 && i <= crosshairHalfSize + 1)
@@ -457,7 +472,7 @@ public class HerrSpeck extends Canvas implements Runnable, MouseListener, MouseM
 			crosshairSprite.setPixel(i + crosshairHalfSize * crosshairSize, 0xffff0000);
 		}
 
-		screen.alphaBlit(crosshairSprite, mouse.getX() - crosshairHalfSize, mouse.getY() - crosshairHalfSize, 128);
+		sceneScreen.alphaBlit(crosshairSprite, mouse.getX() - crosshairHalfSize, mouse.getY() - crosshairHalfSize, 128);
 	}
 
 	/**
@@ -538,8 +553,16 @@ public class HerrSpeck extends Canvas implements Runnable, MouseListener, MouseM
 	 * 
 	 * @return
 	 */
-	public static IAbstractScreen getScreen() {
-		return screen;
+	public static IAbstractScreen getSceneScreen() {
+		return sceneScreen;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public static IAbstractScreen getLightScreen() {
+		return lightScreen;
 	}
 
 	/**

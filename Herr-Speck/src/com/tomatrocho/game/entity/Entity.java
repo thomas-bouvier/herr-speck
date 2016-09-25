@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.tomatrocho.game.entity.mob.Bat;
 import com.tomatrocho.game.entity.mob.Team;
 import com.tomatrocho.game.gfx.IAbstractBitmap;
 import com.tomatrocho.game.gfx.IAbstractScreen;
@@ -104,24 +103,6 @@ public abstract class Entity implements IComparableDepth, IBoundingBoxOwner {
 		this.world = world;
 		this.pos.x = x;
 		this.pos.y = y;
-	}
-	
-	/**
-	 * 
-	 */
-	public void drawDepthLine(IAbstractScreen screen) {
-		final int w = getSprite().getW() / 2;
-		final int h = 1;
-		
-		IAbstractBitmap sprite = screen.createBitmap(w, h);
-		for (int x = 0; x <= w; x++) {
-			for (int y = 0; y <= h; y++) {
-				if (x == 0 || x == w - 1 || y == 0|| y == h - 1)
-					sprite.setPixel(y * w + x, Color.LIGHT_GRAY.getRGB());
-			}
-		}
-		
-		screen.blit(sprite, pos.x - getSprite().getW() / 2 + w / 2, getDepthLine() - getSprite().getH() / 2);
 	}
 
 	/**
@@ -239,10 +220,8 @@ public abstract class Entity implements IComparableDepth, IBoundingBoxOwner {
 			}
 		}
 		
-		if (closest != null && closest.getOwner() != null) {
-			if (closest.getOwner() instanceof Bat) System.out.println("move()");
+		if (closest != null && closest.getOwner() != null)
 			closest.getOwner().handleCollision(from, xxa, yya);
-		}
 		
 		if (xa != 0 || ya != 0) {
 			pos.x += xa;
@@ -336,12 +315,6 @@ public abstract class Entity implements IComparableDepth, IBoundingBoxOwner {
 		
 		return new Vec2((maxX - minX) / 2, (maxY - minY) / 2);
 	}
-	
-	/**
-	 * 
-	 * @return
-	 */
-	public abstract IAbstractBitmap getSprite();
 
 	/**
 	 *
