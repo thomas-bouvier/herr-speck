@@ -22,5 +22,5 @@ public interface IComparableDepth {
 	 * 
 	 * @param screen
 	 */
-	public void drawDepthLine(IAbstractScreen screen);
+	public void renderDepthLine(IAbstractScreen screen);
 }

@@ -5,7 +5,7 @@ public class LightScreen extends Screen {
 	/**
 	 * 
 	 */
-	public static final int ambientLight = 0x0f00f0f0;
+	public static final int ambientLightColor = 0xff000000;
 	
 	
 	/**
@@ -22,7 +22,7 @@ public class LightScreen extends Screen {
 	 */
 	public void clear() {
 		for (int i = 0; i < pixels.length; i++)
-			pixels[i] = ambientLight;
+			pixels[i] = ambientLightColor;
 	}
 	
 	/**
@@ -32,17 +32,27 @@ public class LightScreen extends Screen {
 	 * @return
 	 */
 	public int getLightBlend(int backgroundColor, int lightColor) {
-		final int rr = backgroundColor & 0xff0000;
-        final int gg = backgroundColor & 0xff00;
-        final int bb = backgroundColor & 0xff;
+		final int weight = 170;
+		
+		final int rrr = ambientLightColor & 0xff0000;
+		final int ggg = ambientLightColor & 0xff00;
+		final int bbb = ambientLightColor & 0xff;
+		
+		final int rr = lightColor & 0xff0000;
+        final int gg = lightColor & 0xff00;
+        final int bb = lightColor & 0xff;
+		
+		int r = backgroundColor & 0xff0000;
+        int g = backgroundColor & 0xff00;
+        int b = backgroundColor & 0xff;
         
-        int r = lightColor & 0xff0000;
-        int g = lightColor & 0xff00;
-        int b = lightColor & 0xff;
+        r = ((rr * weight + r * (256 - weight)) >> 8) & 0xff0000;
+        g = ((gg * weight + g * (256 - weight)) >> 8) & 0xff00;
+        b = ((bb * weight + b * (256 - weight)) >> 8) & 0xff;
         
-        r = ((r * 90 + rr * 166) >> 8) & 0xff0000;
-        g = ((g * 90 + gg * 166) >> 8) & 0xff00;
-        b = ((b * 90 + bb * 166) >> 8) & 0xff;
+        if (r < rrr) r = rrr;
+        if (g < ggg) g = ggg;
+        if (b < bbb) b = bbb;
         
         return 0xff000000 | r | g | b;
 	}

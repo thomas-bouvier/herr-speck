@@ -72,7 +72,7 @@ public class Particle extends Entity {
 	}
 
 	@Override
-	public void drawDepthLine(IAbstractScreen screen) {
+	public void renderDepthLine(IAbstractScreen screen) {
 		// TODO Auto-generated method stub
 		
 	}

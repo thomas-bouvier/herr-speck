@@ -1,13 +1,10 @@
 package com.tomatrocho.game.entity;
 
-import java.awt.Color;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import com.tomatrocho.game.entity.mob.Team;
-import com.tomatrocho.game.gfx.IAbstractBitmap;
-import com.tomatrocho.game.gfx.IAbstractScreen;
 import com.tomatrocho.game.gfx.IComparableDepth;
 import com.tomatrocho.game.level.Material;
 import com.tomatrocho.game.level.World;

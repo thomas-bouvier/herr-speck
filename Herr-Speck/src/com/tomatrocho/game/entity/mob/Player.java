@@ -21,11 +21,6 @@ public class Player extends Mob {
 	 * 
 	 */
 	public static final int FIRE_MOUSE_BUTTON = 1;
-	
-	/**
-	 * Max amount of health a {@link Player} can have.
-	 */
-	protected static final float MAX_HEALTH = 100;
 
     /**
      *
@@ -104,7 +99,8 @@ public class Player extends Mob {
     public Player(World world, int x, int y, Keys keys, Mouse mouse) {
     	super(world, x * Tile.W, y * Tile.H, Team.TEAM_1);
     	
-    	this.health = MAX_HEALTH;
+    	this.maxHealth = 100;
+    	this.health = maxHealth;
     	this.speed = 2;
     	
     	bbs.put("head", new BoundingBox(this, -8, -13, 8, 0));
@@ -299,10 +295,6 @@ public class Player extends Mob {
         	sprite = Art.muzzle[muzzleFrame][0];
         	screen.blit(sprite, muzzlePosition.x, muzzlePosition.y);
         }
-        
-		// health
-		if (HerrSpeck.getDebugLevel() > 0)
-			renderBubble(screen, health + "/" + MAX_HEALTH);
     }
 
     @Override

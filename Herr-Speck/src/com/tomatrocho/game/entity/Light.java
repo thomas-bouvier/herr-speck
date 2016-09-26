@@ -2,11 +2,7 @@ package com.tomatrocho.game.entity;
 
 import com.tomatrocho.game.gfx.Bitmap;
 import com.tomatrocho.game.gfx.IAbstractScreen;
-import com.tomatrocho.game.gfx.Screen;
 import com.tomatrocho.game.level.World;
-import com.tomatrocho.game.level.tile.Tile;
-import com.tomatrocho.game.math.BoundingBox;
-import com.tomatrocho.game.math.IBoundingBoxOwner;
 
 public class Light {
 	
@@ -66,7 +62,7 @@ public class Light {
 				final double distance = Math.sqrt(Math.pow(i - radius, 2) + Math.pow(j - radius, 2));
 				
 				if (distance < radius)
-					pixels[j * radius * 2 + 1 + i] = Bitmap.getAlphaColor(color, (int) (255 - (distance / radius) * 255));
+					pixels[j * radius * 2 + 1 + i] = Bitmap.getAlphaColor(color, (int) (75 - (distance / radius) * 75));
 			}
 		}
 	}
@@ -78,5 +74,45 @@ public class Light {
 	public void render(IAbstractScreen screen) {
 		Bitmap bitmap = new Bitmap(radius * 2, radius * 2, pixels);
 		screen.blit(bitmap, x, y);
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public World getWorld() {
+		return world;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public double getX() {
+		return x;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public double getY() {
+		return y;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public int getRadius() {
+		return radius;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public int getColor() {
+		return color;
 	}
 }

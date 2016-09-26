@@ -10,6 +10,7 @@ import java.util.TreeSet;
 import com.tomatrocho.game.HerrSpeck;
 import com.tomatrocho.game.entity.Entity;
 import com.tomatrocho.game.entity.Light;
+import com.tomatrocho.game.entity.Mob;
 import com.tomatrocho.game.entity.mob.Bat;
 import com.tomatrocho.game.entity.predicates.EntityIntersectsBB;
 import com.tomatrocho.game.gfx.Art;
@@ -394,14 +395,6 @@ public class World {
 		
 		renderLight(lightScreen);
 		
-		// rendering bounding boxes
-		if (HerrSpeck.getDebugLevel() > 0) {			
-			renderBoundingBoxes(sceneScreen);
-			
-			if (HerrSpeck.getDebugLevel() > 1)
-				objectsToRender.stream().forEach(object -> object.drawDepthLine(sceneScreen));
-		}
-		
 		// reseting offset
 		sceneScreen.setOffset(0, 0);
 		lightScreen.setOffset(0, 0);
@@ -416,7 +409,7 @@ public class World {
 	 * @param y1
 	 * @param layer
 	 */
-	public void renderTiles(IAbstractScreen screen, int x0, int y0, int x1, int y1, int layer) {
+	private void renderTiles(IAbstractScreen screen, int x0, int y0, int x1, int y1, int layer) {
 		for (int y = y0; y <= y1; y++) {
 			for (int x = x1; x >= x0; x--) {
 				if (x < 0 || x >= w || y < 0 || y >= h) {
@@ -430,31 +423,91 @@ public class World {
 		}
 	}
 	
-	Light light = new Light(this, 100, 100, 150, 0xffff00ff);
+	Light light = new Light(this, 100, 100, 150, 0xffffd97f);
+	Light light2 = new Light(this, 250, 250, 150, 0xff00ff00);
+	Light light3 = new Light(this, 250, 100, 150, 0xffff0000);
 	
 	/**
 	 * 
 	 * @param screen
 	 */
-	public void renderLight(IAbstractScreen screen) {
+	private void renderLight(IAbstractScreen screen) {
+		HerrSpeck.getLightScreen().clear();
+		
 		light.render(screen);
+		light2.render(screen);
+		light3.render(screen);
 	}
 	
 	/**
 	 * 
-	 * @param screen
+	 * @param xScroll
+	 * @param yScroll
 	 */
-	public void renderBoundingBoxes(IAbstractScreen screen) {
+	public void renderBoundingBoxes(int xScroll, int yScroll) {
+		SceneScreen sceneScreen = (SceneScreen) HerrSpeck.getSceneScreen();
+		
+		// setting offsets equal to xScroll, yScroll
+		sceneScreen.setOffset(xScroll, yScroll);
+		
 		Set<BoundingBox> bbs = new HashSet<>();
-		for (Entity entity : entities) {
+		for (Entity entity : getVisibleEntities(sceneScreen, xScroll, yScroll)) {
 			for (final String key : entity.getBBs().keySet())
 				bbs.add(entity.getBoundingBox(key));
 			
 			for (final BoundingBox bb : getClipBoundingBoxes(entity))
 				bbs.add(bb);
+			
+			if (entity instanceof Mob)
+				((Mob) entity).renderBubble(sceneScreen);
 		}
 		
-		bbs.stream().forEach(bb -> bb.draw(screen));
+		bbs.stream().forEach(bb -> bb.draw(sceneScreen));
+		
+		sceneScreen.setOffset(0, 0);
+	}
+	
+	/**
+	 * 
+	 * @param xScroll
+	 * @param yScroll
+	 */
+	public void renderDepthLines(int xScroll, int yScroll) {
+		SceneScreen sceneScreen = (SceneScreen) HerrSpeck.getSceneScreen();
+		
+		// computing corner pins
+		int x0 = (xScroll) / Tile.W;
+		int y0 = (yScroll) / Tile.H;
+		int x1 = (xScroll + sceneScreen.getW()) / Tile.W;
+		int y1 = (yScroll + sceneScreen.getH()) / Tile.H + Tile.H;
+				
+		if (xScroll < 0)
+			x0--;
+		if (yScroll < 0)
+			y0--;
+		
+		// setting offsets equal to xScroll, yScroll
+		sceneScreen.setOffset(xScroll, yScroll);
+		
+		for (int y = y0; y <= y1; y++) {
+			for (int x = x1; x >= x0; x--) {
+				if (x < 0 || x >= w || y < 0 || y >= h)
+					continue;
+				
+				final List<Tile> tiles = this.tiles.get(y * w + x);
+				for (int i = 1; i < tiles.size(); i++) {
+					if (tiles.size() > i)
+						tiles.get(i).renderDepthLine(sceneScreen);
+				}
+			}
+		}
+		
+		for (Entity entity : getVisibleEntities(sceneScreen, xScroll, yScroll)) {
+			if (entity instanceof Mob)
+				((Mob) entity).renderDepthLine(sceneScreen);
+		}
+		
+		sceneScreen.setOffset(0, 0);
 	}
 	
 	/**

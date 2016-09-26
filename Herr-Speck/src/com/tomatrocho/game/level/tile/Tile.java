@@ -126,7 +126,7 @@ public abstract class Tile implements IComparableDepth, IBoundingBoxOwner {
 	/**
 	 * 
 	 */
-	public void drawDepthLine(IAbstractScreen screen) {
+	public void renderDepthLine(IAbstractScreen screen) {
 		final int w = Tile.W;
 		final int h = 1;
 		

@@ -26,6 +26,11 @@ public abstract class Mob extends Entity {
 	public static final int W = 32;
 	
 	/**
+	 * 
+	 */
+	protected float maxHealth;
+	
+	/**
 	 * Amount of health the {@link Mob} currently has.
 	 */
 	protected float health;
@@ -175,16 +180,17 @@ public abstract class Mob extends Entity {
 	/**
 	 * 
 	 * @param screen
-	 * @param string
 	 */
-	public void renderBubble(IAbstractScreen screen, String string) {
+	public void renderBubble(IAbstractScreen screen) {
+		final String string = health + "/" + maxHealth;
 		Font.getDefaultFont().draw(screen, string, (int) pos.x, (int) pos.y - 28, Font.Align.CENTER, true); 
 	}
 	
 	/**
 	 * 
+	 * @param screen
 	 */
-	public void drawDepthLine(IAbstractScreen screen) {
+	public void renderDepthLine(IAbstractScreen screen) {
 		final int w = getSprite().getW() / 2;
 		final int h = 1;
 		

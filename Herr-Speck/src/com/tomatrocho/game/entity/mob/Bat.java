@@ -12,11 +12,6 @@ import com.tomatrocho.game.gfx.IAbstractBitmap;
 
 public class Bat extends HostileMob {
 	
-	/**
-	 * Max amount of health a {@link Bat} can have.
-	 */
-	protected static final float MAX_HEALTH = 50;
-	
 	
 	/**
 	 * Constructor for the {@link Bat} class.
@@ -28,7 +23,8 @@ public class Bat extends HostileMob {
 	public Bat(World level, int x, int y) {
 		super(level, x, y, Team.TEAM_2);
 		
-		this.health = MAX_HEALTH;
+		this.maxHealth = 50;
+		this.health = maxHealth;
 		this.speed = 1.5;
 		
 		bbs.put("body", new BoundingBox(this, -8, -8, 8, 8));
@@ -64,10 +60,6 @@ public class Bat extends HostileMob {
 	@Override
 	public void render(IAbstractScreen screen) {
 		super.render(screen);
-		
-		// health
-		if (HerrSpeck.getDebugLevel() > 0)
-			renderBubble(screen, health + "/" + MAX_HEALTH);
 	}
 
 	@Override

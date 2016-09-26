@@ -116,7 +116,6 @@ public class Bullet extends Entity {
 	
 	@Override
 	public void collide(IBoundingBoxOwner bbOwner, double xa, double ya) {
-		System.out.println("test");
 		if (bbOwner instanceof Mob) {
 			Mob mob = (Mob) bbOwner;
 			
@@ -176,7 +175,7 @@ public class Bullet extends Entity {
 	}
 
 	@Override
-	public void drawDepthLine(IAbstractScreen screen) {
+	public void renderDepthLine(IAbstractScreen screen) {
 		// TODO Auto-generated method stub
 		
 	}

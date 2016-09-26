@@ -18,13 +18,11 @@ import java.util.Random;
 import javax.swing.JFrame;
 import javax.swing.WindowConstants;
 
-import com.tomatrocho.game.entity.Light;
 import com.tomatrocho.game.entity.mob.Player;
 import com.tomatrocho.game.gfx.IAbstractBitmap;
 import com.tomatrocho.game.gfx.IAbstractScreen;
 import com.tomatrocho.game.gfx.LightScreen;
 import com.tomatrocho.game.gfx.SceneScreen;
-import com.tomatrocho.game.gfx.Screen;
 import com.tomatrocho.game.gui.Hud;
 import com.tomatrocho.game.gui.Hud.TextLocation;
 import com.tomatrocho.game.input.Input;
@@ -391,19 +389,28 @@ public class HerrSpeck extends Canvas implements Runnable, MouseListener, MouseM
 	 * Render all the graphics using the given {@link Graphics} object.
 	 */
 	private synchronized void render(Graphics g) {
-		// clear light map
-		lightScreen.clear();
+		final int xScroll = getXScroll();
+		final int yScroll = getYScroll();
 		
-		renderWorld();
-		renderGui();
-		renderCursor();
+		world.render(xScroll, yScroll);
 
+		// combining the scene with light map
+		sceneScreen.combine(lightScreen);
+		
+		if (debugLevel > 0) {
+			world.renderBoundingBoxes(xScroll, yScroll);
+			
+			if (debugLevel > 1)
+				world.renderDepthLines(xScroll, yScroll);
+		}
+		
+		renderHud();
+		renderCursor();
+		
 		// rendering
 		g.fillRect(0, 0, getWidth(), getHeight());
 		g.translate((getWidth() - W * SCALE) / 2, (getHeight() - H * SCALE) / 2);
 		g.clipRect(0, 0, W * SCALE, H * SCALE);
-
-		sceneScreen.combine(lightScreen);
 		
 		// drawing the optimized image
 		g.drawImage(sceneScreen.toCompatibleFormat(), 0, 0, W * SCALE, H * SCALE, null);
@@ -412,22 +419,9 @@ public class HerrSpeck extends Canvas implements Runnable, MouseListener, MouseM
 	}
 
 	/**
-	 * Render the world on the {@link Screen}.
+	 * Render the hud.
 	 */
-	private void renderWorld() {
-		if (world != null) {
-			int xScroll = (int) (player.getX() - sceneScreen.getW() / 2);
-			int yScroll = (int) (player.getY() - sceneScreen.getH() / 2);
-
-			world.render(xScroll, yScroll);
-		}
-		
-	}
-
-	/**
-	 * Render the GUI elements on the {@link Screen}.
-	 */
-	private void renderGui() {
+	private void renderHud() {
 		// fonts
 		if (debugLevel > 0) {
 			// top left
@@ -561,8 +555,24 @@ public class HerrSpeck extends Canvas implements Runnable, MouseListener, MouseM
 	 * 
 	 * @return
 	 */
-	public static IAbstractScreen getLightScreen() {
+	public static LightScreen getLightScreen() {
 		return lightScreen;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public int getXScroll() {
+		return (int) (player.getX() - sceneScreen.getW() / 2);
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public int getYScroll() {
+		return (int) (player.getY() - sceneScreen.getH() / 2);
 	}
 
 	/**
