@@ -363,6 +363,64 @@ public class Bitmap implements IAbstractBitmap {
         
         return color;
     }
+    
+    /**
+     * 
+     * @param color
+     * @return
+     */
+    public static float getA(int color) {
+		return (0xff & (color >> 24)) / 255f;
+	}
+	
+    /**
+     * 
+     * @param color
+     * @return
+     */
+	public static float getR(int color) {
+		return (0xff & (color >> 16)) / 255f;
+	}
+	
+	/**
+	 * 
+	 * @param color
+	 * @return
+	 */
+	public static float getG(int color) {
+		return (0xff & (color >> 8)) / 255f;
+	}
+	
+	/**
+	 * 
+	 * @param color
+	 * @return
+	 */
+	public static float getB(int color) {
+		return (0xff & (color)) / 255f;
+	}
+	
+	/**
+	 * 
+	 * @param a
+	 * @param r
+	 * @param g
+	 * @param b
+	 * @return
+	 */
+	public static int getColor(float a, float r, float g, float b) {
+		return ((int) (a * 255f + 0.5f) << 24 | (int) (r * 255f + 0.5f) << 16 | (int) (g * 255f + 0.5f) << 8 | (int) (b * 255f + 0.5f));
+	}
+	
+	/**
+	 * 
+	 * @param color
+	 * @param power
+	 * @return
+	 */
+	public static int getColorPower(int color, float power) {
+		return getColor(1, getR(color) * power, getG(color) * power, getB(color) * power);
+	}
 
     @Override
     public void setPixel(int pos, int color) {
@@ -373,7 +431,9 @@ public class Bitmap implements IAbstractBitmap {
 
     @Override
     public void setPixel(int x, int y, int color) {
-    	setPixel(y * w + x, color);
+    	if (x >= 0 && x < w && y >= 0 && y < h) {    		
+    		pixels[y * w + x] = color;
+    	}
     }
     
     @Override
@@ -388,7 +448,16 @@ public class Bitmap implements IAbstractBitmap {
 
     @Override
     public int getPixel(int pos) {
+    	if (pos < 0 || pos >= w * h)
+    		return -1;
         return pixels[pos];
+    }
+    
+    @Override
+    public int getPixel(int x, int y) {
+    	if (x < 0 || x >= w || y < 0 || y >= h)
+    		return -1;
+        return pixels[y * w + x];
     }
 
     @Override

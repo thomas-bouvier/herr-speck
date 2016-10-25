@@ -255,6 +255,8 @@ public class HerrSpeck extends Canvas implements Runnable, MouseListener, MouseM
 		if (world != null) {
 			if (world.canPlayerSpawn()) {
 				player = new Player(world, keys, mouse);
+				player.setX(-16);
+				player.setY(-16);
 				world.addEntity(player);
 			}
 		}

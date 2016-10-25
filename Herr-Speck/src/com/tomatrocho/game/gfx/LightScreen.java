@@ -5,7 +5,7 @@ public class LightScreen extends Screen {
 	/**
 	 * 
 	 */
-	public static final int ambientLightColor = 0xff000000;
+	public static final int ambientLightColor = Bitmap.getColor(1, 0.1f, 0.1f, 0.1f);
 	
 	
 	/**
@@ -32,28 +32,24 @@ public class LightScreen extends Screen {
 	 * @return
 	 */
 	public int getLightBlend(int backgroundColor, int lightColor) {
-		final int weight = 170;
+		float r = getR(lightColor);
+		float g = getG(lightColor);
+		float b = getB(lightColor);
 		
-		final int rrr = ambientLightColor & 0xff0000;
-		final int ggg = ambientLightColor & 0xff00;
-		final int bbb = ambientLightColor & 0xff;
+		if (r < getR(ambientLightColor)) r = getR(ambientLightColor);
+		if (g < getG(ambientLightColor)) g = getG(ambientLightColor);
+		if (b < getB(ambientLightColor)) b = getB(ambientLightColor);
 		
-		final int rr = lightColor & 0xff0000;
-        final int gg = lightColor & 0xff00;
-        final int bb = lightColor & 0xff;
-		
-		int r = backgroundColor & 0xff0000;
-        int g = backgroundColor & 0xff00;
-        int b = backgroundColor & 0xff;
-        
-        r = ((rr * weight + r * (256 - weight)) >> 8) & 0xff0000;
-        g = ((gg * weight + g * (256 - weight)) >> 8) & 0xff00;
-        b = ((bb * weight + b * (256 - weight)) >> 8) & 0xff;
-        
-        if (r < rrr) r = rrr;
-        if (g < ggg) g = ggg;
-        if (b < bbb) b = bbb;
-        
-        return 0xff000000 | r | g | b;
+		return getColor(1, r * getR(backgroundColor), g * getG(backgroundColor), b * getB(backgroundColor));
+	}
+	
+	/**
+	 * 
+	 * @param lightColor1
+	 * @param lightColor2
+	 * @return
+	 */
+	public static int getMaxLight(int lightColor1, int lightColor2) {
+		return getColor(1, Math.max(getR(lightColor1), getR(lightColor2)), Math.max(getG(lightColor1), getG(lightColor2)), Math.max(getB(lightColor1), getB(lightColor2)));
 	}
 }

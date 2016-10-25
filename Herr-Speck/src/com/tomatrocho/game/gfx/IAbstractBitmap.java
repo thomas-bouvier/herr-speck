@@ -155,6 +155,14 @@ public interface IAbstractBitmap {
      * @return
      */
     public int getPixel(int pos);
+    
+    /**
+     * 
+     * @param x
+     * @param y
+     * @return
+     */
+    public int getPixel(int x, int y);
 
     /**
      *

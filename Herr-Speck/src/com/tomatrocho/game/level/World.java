@@ -423,7 +423,7 @@ public class World {
 		}
 	}
 	
-	Light light = new Light(this, 100, 100, 150, 0xffffd97f);
+	Light light = new Light(this, 100, 250, 150, 0xffffd97f);
 	Light light2 = new Light(this, 250, 250, 150, 0xff00ff00);
 	Light light3 = new Light(this, 250, 100, 150, 0xffff0000);
 	

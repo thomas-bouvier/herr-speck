@@ -1,7 +1,10 @@
 package com.tomatrocho.game.entity;
 
+import com.tomatrocho.game.HerrSpeck;
 import com.tomatrocho.game.gfx.Bitmap;
+import com.tomatrocho.game.gfx.IAbstractBitmap;
 import com.tomatrocho.game.gfx.IAbstractScreen;
+import com.tomatrocho.game.gfx.LightScreen;
 import com.tomatrocho.game.level.World;
 
 public class Light {
@@ -10,6 +13,11 @@ public class Light {
 	 * 
 	 */
 	public static final int ambient = 0xff00000f;
+	
+	/**
+	 * 
+	 */
+	public IAbstractBitmap lightScreen;
 	
 	/**
 	 * 
@@ -56,13 +64,15 @@ public class Light {
 		this.radius = radius;
 		this.color = color;
 		
-		this.pixels = new int[radius * 2 * radius * 2 + 2];
-		for (int j = 0; j <= 2 * radius; j++) {
-			for (int i = 0; i <= 2 * radius; i++) {
-				final double distance = Math.sqrt(Math.pow(i - radius, 2) + Math.pow(j - radius, 2));
+		this.pixels = new int[radius * 2 * radius * 2];
+		for (int j = 0; j < 2 * radius; j++) {
+			for (int i = 0; i < 2 * radius; i++) {
+				final float distance = (float) Math.sqrt(Math.pow(i - radius, 2) + Math.pow(j - radius, 2));
 				
 				if (distance < radius)
-					pixels[j * radius * 2 + 1 + i] = Bitmap.getAlphaColor(color, (int) (75 - (distance / radius) * 75));
+					pixels[j * radius * 2 + i] = Bitmap.getColorPower(color, 1 - distance / radius);
+				else
+					pixels[j * radius * 2 + i] = 0xff000000;
 			}
 		}
 	}
@@ -72,8 +82,30 @@ public class Light {
 	 * @param screen
 	 */
 	public void render(IAbstractScreen screen) {
+		final LightScreen lightScreen = HerrSpeck.getLightScreen();
+		for (int j = 0; j < 2 * radius; j++) {
+			for (int i = 0; i < 2 * radius; i++) {
+				final int x = (int) this.x + i - lightScreen.getXOffset() - radius;
+				final int y = (int) this.y + j - lightScreen.getYOffset() - radius;
+				
+				lightScreen.setPixel(x, y, LightScreen.getMaxLight(pixels[j * radius * 2 + i], lightScreen.getPixel(x, y)));
+			}
+		}
+		
+		/*
+		final int dx = Math.abs(x1 - x0);
+		final int dy = Math.abs(y1 - y0);
+		
+		final int sx = x0 < x1 ? 1 : -1;
+		final int sy = y0 < y1 ? 1 : -1;
+		
+		final int err = dx - dy;
+		*/
+		
+		/*
 		Bitmap bitmap = new Bitmap(radius * 2, radius * 2, pixels);
 		screen.blit(bitmap, x, y);
+		*/
 	}
 	
 	/**
