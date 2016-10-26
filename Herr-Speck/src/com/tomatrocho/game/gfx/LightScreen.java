@@ -7,6 +7,11 @@ public class LightScreen extends Screen {
 	 */
 	public static final int ambientLightColor = Bitmap.getColor(1, 0.1f, 0.1f, 0.1f);
 	
+	/**
+	 * 
+	 */
+	private Shadow shadows[];
+	
 	
 	/**
 	 * 
@@ -15,6 +20,10 @@ public class LightScreen extends Screen {
 	 */
 	public LightScreen(int w, int h) {
 		super(w, h);
+		
+		this.shadows = new Shadow[w * h];
+		for (int i = 0; i < shadows.length; i++)
+			shadows[i] = Shadow.NONE;
 	}
 	
 	/**
@@ -51,5 +60,13 @@ public class LightScreen extends Screen {
 	 */
 	public static int getMaxLight(int lightColor1, int lightColor2) {
 		return getColor(1, Math.max(getR(lightColor1), getR(lightColor2)), Math.max(getG(lightColor1), getG(lightColor2)), Math.max(getB(lightColor1), getB(lightColor2)));
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public Shadow[] getShadows() {
+		return shadows;
 	}
 }

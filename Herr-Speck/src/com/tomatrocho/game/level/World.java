@@ -9,7 +9,6 @@ import java.util.TreeSet;
 
 import com.tomatrocho.game.HerrSpeck;
 import com.tomatrocho.game.entity.Entity;
-import com.tomatrocho.game.entity.Light;
 import com.tomatrocho.game.entity.Mob;
 import com.tomatrocho.game.entity.mob.Bat;
 import com.tomatrocho.game.entity.predicates.EntityIntersectsBB;
@@ -17,6 +16,7 @@ import com.tomatrocho.game.gfx.Art;
 import com.tomatrocho.game.gfx.DepthComparator;
 import com.tomatrocho.game.gfx.IAbstractScreen;
 import com.tomatrocho.game.gfx.IComparableDepth;
+import com.tomatrocho.game.gfx.Light;
 import com.tomatrocho.game.gfx.LightScreen;
 import com.tomatrocho.game.gfx.SceneScreen;
 import com.tomatrocho.game.level.tile.SandstoneTile;
@@ -350,6 +350,8 @@ public class World {
 		SceneScreen sceneScreen = (SceneScreen) HerrSpeck.getSceneScreen();
 		LightScreen lightScreen = (LightScreen) HerrSpeck.getLightScreen();
 		
+		lightScreen.clear();
+		
 		// computing corner pins
 		int x0 = (xScroll) / Tile.W;
 		int y0 = (yScroll) / Tile.H;
@@ -393,8 +395,6 @@ public class World {
 		// objects rendering
 		objectsToRender.stream().forEach(object -> object.render(sceneScreen));
 		
-		renderLight(lightScreen);
-		
 		// reseting offset
 		sceneScreen.setOffset(0, 0);
 		lightScreen.setOffset(0, 0);
@@ -421,22 +421,6 @@ public class World {
 					tiles.get(y * w + x).get(layer).render(screen);
 			}
 		}
-	}
-	
-	Light light = new Light(this, 100, 250, 150, 0xffffd97f);
-	Light light2 = new Light(this, 250, 250, 150, 0xff00ff00);
-	Light light3 = new Light(this, 250, 100, 150, 0xffff0000);
-	
-	/**
-	 * 
-	 * @param screen
-	 */
-	private void renderLight(IAbstractScreen screen) {
-		HerrSpeck.getLightScreen().clear();
-		
-		light.render(screen);
-		light2.render(screen);
-		light3.render(screen);
 	}
 	
 	/**

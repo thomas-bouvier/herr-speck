@@ -6,6 +6,7 @@ import com.tomatrocho.game.gfx.Art;
 import com.tomatrocho.game.gfx.Bitmap;
 import com.tomatrocho.game.gfx.IAbstractBitmap;
 import com.tomatrocho.game.gfx.IAbstractScreen;
+import com.tomatrocho.game.gfx.Light;
 import com.tomatrocho.game.input.Keys;
 import com.tomatrocho.game.input.Mouse;
 import com.tomatrocho.game.level.World;
@@ -66,6 +67,11 @@ public class Player extends Mob {
      * 
      */
     private int muzzleFrame = 0;
+    
+    /**
+     * 
+     */
+    private Light light;
 
     
     /**
@@ -76,6 +82,8 @@ public class Player extends Mob {
      */
     public Player(World world, Keys keys, Mouse mouse) {
     	this(world, world.getSpawnLocation(), keys, mouse);
+    	
+    	this.light = new Light(this.world, this.pos.x, this.pos.y, 150, 0xff0000ff);
     }
     
     /**
@@ -188,7 +196,10 @@ public class Player extends Mob {
         xd *= 0.1;
         yd *= 0.1;
         
-        // handle map revealing
+        // light update
+        
+        light.x = pos.x;
+        light.y = pos.y;
         //world.reveal(World.getTileFromPosition(new Vec2(x, y)), 10);
     }
     
@@ -295,6 +306,9 @@ public class Player extends Mob {
         	sprite = Art.muzzle[muzzleFrame][0];
         	screen.blit(sprite, muzzlePosition.x, muzzlePosition.y);
         }
+        
+        // light
+        light.render(HerrSpeck.getLightScreen());
     }
 
     @Override

@@ -1,10 +1,5 @@
-package com.tomatrocho.game.entity;
+package com.tomatrocho.game.gfx;
 
-import com.tomatrocho.game.HerrSpeck;
-import com.tomatrocho.game.gfx.Bitmap;
-import com.tomatrocho.game.gfx.IAbstractBitmap;
-import com.tomatrocho.game.gfx.IAbstractScreen;
-import com.tomatrocho.game.gfx.LightScreen;
 import com.tomatrocho.game.level.World;
 
 public class Light {
@@ -13,11 +8,6 @@ public class Light {
 	 * 
 	 */
 	public static final int ambient = 0xff00000f;
-	
-	/**
-	 * 
-	 */
-	public IAbstractBitmap lightScreen;
 	
 	/**
 	 * 
@@ -82,30 +72,64 @@ public class Light {
 	 * @param screen
 	 */
 	public void render(IAbstractScreen screen) {
-		final LightScreen lightScreen = HerrSpeck.getLightScreen();
-		for (int j = 0; j < 2 * radius; j++) {
-			for (int i = 0; i < 2 * radius; i++) {
-				final int x = (int) this.x + i - lightScreen.getXOffset() - radius;
-				final int y = (int) this.y + j - lightScreen.getYOffset() - radius;
-				
-				lightScreen.setPixel(x, y, LightScreen.getMaxLight(pixels[j * radius * 2 + i], lightScreen.getPixel(x, y)));
-			}
+		for (int i = 0; i <= 2 * radius; i++) {
+			renderLine((LightScreen) screen, radius, radius, i, 0);
+			renderLine((LightScreen) screen, radius, radius, i, radius * 2);
+			renderLine((LightScreen) screen, radius, radius, 0, i);
+			renderLine((LightScreen) screen, radius, radius, radius * 2, i);
 		}
-		
-		/*
+	}
+	
+	/**
+	 * 
+	 * @param screen
+	 * @param x0
+	 * @param y0
+	 * @param x1
+	 * @param y1
+	 */
+	private void renderLine(LightScreen screen, int x0, int y0, int x1, int y1) {	
 		final int dx = Math.abs(x1 - x0);
 		final int dy = Math.abs(y1 - y0);
 		
 		final int sx = x0 < x1 ? 1 : -1;
 		final int sy = y0 < y1 ? 1 : -1;
 		
-		final int err = dx - dy;
-		*/
+		int err1 = dx - dy;
+		int err2 = 0;
 		
-		/*
-		Bitmap bitmap = new Bitmap(radius * 2, radius * 2, pixels);
-		screen.blit(bitmap, x, y);
-		*/
+		int x, y;
+		
+		while (true) {
+			if (x0 == x1 && y0 == y1)
+				break;
+			
+			if (pixels[y0 * radius * 2 + x0] == 0xff000000)
+				break;
+			
+			x = (int) x0 - screen.getXOffset() - radius + (int) this.x;
+			y = (int) y0 - screen.getYOffset() - radius + (int) this.y;
+			
+			if (x >= 0 && x < screen.getW() && y >= 0 && y < screen.getH()) {
+				if (screen.getShadows()[y * screen.getW() + x] == Shadow.TOTAL)
+					break;
+			}
+			
+			//screen.setPixel(x, y, pixels[y0 * radius * 2 + x0]);
+			screen.setPixel(x, y, LightScreen.getMaxLight(pixels[y0 * radius * 2 + x0], screen.getPixel(x, y)));
+			
+			err2 = 2 * err1;
+			
+			if (err2 > -dy) {
+				err1 -= dy;
+				x0 += sx;
+			}
+			
+			if (err2 < dx) {
+				err1 += dx;
+				y0 += sy;
+			}
+		}
 	}
 	
 	/**
